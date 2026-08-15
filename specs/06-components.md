@@ -1,0 +1,151 @@
+# 06 · Component inventory
+
+Every component is an `.astro` file. Props are typed with an exported `Props` interface. Components never
+contain literal user-visible text — they receive it as props or read it from `t`.
+
+## Layouts
+
+### `BaseLayout.astro`
+Owns `<html>`, `<head>`, `<body>`, the skip link, `Header`, `<slot />`, `Footer`, and the global scripts.
+
+```ts
+interface Props {
+  lang: Lang;
+  title: string;              // becomes "<title> · Keily", except on home where it is used verbatim
+  description: string;
+  image?: string;             // OG image path, defaults to /og-default.jpg
+  noindex?: boolean;
+  transparentHeader?: boolean; // true only on the landing page
+}
+```
+
+Responsibilities: font imports, `global.css` import, canonical + `hreflang` links (from `alternatePath`),
+OG/Twitter meta, JSON-LD, `<meta name="theme-color" content="#0E0A08">`, favicon links,
+`ClientRouter` for view transitions, and the skip link (`t.nav.skipToContent` → `#main`).
+
+### `PageLayout.astro`
+Wraps `BaseLayout` for `/about` and `/my-work`: renders the standard page header block (eyebrow, `<h1>`,
+lead) and provides a `<slot />` for page body. Sets `transparentHeader={false}`.
+
+```ts
+interface Props extends Omit<BaseProps, 'transparentHeader'> {
+  eyebrow: string;
+  heading: string;
+  lead?: string;
+  container?: 'content' | 'narrow' | 'wide';
+}
+```
+
+## Layout components
+
+| Component | Props | Notes |
+|---|---|---|
+| `Header.astro` | `lang`, `transparent?: boolean` | Sticky. Scroll-state class toggled by `scroll-header.ts` using a passive listener + `requestAnimationFrame`. Persisted across view transitions (`transition:persist`) |
+| `Nav.astro` | `lang`, `variant: 'header' \| 'mobile' \| 'footer'` | Single source of nav items, built from `ROUTES`. Sets `aria-current="page"` by comparing `getPageKey(Astro.url)` |
+| `MobileMenu.astro` | `lang` | `<dialog>`-free custom overlay. Focus trap, `Esc`, scroll lock, `inert` on the page behind |
+| `LanguageSwitcher.astro` | `lang`, `variant: 'inline' \| 'stacked'` | Uses `alternatePath(Astro.url, other)`. Active language is a `<span aria-current="true">`, not a link. Link carries `hreflang` and `lang` |
+| `Footer.astro` | `lang` | Three zones + bottom bar. Year computed at build time |
+
+## Sections
+
+| Component | Props | Notes |
+|---|---|---|
+| `Hero.astro` | `lang` | Owns the scrim, the segmented `<h1>`, and the reveal/parallax hooks |
+| `AboutPreview.astro` | `lang` | Two-column intro + portrait |
+| `FeaturedWork.astro` | `lang`, `photos: Photo[]` | Receives exactly 6 photos; asserts the count |
+| `ContactSection.astro` | `lang` | Wraps `ContactForm` + the socials sidebar. Owns `id="contact"` |
+
+## Gallery
+
+### `MasonryGallery.astro`
+```ts
+interface Props {
+  photos: Photo[];
+  lang: Lang;
+  columns?: { base?: number; sm?: number; lg?: number; xl?: number };  // default { base:1, sm:2, lg:3 }
+  eagerCount?: number;         // default 3
+  interaction?: PhotoInteraction;
+}
+```
+Renders a `<ul>` of `PhotoCard`s inside a CSS-columns container. The `columns` prop maps to a fixed
+allowlist of Tailwind classes — no dynamic class string construction, since Tailwind cannot see those.
+
+### `PhotoCard.astro`
+```ts
+type PhotoInteraction = 'none' | 'lightbox' | 'link';   // see open decision #2
+
+interface Props {
+  photo: Photo;
+  lang: Lang;
+  loading: 'eager' | 'lazy';
+  index: number;               // used for the stagger delay and lightbox indexing
+  interaction: PhotoInteraction;
+}
+```
+Renders `<li><figure>` with the `<Image>` and an optional `<figcaption>`. `interaction` selects the wrapper:
+`none` → no wrapper; `lightbox` → `<button>` with `aria-haspopup="dialog"` and the photo title as its
+accessible name; `link` → `<a>` to the detail page. **This one prop is the entire surface area of open
+decision #2.**
+
+### `GalleryFilters.astro` — gated on open decision #1
+```ts
+interface Props {
+  lang: Lang;
+  filters: { slug: string; label: string; count: number }[];
+  active: string;
+}
+```
+`role="group"` with an `aria-label`; each filter a `<button aria-pressed>`. Filtering is client-side
+(`hidden` attribute toggled per item, plus a URL param update via `history.replaceState`) — all photos are
+in the DOM, so there is no re-layout flash and no data fetch.
+
+### `Lightbox.astro` — gated on open decision #2
+Specified in full in [09-open-decisions.md](./09-open-decisions.md#2--photo-click-behaviour) so it can be
+built or dropped without touching anything else.
+
+## Form
+
+| Component | Props | Notes |
+|---|---|---|
+| `ContactForm.astro` | `lang` | Owns the `<form novalidate>`, honeypot, state machine wiring |
+| `Field.astro` | `id`, `name`, `label`, `type`, `required`, `placeholder?`, `autocomplete?`, `rows?`, `maxlength?`, `help?` | Renders label + control + error slot with all ARIA wiring. `type: 'textarea'` switches the element |
+| `FormStatus.astro` | `lang` | The success panel and the error alert, both present in the DOM and toggled with `hidden` so focus management is straightforward |
+
+## UI
+
+| Component | Props |
+|---|---|
+| `Button.astro` | `variant: 'primary' \| 'ghost'`, `size?: 'md' \| 'lg'`, `href?`, `type?`, `disabled?`, plus `...rest`. Renders `<a>` when `href` is present, `<button>` otherwise |
+| `SectionHeading.astro` | `eyebrow?`, `heading`, `lead?`, `as?: 'h1' \| 'h2' \| 'h3'` (default `h2`), `size?: 'lg' \| 'md'`, `align?: 'start' \| 'center'` |
+| `Eyebrow.astro` | `text` |
+| `Chip.astro` | `label`, `count?`, `active`, `value` |
+| `Container.astro` | `size?: 'content' \| 'narrow' \| 'wide'`, `as?: string` |
+| `Section.astro` | `background: 'ink' \| 'bark'`, `spacing?: 'default' \| 'tight'`, `id?` |
+| `icons/*.astro` | `class?`, `title?` |
+
+## Motion
+
+| Component | Props | Notes |
+|---|---|---|
+| `Reveal.astro` | `delay?: number` (ms), `as?: string`, `distance?: number` (px, default 24) | Adds `data-reveal` + inline `--reveal-delay`. All observation is done by one shared IntersectionObserver in `reveal.ts` |
+| `Parallax.astro` | `factor?: number` (default 0.15) | Adds `data-parallax`; `parallax.ts` transforms it on scroll |
+
+Both render their children unchanged when `prefers-reduced-motion: reduce` — the CSS makes the initial state
+fully visible, so a reveal that never fires can never hide content.
+
+## Client scripts
+
+| File | Bundle | Responsibility |
+|---|---|---|
+| `reveal.ts` | all pages | One `IntersectionObserver`, `threshold: 0.15`, `rootMargin: '0px 0px -8% 0px'`, unobserves after firing |
+| `parallax.ts` | landing only | Single scroll listener, `passive`, rAF-throttled, `transform: translate3d` only |
+| `hero-reveal.ts` | landing only | Line-by-line headline reveal on load |
+| `scroll-header.ts` | all pages | Toggles the header's scrolled class |
+| `mobile-menu.ts` | all pages | Open/close, focus trap, scroll lock |
+| `contact-form.ts` | landing only | Validation, state machine, calls `submitContact` |
+| `gallery-filters.ts` | `/my-work`, if enabled | Filter toggling + URL param sync |
+| `lightbox.ts` | if enabled | Lightbox controller |
+
+All scripts are idempotent and re-initialise on `astro:page-load` (fired by `ClientRouter`), so view
+transitions do not leave dead listeners. Every script guards on the existence of its root element and exits
+early if absent, so no page pays for a script it does not need beyond a few bytes.

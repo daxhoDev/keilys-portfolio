@@ -1,0 +1,8 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(sed -i 's/enough to exercise every branch of all three open decisions\\\\./enough to exercise every branch of both open gallery decisions./' 10-content-checklist.md)",
+      "Bash(sed -i 's/branch of all three open-decision options\\\\./branch of both open gallery-decision options./' 04-content-model.md)"
+    ]
+  }
+}
