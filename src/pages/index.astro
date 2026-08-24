@@ -1,7 +1,59 @@
 ---
-// Phase 0 placeholder. This page exists so the deploy pipeline has something to build
-// and so a broken commit fails loudly. Phase 2 replaces it with the real Spanish landing page.
-const builtAt = new Date().toISOString();
+/**
+ * Phase 1 scratch page. Exists to prove the token layer resolves and both fonts
+ * load; it renders no real content and hard-codes its strings deliberately.
+ * Phase 2 replaces this file with the Spanish landing page, at which point the
+ * font imports below move to BaseLayout.astro (specs/01-tech-stack.md § Font loading).
+ *
+ * Every utility below is written out in full. Tailwind scans source as text, so a
+ * constructed class name like `bg-${token}` is never emitted — the rule against
+ * dynamic class strings in specs/01-tech-stack.md § Conventions is not stylistic.
+ */
+import '~/styles/global.css';
+
+import '@fontsource-variable/inter';
+import '@fontsource/playfair-display/latin-400-italic.css';
+import '@fontsource/playfair-display/latin-500-italic.css';
+import '@fontsource/playfair-display/latin-600-italic.css';
+import '@fontsource/playfair-display/latin-ext-400-italic.css';
+import '@fontsource/playfair-display/latin-ext-500-italic.css';
+import '@fontsource/playfair-display/latin-ext-600-italic.css';
+
+import { SITE } from '~/lib/site';
+
+const surfaces = [
+  { token: 'ink', hex: '#000000', role: 'Fondo de página', cls: 'bg-ink' },
+  { token: 'coal', hex: '#0C0C0B', role: 'Sección alterna', cls: 'bg-coal' },
+  { token: 'graphite', hex: '#161615', role: 'Tarjetas, campos', cls: 'bg-graphite' },
+  { token: 'iron', hex: '#262624', role: 'Bordes, filetes', cls: 'bg-iron' },
+  { token: 'steel', hex: '#3C3B39', role: 'Bordes fuertes', cls: 'bg-steel' },
+];
+
+const inks = [
+  { token: 'mustang-dim', hex: '#565553', ratio: '2.8:1', cls: 'text-mustang-dim' },
+  { token: 'mustang', hex: '#7E7D7B', ratio: '5.1:1', cls: 'text-mustang' },
+  { token: 'mist', hex: '#A3A19E', ratio: '8.2:1', cls: 'text-mist' },
+  { token: 'mustang-soft', hex: '#B4B2AF', ratio: '9.9:1', cls: 'text-mustang-soft' },
+  { token: 'bone', hex: '#F2F1EF', ratio: '18.6:1', cls: 'text-bone' },
+  { token: 'danger', hex: '#E06B5A', ratio: '6.4:1', cls: 'text-danger' },
+  { token: 'success', hex: '#7FA86B', ratio: '7.7:1', cls: 'text-success' },
+];
+
+const scale = [
+  { token: 'display-xl', sample: 'Hola, soy Keily', cls: 'text-display-xl font-display' },
+  { token: 'display-lg', sample: 'Sobre mí', cls: 'text-display-lg font-display' },
+  { token: 'display-md', sample: 'Mi trabajo', cls: 'text-display-md font-display' },
+  { token: 'display-sm', sample: 'Mañana, habitación oeste', cls: 'text-display-sm font-display' },
+  {
+    token: 'body-lg',
+    sample: 'Artista autodidacta. Exploro el medio cotidiano.',
+    cls: 'text-body-lg',
+  },
+  { token: 'body', sample: 'Acentos: ñ á é í ó ú ¿ ¡ — y comillas «así».', cls: 'text-body' },
+  { token: 'body-sm', sample: 'Pie de foto, notas y texto de ayuda.', cls: 'text-body-sm' },
+  { token: 'label', sample: 'Etiqueta de formulario', cls: 'text-label' },
+  { token: 'eyebrow', sample: 'Sobre mí', cls: 'text-eyebrow uppercase' },
+];
 ---
 
 <!doctype html>
@@ -10,26 +62,95 @@ const builtAt = new Date().toISOString();
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="robots" content="noindex, nofollow" />
-    <title>Keily Mar Couselo — en construcción</title>
-    <style>
-      body {
-        margin: 0;
-        min-height: 100svh;
-        display: grid;
-        place-content: center;
-        gap: 0.75rem;
-        background: #000;
-        color: #f2f1ef;
-        font: 400 1rem/1.6 system-ui, sans-serif;
-        text-align: center;
-        padding: 2rem;
-      }
-      p { margin: 0; color: #a3a19e; }
-      span { color: #7e7d7b; }
-    </style>
+    <meta name="theme-color" content="#000000" />
+    <title>Fase 1 · Tokens — {SITE.name}</title>
   </head>
-  <body>
-    <p>Keily Mar Couselo</p>
-    <p><span>Pipeline OK · {builtAt}</span></p>
+
+  <body class="bg-ink text-bone">
+    <main class="gutter-x section-y max-w-content mx-auto">
+      <p class="text-eyebrow text-mustang uppercase">Fase 1 · Fundación</p>
+      <h1 class="font-display text-display-xl mt-4">
+        Hola, soy Keily, y soy <span class="text-mustang-soft">fotógrafa.</span>
+      </h1>
+      <p class="text-body-lg measure-lead text-mist mt-6">
+        Esta página existe solo para comprobar que los tokens y las dos tipografías cargan. La
+        sustituye la portada de verdad en la fase 2.
+      </p>
+
+      <section class="mt-16">
+        <h2 class="font-display text-display-md">Superficies</h2>
+        <ul class="border-iron bg-iron mt-6 grid gap-px border sm:grid-cols-5">
+          {
+            surfaces.map((s) => (
+              <li class:list={['p-5', s.cls]}>
+                <span class="text-label text-bone block">{s.token}</span>
+                <span class="text-body-sm text-mist block">{s.hex}</span>
+                <span class="text-body-sm text-mist mt-2 block">{s.role}</span>
+              </li>
+            ))
+          }
+        </ul>
+      </section>
+
+      <section class="mt-16">
+        <h2 class="font-display text-display-md">Tinta y acento</h2>
+        <ul class="mt-6">
+          {
+            inks.map((i) => (
+              <li class="border-iron flex flex-wrap items-baseline gap-x-6 gap-y-1 border-b py-3">
+                <span class:list={['text-body min-w-48', i.cls]}>{i.token}</span>
+                <span class="text-body-sm text-mist">{i.hex}</span>
+                <span class="text-body-sm text-mist">{i.ratio} sobre ink</span>
+              </li>
+            ))
+          }
+        </ul>
+        <p class="text-body-sm text-mist mt-6">
+          Cada fila está escrita en su propio color, sobre <code>ink</code>. Si alguna no se lee, el
+          token está mal.
+        </p>
+      </section>
+
+      <section class="mt-16">
+        <h2 class="font-display text-display-md">Escala tipográfica</h2>
+        <ul class="mt-6 space-y-6">
+          {
+            scale.map((s) => (
+              <li>
+                <span class="text-eyebrow text-mustang uppercase">{s.token}</span>
+                <p class:list={['mt-1', s.cls]}>{s.sample}</p>
+              </li>
+            ))
+          }
+        </ul>
+      </section>
+
+      <section class="border-iron bg-graphite mt-16 rounded-md border p-6">
+        <h2 class="font-display text-display-sm">Sobre superficie elevada</h2>
+        <p class="text-body text-mist mt-3">
+          En <code>graphite</code>, el acento se escribe en
+          <span class="text-mustang-soft">mustang-soft</span> — nunca en
+          <span class="text-mustang">mustang</span>, que aquí se queda en 4,4:1 y no cumple AA.
+        </p>
+        <div class="mt-5 flex flex-wrap gap-3">
+          <button
+            class="text-label duration-fast bg-mustang text-ink hover:bg-mustang-soft rounded-sm px-5 py-3 transition-colors"
+            type="button"
+          >
+            Botón primario
+          </button>
+          <button
+            class="text-label duration-fast border-steel text-bone hover:border-mustang-soft rounded-sm border px-5 py-3 transition-colors"
+            type="button"
+          >
+            Botón fantasma
+          </button>
+        </div>
+      </section>
+
+      <p class="text-body-sm text-mist border-iron mt-16 border-t pt-6">
+        {SITE.name} · {SITE.url} · indexable: {String(SITE.indexable)}
+      </p>
+    </main>
   </body>
 </html>

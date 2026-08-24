@@ -1,0 +1,11 @@
+dist/
+.astro/
+node_modules/
+package-lock.json
+src/assets/
+public/
+
+# Hand-wrapped prose. Prettier rewraps paragraphs and reflows tables, which makes
+# spec diffs unreadable and destroys deliberate line breaks.
+specs/
+*.md

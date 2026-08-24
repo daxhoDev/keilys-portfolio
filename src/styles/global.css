@@ -1,0 +1,190 @@
+@import 'tailwindcss';
+
+/* ---------------------------------------------------------------------------
+   Design tokens. The authority for every value here is specs/02-design-system.md.
+   Palette: pure black with details in "gris mustang" #7E7D7B — Keily's choice.
+   There is no chromatic accent; hierarchy is carried by brightness.
+--------------------------------------------------------------------------- */
+
+@theme {
+  /* Surfaces, darkest first */
+  --color-ink: #000000;
+  --color-coal: #0c0c0b;
+  --color-graphite: #161615;
+  --color-iron: #262624;
+  --color-steel: #3c3b39;
+
+  /* Accent and text, dimmest first */
+  --color-mustang-dim: #565553;
+  --color-mustang: #7e7d7b;
+  --color-mist: #a3a19e;
+  --color-mustang-soft: #b4b2af;
+  --color-bone: #f2f1ef;
+
+  /* The only chromatic values in the system. Form feedback only. */
+  --color-danger: #e06b5a;
+  --color-success: #7fa86b;
+
+  --font-sans: 'Inter Variable', system-ui, -apple-system, 'Segoe UI', sans-serif;
+  --font-display: 'Playfair Display', 'Iowan Old Style', Georgia, serif;
+
+  /* Fluid type. Each clamp runs between roughly 320px and 1100px viewport. */
+  --text-display-xl: clamp(2.75rem, 1.6rem + 5.7vw, 5.5rem);
+  --text-display-xl--line-height: 1.02;
+  --text-display-xl--letter-spacing: -0.02em;
+  --text-display-xl--font-weight: 400;
+
+  --text-display-lg: clamp(2.25rem, 1.6rem + 3.2vw, 3.75rem);
+  --text-display-lg--line-height: 1.08;
+  --text-display-lg--letter-spacing: -0.015em;
+  --text-display-lg--font-weight: 400;
+
+  --text-display-md: clamp(1.75rem, 1.4rem + 1.8vw, 2.75rem);
+  --text-display-md--line-height: 1.15;
+  --text-display-md--letter-spacing: -0.01em;
+  --text-display-md--font-weight: 400;
+
+  --text-display-sm: clamp(1.375rem, 1.22rem + 0.77vw, 1.75rem);
+  --text-display-sm--line-height: 1.25;
+  --text-display-sm--letter-spacing: -0.005em;
+  --text-display-sm--font-weight: 500;
+
+  --text-body-lg: clamp(1.0625rem, 0.99rem + 0.38vw, 1.25rem);
+  --text-body-lg--line-height: 1.65;
+  --text-body-lg--font-weight: 400;
+
+  --text-body: clamp(1rem, 0.97rem + 0.13vw, 1.0625rem);
+  --text-body--line-height: 1.7;
+  --text-body--font-weight: 400;
+
+  --text-body-sm: 0.875rem;
+  --text-body-sm--line-height: 1.6;
+  --text-body-sm--font-weight: 400;
+
+  --text-label: 0.8125rem;
+  --text-label--line-height: 1.4;
+  --text-label--letter-spacing: 0.02em;
+  --text-label--font-weight: 500;
+
+  --text-eyebrow: 0.75rem;
+  --text-eyebrow--line-height: 1.3;
+  --text-eyebrow--letter-spacing: 0.18em;
+  --text-eyebrow--font-weight: 500;
+
+  /* Container widths — these power max-w-content / max-w-narrow / max-w-wide */
+  --container-content: 72rem;
+  --container-narrow: 48rem;
+  --container-wide: 90rem;
+
+  --radius-sm: 2px;
+  --radius-md: 4px;
+
+  --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-out-quart: cubic-bezier(0.22, 1, 0.36, 1);
+  --ease-in-out-soft: cubic-bezier(0.65, 0, 0.35, 1);
+
+  --duration-fast: 180ms;
+  --duration-base: 320ms;
+  --duration-slow: 600ms;
+  --duration-reveal: 800ms;
+}
+
+/* Layout rhythm. Not Tailwind namespaces, so they are consumed through the
+   utilities defined at the bottom of this file rather than as bare classes. */
+:root {
+  --gutter: clamp(1.25rem, 5vw, 4rem);
+  --section-y: clamp(4.5rem, 10vw, 9rem);
+  --section-y-tight: clamp(3rem, 6vw, 5rem);
+  --measure: 68ch;
+  --measure-lead: 58ch;
+}
+
+/* Semantic aliases. Components use the token names directly; these exist so the
+   intent of a colour is greppable and so a future re-theme has one place to look. */
+:root {
+  --color-bg: var(--color-ink);
+  --color-bg-alt: var(--color-coal);
+  --color-surface: var(--color-graphite);
+  --color-border: var(--color-iron);
+  --color-border-strong: var(--color-steel);
+  --color-text: var(--color-bone);
+  --color-text-muted: var(--color-mist);
+  --color-accent: var(--color-mustang);
+  --color-accent-soft: var(--color-mustang-soft);
+}
+
+@layer base {
+  html {
+    color-scheme: dark;
+    scroll-behavior: smooth;
+    -webkit-text-size-adjust: 100%;
+  }
+
+  body {
+    background: var(--color-ink);
+    color: var(--color-bone);
+    font-family: var(--font-sans);
+    font-size: var(--text-body);
+    line-height: 1.7;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  ::selection {
+    background: var(--color-mustang);
+    color: var(--color-ink);
+  }
+
+  /* Never removed, never replaced by a colour change alone. */
+  :focus-visible {
+    outline: 2px solid var(--color-mustang);
+    outline-offset: 2px;
+    border-radius: 2px;
+  }
+
+  /* Photographs are never rounded: a rounded photo reads as a UI element. */
+  img,
+  picture,
+  video {
+    display: block;
+    max-width: 100%;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    html {
+      scroll-behavior: auto;
+    }
+  }
+}
+
+/* ---------------------------------------------------------------------------
+   Utilities. Only introduced where the same declaration is repeated three or
+   more times and names a real concept (see specs/01-tech-stack.md § Conventions).
+--------------------------------------------------------------------------- */
+
+/* Playfair is used exclusively in italic. A non-italic Playfair is a bug, so the
+   utility sets the style itself rather than trusting every call site. */
+@utility font-display {
+  font-family: var(--font-display);
+  font-style: italic;
+  font-weight: 400;
+}
+
+@utility gutter-x {
+  padding-inline: var(--gutter);
+}
+
+@utility section-y {
+  padding-block: var(--section-y);
+}
+
+@utility section-y-tight {
+  padding-block: var(--section-y-tight);
+}
+
+@utility measure {
+  max-inline-size: var(--measure);
+}
+
+@utility measure-lead {
+  max-inline-size: var(--measure-lead);
+}
