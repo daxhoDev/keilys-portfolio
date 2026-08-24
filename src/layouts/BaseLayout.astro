@@ -1,0 +1,152 @@
+---
+/**
+ * Owns <html>, <head>, <body> and the skip link.
+ *
+ * Header and Footer land here in Phase 3; the <slot /> and the skip-link target
+ * are already in their final positions so that is an insertion, not a rewrite.
+ */
+import '~/styles/global.css';
+
+import '@fontsource-variable/inter';
+import '@fontsource/playfair-display/latin-400-italic.css';
+import '@fontsource/playfair-display/latin-500-italic.css';
+import '@fontsource/playfair-display/latin-600-italic.css';
+import '@fontsource/playfair-display/latin-ext-400-italic.css';
+import '@fontsource/playfair-display/latin-ext-500-italic.css';
+import '@fontsource/playfair-display/latin-ext-600-italic.css';
+
+import { ClientRouter } from 'astro:transitions';
+
+import { SITE, absoluteUrl } from '~/lib/site';
+import type { Lang } from '~/i18n/routes';
+import { alternatePath, path } from '~/i18n/routes';
+import { useTranslations, HTML_LANG, OG_LOCALE } from '~/i18n/utils';
+
+interface Props {
+  lang: Lang;
+  /** Becomes "{title} · Keily Mar Couselo", except on home where it is used verbatim. */
+  title: string;
+  description: string;
+  /** OG image path, defaults to /og-default.jpg. */
+  image?: string;
+  imageAlt?: string;
+  /** Forces noindex regardless of SITE.indexable — the 404 uses this. */
+  noindex?: boolean;
+  /** Suppresses hreflang. The 404 is not a per-locale page, so it emits none. */
+  noAlternates?: boolean;
+  transparentHeader?: boolean;
+  /** Extra JSON-LD for this page, appended after the site-wide Person. */
+  jsonLd?: Record<string, unknown>[];
+}
+
+const {
+  lang,
+  title,
+  description,
+  image = '/og-default.jpg',
+  imageAlt,
+  noindex = false,
+  noAlternates = false,
+  jsonLd = [],
+} = Astro.props;
+
+const t = useTranslations(lang);
+
+const isHome = Astro.url.pathname === path('home', lang);
+const fullTitle = isHome ? title : `${title} · ${SITE.name}`;
+
+/**
+ * noindex while the site lives on *.vercel.app. Flipping SITE.indexable is a launch
+ * step for the real domain — see specs/08-accessibility-seo-performance.md.
+ */
+const isNoindex = noindex || !SITE.indexable;
+
+const canonical = absoluteUrl(Astro.url.pathname);
+const esHref = absoluteUrl(alternatePath(Astro.url, 'es'));
+const enHref = absoluteUrl(alternatePath(Astro.url, 'en'));
+const ogImage = absoluteUrl(image);
+
+const jobTitle = lang === 'es' ? 'Fotógrafa' : 'Photographer';
+
+const person = {
+  '@context': 'https://schema.org',
+  '@type': 'Person',
+  '@id': `${SITE.url}/#person`,
+  name: SITE.name,
+  jobTitle,
+  url: SITE.url,
+  image: absoluteUrl('/og-default.jpg'),
+  knowsLanguage: ['es', 'en'],
+  sameAs: SITE.socials
+    .filter((social) => !social.href.startsWith('mailto:'))
+    .map((social) => social.href),
+};
+---
+
+<!doctype html>
+<html lang={HTML_LANG[lang]}>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="generator" content={Astro.generator} />
+
+    <title>{fullTitle}</title>
+    <meta name="description" content={description} />
+    {isNoindex && <meta name="robots" content="noindex, nofollow" />}
+
+    <link rel="canonical" href={canonical} />
+    {
+      !noAlternates && (
+        <>
+          <link rel="alternate" hreflang="es" href={esHref} />
+          <link rel="alternate" hreflang="en" href={enHref} />
+          {/* x-default points at Spanish, because Spanish is the default language. */}
+          <link rel="alternate" hreflang="x-default" href={esHref} />
+        </>
+      )
+    }
+
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content={SITE.name} />
+    <meta property="og:locale" content={OG_LOCALE[lang]} />
+    <meta property="og:locale:alternate" content={OG_LOCALE[lang === 'es' ? 'en' : 'es']} />
+    <meta property="og:title" content={fullTitle} />
+    <meta property="og:description" content={description} />
+    <meta property="og:url" content={canonical} />
+    <meta property="og:image" content={ogImage} />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:image:alt" content={imageAlt ?? t.hero.imageAlt} />
+    <meta name="twitter:card" content="summary_large_image" />
+
+    <meta name="theme-color" content="#000000" />
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <link rel="icon" href="/favicon-96.png" sizes="96x96" type="image/png" />
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+
+    <script
+      is:inline
+      type="application/ld+json"
+      set:html={JSON.stringify(jsonLd.length ? [person, ...jsonLd] : person)}
+    />
+
+    <ClientRouter />
+  </head>
+
+  <body class="bg-ink text-bone">
+    <a
+      href="#main"
+      class="text-label focus-visible:bg-graphite focus-visible:border-mustang sr-only focus-visible:not-sr-only focus-visible:fixed focus-visible:top-4 focus-visible:left-4 focus-visible:z-50 focus-visible:rounded-sm focus-visible:border focus-visible:px-4 focus-visible:py-3"
+    >
+      {t.nav.skipToContent}
+    </a>
+
+    {/* Header lands here in Phase 3. */}
+
+    <main id="main">
+      <slot />
+    </main>
+
+    {/* Footer lands here in Phase 3. */}
+  </body>
+</html>

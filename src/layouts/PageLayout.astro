@@ -1,0 +1,52 @@
+---
+/**
+ * Wraps BaseLayout for the About and Work pages: the standard page header block
+ * (eyebrow, <h1>, lead) plus a slot for the page body.
+ */
+import BaseLayout from '~/layouts/BaseLayout.astro';
+import type { Lang } from '~/i18n/routes';
+
+interface Props {
+  lang: Lang;
+  title: string;
+  description: string;
+  image?: string;
+  imageAlt?: string;
+  jsonLd?: Record<string, unknown>[];
+  eyebrow: string;
+  heading: string;
+  lead?: string;
+  container?: 'content' | 'narrow' | 'wide';
+}
+
+const {
+  lang,
+  title,
+  description,
+  image,
+  imageAlt,
+  jsonLd,
+  eyebrow,
+  heading,
+  lead,
+  container = 'content',
+} = Astro.props;
+
+const containerClass = {
+  content: 'max-w-content',
+  narrow: 'max-w-narrow',
+  wide: 'max-w-wide',
+}[container];
+---
+
+<BaseLayout {lang} {title} {description} {image} {imageAlt} {jsonLd}>
+  <div class:list={['gutter-x section-y mx-auto', containerClass]}>
+    <header>
+      <p class="text-eyebrow text-mustang uppercase">{eyebrow}</p>
+      <h1 class="font-display text-display-lg mt-4">{heading}</h1>
+      {lead && <p class="text-body-lg measure-lead text-mist mt-6">{lead}</p>}
+    </header>
+
+    <slot />
+  </div>
+</BaseLayout>

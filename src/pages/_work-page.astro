@@ -1,0 +1,28 @@
+---
+/**
+ * The Work page, shared by /mi-trabajo (Spanish) and /en/my-work (English).
+ * Phase 5 adds the tone filters, the masonry gallery and the lightbox.
+ */
+import PageLayout from '~/layouts/PageLayout.astro';
+import type { Lang } from '~/i18n/routes';
+import { useTranslations } from '~/i18n/utils';
+
+interface Props {
+  lang: Lang;
+}
+
+const { lang } = Astro.props;
+const t = useTranslations(lang);
+---
+
+<PageLayout
+  {lang}
+  title={t.meta.work.title}
+  description={t.meta.work.description}
+  eyebrow={t.work.eyebrow}
+  heading={t.work.page.title}
+  lead={t.work.page.lead}
+  container="wide"
+>
+  <!-- GalleryFilters + MasonryGallery + Lightbox — Phase 5 -->
+</PageLayout>

@@ -1,0 +1,57 @@
+---
+/**
+ * The About page, shared by /sobre-mi (Spanish) and /en/about (English).
+ * Phase 7 adds the portrait, the secondary image and the closing CTA band.
+ */
+import PageLayout from '~/layouts/PageLayout.astro';
+import type { Lang } from '~/i18n/routes';
+import { useTranslations } from '~/i18n/utils';
+import { SITE, absoluteUrl } from '~/lib/site';
+
+interface Props {
+  lang: Lang;
+}
+
+const { lang } = Astro.props;
+const t = useTranslations(lang);
+
+const aboutJsonLd = [
+  {
+    '@context': 'https://schema.org',
+    '@type': 'AboutPage',
+    name: t.about.page.title,
+    description: t.meta.about.description,
+    url: absoluteUrl(Astro.url.pathname),
+    mainEntity: { '@id': `${SITE.url}/#person` },
+  },
+];
+---
+
+<PageLayout
+  {lang}
+  title={t.meta.about.title}
+  description={t.meta.about.description}
+  eyebrow={t.about.eyebrow}
+  heading={t.about.page.title}
+  lead={t.about.page.lead}
+  container="narrow"
+  jsonLd={aboutJsonLd}
+>
+  <div class="mt-12 space-y-5">
+    {t.about.page.body.map((paragraph) => <p class="text-body measure text-mist">{paragraph}</p>)}
+  </div>
+
+  <section class="mt-16">
+    <h2 class="font-display text-display-sm">{t.about.page.factsHeading}</h2>
+    <dl class="mt-6">
+      {
+        t.about.page.facts.map((fact) => (
+          <div class="border-iron flex flex-wrap gap-x-6 gap-y-1 border-b py-3">
+            <dt class="text-label text-mist min-w-48 uppercase">{fact.label}</dt>
+            <dd class="text-body text-bone">{fact.value}</dd>
+          </div>
+        ))
+      }
+    </dl>
+  </section>
+</PageLayout>

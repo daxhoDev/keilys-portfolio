@@ -1,0 +1,50 @@
+---
+/**
+ * Astro emits a single /404.html for a static build, so it cannot be per-locale.
+ * It therefore renders in both languages, Spanish first, separated by a mustang
+ * hairline. The root lang is `es`, matching the default language. This is the
+ * simplest correct answer for a static host, not a placeholder.
+ *
+ * No hreflang (it is not a per-locale page) and always noindex.
+ */
+import BaseLayout from '~/layouts/BaseLayout.astro';
+import { LANGS, path } from '~/i18n/routes';
+import { useTranslations, HTML_LANG } from '~/i18n/utils';
+
+const es = useTranslations('es');
+---
+
+<BaseLayout
+  lang="es"
+  title={es.meta.notFound.title}
+  description={es.notFound.body}
+  noindex
+  noAlternates
+>
+  <div class="gutter-x section-y max-w-narrow mx-auto">
+    <p class="font-display text-display-lg text-mustang">404</p>
+
+    {
+      LANGS.map((lang, index) => {
+        const t = useTranslations(lang);
+        return (
+          <section
+            lang={HTML_LANG[lang]}
+            class:list={['mt-10', index > 0 && 'border-mustang mt-10 border-t pt-10']}
+          >
+            <h2 class="font-display text-display-md">{t.notFound.heading}</h2>
+            <p class="text-body measure text-mist mt-4">{t.notFound.body}</p>
+            <p class="mt-6">
+              <a
+                href={path('home', lang)}
+                class="text-label border-steel text-bone inline-block rounded-sm border px-5 py-3"
+              >
+                {t.notFound.cta}
+              </a>
+            </p>
+          </section>
+        );
+      })
+    }
+  </div>
+</BaseLayout>
