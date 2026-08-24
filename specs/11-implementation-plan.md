@@ -31,12 +31,30 @@ Estimates are working days for one developer, and they describe focused build ti
 
 **0.25 days.** Get a broken build to fail loudly on day one rather than on day ten.
 
-- `git init` is already done; add `.gitignore`, `.nvmrc` (Node ≥ 20.11), `package.json` `engines`.
-- Create the Vercel project **`keilymargallery`** and connect it to the repo. Framework preset: Astro.
-- Confirm preview deploys on every push and production deploys from `master`.
-- Commit a single placeholder page so the pipeline has something to build.
+- `.gitignore`, `.nvmrc` (Node 22), `package.json` `engines: >=20.11`.
+- Minimal Astro 5 scaffold — static output, strict TypeScript, the `~/*` alias, `site` set to the Vercel
+  URL — plus one placeholder page carrying `noindex`. **Not** Tailwind, tokens or fonts; those are Phase 1.
+- Create the Vercel project **`keilymargallery`** from the GitHub repo. Framework preset: Astro.
 
-**Done when:** a push to `master` produces a green deploy at `https://keilymargallery.vercel.app`, and a
+### Branching
+
+All build work happens on a long-lived **`development`** branch. `master` keeps only the initial commit
+until launch.
+
+| | |
+|---|---|
+| Vercel Production Branch | `master` — so `keilymargallery.vercel.app` stays empty during the build |
+| The URL to actually use | the branch alias, `keilymargallery-git-development-<scope>.vercel.app` |
+| At launch ([Phase 10](#phase-10--launch)) | merge `development` → `master`; the production URL fills in |
+
+Every deploy during the build is a preview deploy, and previews are password-protectable in Vercel if the
+work-in-progress should not be publicly readable.
+
+**Note on metadata in previews:** canonical, `og:url` and `hreflang` are built from `SITE.url`, so on a
+preview they point at `keilymargallery.vercel.app` rather than at the alias being viewed. That is correct —
+they must describe the final location — and it is harmless while everything is `noindex`.
+
+**Done when:** a push to `development` produces a green deploy and a reachable preview URL, and a
 deliberately broken commit turns it red.
 
 **Why first:** every later phase gets a shareable URL for free, and CI catches the class of failure — a
@@ -257,7 +275,8 @@ design. Flag it to her the day the files land, not at launch.
 
 **0.25 days.**
 
-- Merge to `master`, confirm the production deploy is green.
+- **Merge `development` → `master`.** This is the moment `keilymargallery.vercel.app` stops being empty;
+  confirm the production deploy is green before telling anyone.
 - Walk all seven routes on a real phone, in Spanish, on a cold cache.
 - **Tell Keily, in as many words, that the contact form does not send yet** and that her email beside it is
   the working path. This is on the checklist because it is the one way this site could quietly lose her a
