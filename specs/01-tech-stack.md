@@ -19,7 +19,7 @@
 ### Why no UI framework
 
 Every interactive element on this site (mobile menu, form validation, scroll reveals, parallax, language
-switcher, and the possible lightbox) is small and self-contained. Adding a framework would add a hydration
+switcher, the gallery tone filter, and the lightbox) is small and self-contained. Adding a framework would add a hydration
 runtime for no benefit and would jeopardise the < 30KB JS budget. Interactivity is written as plain
 TypeScript modules imported from `<script>` tags, which Astro bundles, tree-shakes, and type-checks.
 
@@ -48,7 +48,8 @@ sharp                                   ^0.33   # explicit, for the placeholder 
 
 Nothing else is added without amending this document. In particular: no animation library (motion is
 hand-written, see [07-motion.md](./07-motion.md)), no form library, no icon package (icons are inline SVG
-components), and no lightbox library unless [09-open-decisions.md](./09-open-decisions.md) #2 resolves that way.
+components), and **no lightbox library** — decision #2 resolved to a hand-written one (~3KB) rather than PhotoSwipe
+(~40KB), for the reasons in [09-open-decisions.md](./09-open-decisions.md#2--photo-click-behaviour-resolved-a-custom-lightbox).
 
 ## Font loading
 
@@ -81,11 +82,12 @@ import tailwindcss from '@tailwindcss/vite';
 import sitemap from '@astrojs/sitemap';
 
 export default defineConfig({
-  site: 'https://TODO-production-domain',   // required for sitemap + canonical URLs
+  site: 'https://keilymargallery.vercel.app',   // temporary; custom domain much later
   output: 'static',
   trailingSlash: 'never',
   vite: { plugins: [tailwindcss()] },
-  integrations: [sitemap({ i18n: { defaultLocale: 'es', locales: { es: 'es-ES', en: 'en-US' } } })],
+  // Sitemap is emitted only when SITE.indexable is true — see 08-accessibility-seo-performance.md
+  integrations: [...(SITE.indexable ? [sitemap({ i18n: { defaultLocale: 'es', locales: { es: 'es-ES', en: 'en-US' } } })] : [])],
   image: { service: { entrypoint: 'astro/assets/services/sharp' } },
   prefetch: { prefetchAll: true, defaultStrategy: 'viewport' },
 });
@@ -130,7 +132,8 @@ keily-portfolio/
 │   ├── assets/
 │   │   ├── photos/                 # gallery images, referenced by content entries
 │   │   ├── hero.jpg
-│   │   └── portrait.jpg            # About Me photo
+│   │   ├── portrait.jpg            # About Me photo
+│   │   └── about-secondary.jpg     # second image on /about
 │   ├── components/
 │   │   ├── layout/
 │   │   │   ├── Header.astro
@@ -146,8 +149,8 @@ keily-portfolio/
 │   │   ├── gallery/
 │   │   │   ├── MasonryGallery.astro
 │   │   │   ├── PhotoCard.astro
-│   │   │   ├── GalleryFilters.astro   # gated on open decision #1
-│   │   │   └── Lightbox.astro         # gated on open decision #2
+│   │   │   ├── GalleryFilters.astro   # Todas · Blanco y negro · Color
+│   │   │   └── Lightbox.astro         # full-screen viewer, decision #2 = A
 │   │   ├── form/
 │   │   │   ├── ContactForm.astro
 │   │   │   ├── Field.astro
@@ -176,12 +179,17 @@ keily-portfolio/
 │   ├── lib/
 │   │   ├── contact.ts            # the stubbed submit seam
 │   │   ├── validation.ts
+│   │   ├── images.ts             # responsiveWidths(): never upscale a small source
+│   │   ├── photos.ts             # collection queries + tone counts
 │   │   └── site.ts               # site constants: socials, email, handles
 │   ├── scripts/                  # client-side TS, imported from <script>
 │   │   ├── reveal.ts
 │   │   ├── parallax.ts
 │   │   ├── hero-reveal.ts
 │   │   ├── mobile-menu.ts
+│   │   ├── scroll-header.ts
+│   │   ├── gallery-filters.ts
+│   │   ├── lightbox.ts
 │   │   └── contact-form.ts
 │   ├── styles/
 │   │   └── global.css            # Tailwind import + @theme tokens + base layer

@@ -126,22 +126,25 @@ The full key inventory is specified in [04-content-model.md](./04-content-model.
 Sticky, full width, `z-50`. Height 72px mobile / 88px desktop.
 
 - **Initial state on the landing page:** transparent background, sitting over the hero.
-- **Scrolled state (> 24px):** `bark` background at 92% opacity, `backdrop-blur-sm`, 1px `cocoa` bottom
+- **Scrolled state (> 24px):** `coal` background at 92% opacity, `backdrop-blur-sm`, 1px `iron` bottom
   border. Transition 320ms.
 - **On the About, Work and 404 pages:** starts in the scrolled state immediately.
 
 Contents, left → right:
-1. **Wordmark** — "Keily" in `font-display` at `display-sm`, linking to `path('home', lang)`. It is the
-   site's logotype; there is no image logo.
+1. **Wordmark** — `SITE.wordmark` ("Keily Mar") in `font-display` at `display-sm`, linking to
+   `path('home', lang)`. It is the site's logotype; there is no image logo. The **full** name
+   "Keily Mar Couselo" is used in `<title>`, `og:site_name`, JSON-LD and the footer — the header is the one
+   place it is shortened, because three words at `display-sm` crowd the nav at 375px. See
+   [12-copy-from-keily.md](./12-copy-from-keily.md#identity-and-contact-site).
 2. *(spacer)*
 3. **Nav links** (desktop ≥ `md`): About · Work · Contact, labelled from `t.nav.*`. "Contact" is an in-page
    anchor to `#contact`, which exists only on the landing page — from the About and Work pages it links to
    `` `${path('home', lang)}#contact` ``.
 4. **Language switcher** — `ES / EN` (default language first) with the inactive language as a link and the
-   active one as non-interactive `linen` text. `hreflang` and `lang` attributes set on the link.
+   active one as non-interactive `bone` text. `hreflang` and `lang` attributes set on the link.
 5. **Menu button** (mobile < `md`) — 44×44, `aria-expanded`, `aria-controls`.
 
-The current page's nav link carries `aria-current="page"` and a persistent gold underline.
+The current page's nav link carries `aria-current="page"` and a persistent mustang underline.
 
 ### Mobile menu
 
@@ -156,11 +159,12 @@ background scroll locked (`overflow: hidden` on `<body>` plus scrollbar-width co
 
 Present on every page. Three zones, stacked on mobile:
 
-1. Wordmark + one-line tagline (`t.footer.tagline`).
+1. Wordmark + one-line tagline (`t.footer.tagline` — *"Las fotografías; epitafios de lo que vivo"*).
 2. Navigation column: About, My Work, Contact.
-3. Contact column: email `mailto:` link, Instagram link, language switcher.
+3. Contact column: email `mailto:` link, **both** Instagram links (work and personal, separately
+   labelled), language switcher.
 
-Bottom bar: `© {currentYear} Keily. {t.footer.rights}` at `body-sm` in `sand`, with a 1px `cocoa` rule above.
+Bottom bar: `© {currentYear} Keily Mar Couselo. {t.footer.rights}` at `body-sm` in `mist`, with a 1px `iron` rule above.
 
 `currentYear` is computed at **build time** (`new Date().getFullYear()`), which is correct for a static site
 that is rebuilt on content change; the acceptance criterion is simply that it is not hard-coded.
@@ -170,7 +174,7 @@ that is rebuilt on content change; the acceptance criterion is simply that it is
 Astro emits a single `/404.html` for a static build, so it cannot be per-locale.
 
 Behaviour: the page renders its heading and body **in both languages**, **Spanish first**, separated by a
-gold hairline — `<section lang="es">` then `<section lang="en">`. Each half offers a link back to its own
+mustang hairline — `<section lang="es">` then `<section lang="en">`. Each half offers a link back to its own
 homepage. The document's root `lang` is `es`, matching the default language. This is intentional and is the
 simplest correct answer for a static host; it is not a placeholder.
 

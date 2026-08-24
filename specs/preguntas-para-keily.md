@@ -37,7 +37,8 @@ habrá un botón arriba para cambiar a inglés.
 ¿Algo de esto no te encaja?
 
 > **Tu respuesta:**
->
+>ola, para el color del fondo quisiera negro y los detalles en gris mustang (HEX: 7E7D7B o RGB: R126 G125 B123)
+
 >
 
 ---
@@ -78,7 +79,7 @@ Solo dos botones, separando tu trabajo en monocromo del que esté en color.
 simple vista.*
 
 > **Tu elección:**
->
+>D
 > **Si eliges A** — ¿qué series tienes y cómo se llaman? (entre 3 y 5 está bien)
 >
 >
@@ -105,7 +106,7 @@ Al hacer clic vas a una página dedicada solo a esa foto, con espacio para conta
 foto necesitaría su texto, en español y en inglés.*
 
 > **Tu elección:**
->
+>A
 >
 
 ---
@@ -118,7 +119,7 @@ Lo ideal son **entre 18 y 30** para la galería. Menos de 15 se queda corto; má
 hace que las mejores se pierdan entre las demás. **Es mejor 20 fotos excelentes que 50 buenas.**
 
 > **Cuántas vas a mandar:**
->
+>20
 >
 
 ## 4. Fotos concretas que necesitamos aparte de la galería
@@ -137,7 +138,7 @@ simplemente una imagen tuya que acompañe bien al texto.
 que aparece en la vista previa del enlace. Puede ser un recorte de alguna de las anteriores.
 
 > **¿Las tienes? ¿Alguna duda con alguna?**
->
+> Sí, las adjuntaré más adelante
 >
 
 ## 5. Cómo mandar las fotos
@@ -155,7 +156,7 @@ Pueden ser verticales, horizontales o cuadradas, mezcladas sin problema. **Ningu
 la galería está hecha justamente para respetar la proporción original de cada imagen.
 
 > **¿Necesitas ayuda con la exportación?**
->
+> Tengo dudas con lo de Espacio de color sRGB. Algunas no llegan a 2400px
 >
 
 ## 6. Una descripción por foto (importante)
@@ -179,7 +180,7 @@ Describe el contenido, no la autoría. Con una frase por foto es suficiente.
 - El **año** en que la hiciste (opcional).
 
 > **¿Te encaja hacerlo así?**
->
+> Sí
 >
 
 ## 7. Tus 6 mejores fotos
@@ -190,7 +191,7 @@ completa. Necesitamos que elijas **exactamente 6 fotos** para ahí.
 Piénsalo como: si alguien solo va a ver seis fotos tuyas en su vida, ¿cuáles?
 
 > **Cuáles:**
->
+> Más adelante
 >
 
 ---
@@ -214,14 +215,16 @@ La palabra **"fotógrafa"** iría en dorado, destacada del resto.
 ¿Te gusta así? ¿Prefieres "fotógrafa profesional"? ¿O algo completamente distinto, más tuyo?
 
 > **Tu respuesta:**
->
+> La frase está bien, aunque si te parece podemos sustituir el dorado por gris o plateado, idk
+
 >
 
 Y justo debajo va **una frase más, corta** (máximo unas 15 palabras), que diga algo sobre cómo miras o qué
 buscas cuando haces fotos.
 
 > **Tu frase:**
->
+>: Artista autodidacta. Explora el medio cotidiano en busca de sentido artístico, especialmente mediante las bondades del blanco y negro. 
+
 >
 
 ## 9. Presentación corta (para la página principal)
@@ -230,7 +233,8 @@ Unas **100-120 palabras** presentándote. Es lo que lee alguien que acaba de lle
 ti. Tono cercano, en primera persona.
 
 > **Tu texto:**
->
+> Soy Keily Mar, fotógrafa autodidacta con una vocación que nació en la infancia y se consolidó en la adolescencia, cuando decidí explorar a fondo la técnica y el lenguaje artístico de la imagen. Mi mirada se detiene en lo que suele pasar desapercibido: calles urbanas con sus secretos mejor guardados, pueblos de mar, rincones que cuentan historias silenciosas, animales como las palomas, y personas envueltas en su cotidianidad. Creo firmemente que cada instante tiene un peso visual y espiritual que merece ser eternizado. Por eso, en mis fotografías busco despojar la realidad del ruido cromático y revelar su esencia a través del blanco y negro. Así, cada captura se convierte en un encuentro honesto entre lo que veo y lo que siento. Bienvenido a mi mundo.
+
 >
 
 ## 10. Texto largo (para la página "Sobre mí")
@@ -245,7 +249,8 @@ ayuda a arrancar — no hace falta que las cubras todas:
 - Algo personal que no tenga que ver con la fotografía.
 
 > **Tu texto:**
->
+>Mi vínculo con la fotografía nació en la infancia, de la mano de mi padre, cuya pasión por capturar instantes fue tan contagiosa como genuina. Recuerdo sus explicaciones acerca de cómo lograr un encuadre preciso y cómo la luz podía transformar un rostro común en un valioso retrato. Esos primeros aprendizajes no fueron solo técnicos; fueron, sobre todo, una iniciación emocional en el arte de observar. En la adolescencia algo cambió en mi interior: el simple gusto por tomar fotos ya no era suficiente. Sentí­ la necesidad de transgredir mis propios límites y empezar a abordar esta disciplina desde una perspectiva más profesional y fundamentada en estudios. Fue entonces cuando emprendí un camino de estudio autodidacta que aún hoy continúo. Acudí a libros y a internet en busca de referentes y lecciones. Observé y consulté a fotógrafos consagrados y tomé cursos que ampliaron y consolidaron mi mirada. Cada nuevo conocimiento era una herramienta que sumaba a mi quehacer, y con cada herramienta, mi manera de ver el mundo se volvía más rica y más compleja. En ese proceso de evolución, fui encontrando un lenguaje que resonaba con mi sensibilidad: el blanco y negro. No fue una elección arbitraria, sino un descubrimiento progresivo. Descubrí que, al despojar una imagen del color, esta adquiría una nueva dimensión expresiva, un lenguaje más depurado que transmitía mensajes de una honestidad y una pureza difíciles de lograr en la paleta cromática. El blanco y negro me permite llegar al núcleo emocional de la escena, a su esencia más sincera. Sin embargo, no sería justo reducir mi trabajo a esa estética. La fotografía a color ocupa un lugar fundamental en mi quehacer creativo, especialmente cuando me enfrento a tonos fríos, que poseen una cualidad melancólica y poética, que tanto admiro. Azules, verdes y grises se convierten entonces en protagonistas de composiciones donde el color acompaña y potencia la narrativa visual. No me gusta poner límites ni encerrarme en fórmulas rígidas, prefiero mantener una actitud abierta y exploradora, dispuesta a recibir sugerencias y a embarcarme en proyectos innovadores, creativos y cargados de valor simbólico. Mi admiración por las artes en todas sus manifestaciones me impulsa a desear no solo contemplarlas, sino también producirlas. Paradójicamente, en mi infancia soñaba con ser actriz; dediqué varios años al teatro, aprendiendo a habitar personajes y a contar historias desde el cuerpo y la voz. Hoy, esa misma vocación narrativa se ha transformado: he pasado del frente de la cámara a la parte trasera de ella. Ahora soy quien maneja el dispositivo, quien elige el instante, quien convierte en actores de mi obra fotográfica a todos los que cruzan por mi lente. Cada persona, cada animal, las olas del mar y los rincones urbanos se convierten en intérpretes de una escena que escribo con luz y sombra. Esa es mi pasión, y es lo que deseo compartir contigo.
+
 >
 
 ## 11. Ficha de datos
@@ -254,11 +259,11 @@ En la página "Sobre mí" va una lista corta de datos sueltos. Propuesta:
 
 | | |
 |---|---|
-| **Con base en** | (tu ciudad) |
-| **Trabajando desde** | (año) |
-| **Fotografío** | (ej: retrato, calle, eventos) |
-| **Idiomas** | (ej: español, inglés) |
-| **Equipo** | (opcional — si te apetece contarlo) |
+| **Con base en** | Holguín |
+| **Trabajando desde** | 2020 |
+| **Fotografío** | Calle, mar, animales, eventos culturales, personas |
+| **Idiomas** | Español e Inglés |
+| **Equipo** | Canon PowerShot SX400 IS |
 
 > **Rellena las que quieras, quita las que no, añade las que falten:**
 >
@@ -274,8 +279,9 @@ Son frases sueltas, de una línea cada una. Si no se te ocurre algo, escribimos 
 - **Al pie de la web:** una frase muy corta debajo de tu nombre.
 
 > **Tus frases:**
->
->
+> Instantáneas de encuentros honestos, entre lo que veo y lo que siento.
+> ¿Deseas contar una historia junto a mí? Estoy a un mensaje de distancia.
+> Las fotografías; epitafios de lo que vivo
 
 ---
 
@@ -284,9 +290,10 @@ Son frases sueltas, de una línea cada una. Si no se te ocurre algo, escribimos 
 ## 13. Contacto
 
 > **Correo electrónico** (el que quieres que use la gente para escribirte):
->
+> kylieemar0500@gmail.com
+
 > **Instagram** (tu usuario o el enlace):
->
+> `_kyliemar_` & `kyliemargallery`
 
 ## 14. ¿Alguna otra red?
 
@@ -314,7 +321,7 @@ Ese cuadradito diminuto que aparece en la pestaña del navegador junto al nombre
 en cursiva, en dorado sobre fondo oscuro.
 
 > **Tu respuesta:**
->
+> Una K sería perfecto, y si se pudiera poner en negro sobre un fondo claro, mucho mejor!
 >
 
 ## 17. Tu nombre
@@ -323,7 +330,8 @@ En la web aparece solo **"Keily"**, sin apellido. ¿Es así como quieres que te 
 nombre completo?
 
 > **Tu respuesta:**
->
+> Bueno, estoy incursionando en el Keily Mar Couselo, ese estaría bien.
+
 >
 
 ---
@@ -333,10 +341,10 @@ nombre completo?
 Estas cosas **no** van en esta primera versión, pero conviene saber si las quieres en algún momento, para
 dejar el sitio preparado:
 
-- ☐ **Servicios y precios** — una página o sección explicando qué tipo de sesiones haces y cuánto cuestan.
+- ☐yes **Servicios y precios** — una página o sección explicando qué tipo de sesiones haces y cuánto cuestan.
 - ☐ **Testimonios** — opiniones de clientes.
-- ☐ **Blog o diario** — publicar entradas de vez en cuando.
-- ☐ **Venta de copias** — vender impresiones desde la web.
+- ☐yes **Blog o diario** — publicar entradas de vez en cuando.
+- ☐yes **Venta de copias** — vender impresiones desde la web.
 - ☐ **Reservas** — que la gente pueda reservar una sesión directamente.
 - ☐ **Nada de esto, de momento.**
 

@@ -8,8 +8,9 @@ application: there are no accounts, no store, no admin panel.
 
 Her practice spans many subjects, and **her photographs are predominantly black and white**. This is the
 single most important fact driving the design: the interface must never compete with the images. The
-palette is deliberately desaturated and dark so that monochrome photography reads as the only source of
-contrast on the page, with gold used sparingly as the sole chromatic accent.
+palette is pure black and fully achromatic so that monochrome photography reads as the only source of
+contrast on the page. There is no chromatic accent at all — Keily chose a black background with details in
+*gris mustang* `#7E7D7B` — so hierarchy is carried by brightness rather than by colour.
 
 ## Audience
 
@@ -38,10 +39,13 @@ Primary conversion action: **submitting the contact form** (or reaching her via 
 ## Scope — out (this phase)
 
 - Any backend, server rendering, database, or API. `output: 'static'` only.
-- Real delivery of contact-form submissions (the submit handler is a documented stub — see
-  [05-pages-and-sections.md](./05-pages-and-sections.md#contact-form)).
+- Real delivery of contact-form submissions. **Decided: the stub ships**
+  ([09-open-decisions.md §4](./09-open-decisions.md#4--contact-form-delivery-resolved-stub-at-launch)) — the
+  form is complete and correct but sends nothing, and her email sits beside it as the working contact path.
 - CMS or admin editing. Content is edited by changing files in the repo.
-- Services, pricing, testimonials, blog, client galleries, print sales, booking.
+- Services, pricing, testimonials, blog, client galleries, print sales, booking. **Keily has asked for
+  services & pricing, a blog, and print sales in a later phase** — the information architecture leaves room
+  for the first two (nav and routes iterate); print sales would need a backend and is a different project.
 - Legal pages (privacy notice, cookie banner). These become required when the form starts actually
   transmitting personal data; they are deferred with that work.
 - Analytics.
@@ -70,10 +74,14 @@ Primary conversion action: **submitting the contact form** (or reaching her via 
 
 ## Constraints
 
-- Frontend only, static output, deployable to Vercel with no serverless functions.
-- No content available at spec time — the build proceeds against generated placeholders and a documented
-  content checklist ([10-content-checklist.md](./10-content-checklist.md)).
-- Two decisions remain open ([09-open-decisions.md](./09-open-decisions.md)), both concerning the gallery.
-  The architecture is deliberately designed so that both can be answered late without rework.
+- Frontend only, static output, deployable to Vercel with no serverless functions. The site launches at
+  `keilymargallery.vercel.app` and is `noindex` until a custom domain replaces it.
+- The build proceeds against generated placeholders where content is missing, tracked in
+  [10-content-checklist.md](./10-content-checklist.md).
+- Every design decision is closed ([09-open-decisions.md](./09-open-decisions.md)). The remaining
+  constraint is content: **the 20 photographs have not arrived**, and everything Keily wrote is Spanish-only
+  ([10-content-checklist.md](./10-content-checklist.md)).
+- Some of her photographs are **under 2400px on the long edge**. Nothing is ever upscaled; responsive widths
+  are clamped per file ([04-content-model.md](./04-content-model.md#photographs-smaller-than-2400px)).
 - Spanish is the site's default language. English is a full, equal translation, but Spanish is what a
   visitor gets at the bare domain.

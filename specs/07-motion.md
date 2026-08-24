@@ -29,9 +29,15 @@ Fires once, on load, without waiting for the IntersectionObserver.
 | Headline line 1 | `translateY(100%)` inside an `overflow:hidden` mask | `translateY(0)` | 800ms | `--ease-out-expo` | 200ms |
 | Headline line 2 | same | same | 800ms | same | 290ms |
 | Headline line 3 | same | same | 800ms | same | 380ms |
+| Accent underline | `scaleX(0)`, `transform-origin: left` | `scaleX(1)` | 600ms | `--ease-out-quart` | 520ms |
 | Subline | `translateY(16px)`, `opacity 0` | rest | 700ms | `--ease-out-expo` | 560ms |
 | CTA row | `translateY(16px)`, `opacity 0` | rest | 700ms | `--ease-out-expo` | 660ms |
 | Scroll hint | `opacity 0` | `opacity 1` | 600ms | linear | 1000ms |
+
+**The accent underline** is the 1px `mustang` rule beneath "fotógrafa." in headline line 3. It draws in
+after that line has landed, and it is the reason the accent word reads as emphasised at all — the word
+itself is `mustang-soft`, only a step away from the `bone` around it, so the rule is carrying the emphasis.
+Under reduced motion it is present from the start rather than animated.
 
 **Line masking:** each headline segment is `<span class="block overflow-hidden"><span class="block">…</span></span>`.
 The inner span translates; the outer clips. The `overflow: hidden` must have enough vertical padding
@@ -42,8 +48,8 @@ the single most common way this effect goes wrong.
 carries the `js` class, which is set by a tiny inline script in `<head>`. Without JS the hero renders fully
 visible with no animation. Content is never hidden by a script that might not run.
 
-**Scroll hint ambient loop:** the 40px vertical gold rule under the scroll hint has a 1.8px travelling
-highlight — `background-position` is forbidden, so it is implemented as a 1px × 12px `gold` pseudo-element
+**Scroll hint ambient loop:** the 40px vertical mustang rule under the scroll hint has a 1.8px travelling
+highlight — `background-position` is forbidden, so it is implemented as a 1px × 12px `mustang` pseudo-element
 translating from `translateY(0)` to `translateY(28px)` and fading out, 2.4s, `ease-in-out`, infinite.
 Stops entirely once the user has scrolled past 10% of the viewport.
 
@@ -86,12 +92,12 @@ Every major block on every page — headings, paragraphs, images, the form, the 
 | Target | Effect |
 |---|---|
 | Photo card | Inner `<img>` `scale(1.04)`, 600ms `--ease-out-quart`. Wrapper is `overflow: hidden`. Caption scrim + text fade in over 320ms |
-| Text link | Gold underline: a 1px `::after` at the baseline, `transform: scaleX(0)` → `scaleX(1)`, `transform-origin: left`, 180ms `--ease-out-quart`. On mouse-out it scales out to the **right** (origin flips), which reads as the line leaving rather than rewinding |
-| Nav link | Same underline, plus colour `sand` → `linen`, 180ms |
-| Primary button | Background `gold` → `gold-soft`, 180ms. `scale(0.985)` on `:active`, 100ms |
-| Ghost button | Border and label `clay`/`linen` → `gold`/`gold`, 180ms |
-| Filter chip | Border `cocoa` → `gold`, 180ms. Active chip has a `gold` border and `gold` label, no transition needed |
-| Social icon | Colour `sand` → `gold`, 180ms |
+| Text link | Mustang underline: a 1px `::after` at the baseline, `transform: scaleX(0)` → `scaleX(1)`, `transform-origin: left`, 180ms `--ease-out-quart`. On mouse-out it scales out to the **right** (origin flips), which reads as the line leaving rather than rewinding |
+| Nav link | Same underline, plus colour `mist` → `bone`, 180ms |
+| Primary button | Background `mustang` → `mustang-soft`, 180ms. `scale(0.985)` on `:active`, 100ms |
+| Ghost button | Border `steel` → `mustang-soft`, 180ms. The label stays `bone`; it is already at maximum brightness |
+| Filter chip | Border `iron` → `mustang-soft` and label `mist` → `bone`, 180ms. The active chip has a `mustang` border, `graphite` fill and `bone` label, no transition needed |
+| Social icon | Colour `mist` → `bone`, 180ms. Brightening, not tinting — a `mustang` hover would make the icon *darker* |
 
 All hover effects are wrapped in `@media (hover: hover) and (pointer: fine)` so touch devices do not get
 sticky hover states.

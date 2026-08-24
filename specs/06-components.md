@@ -11,7 +11,7 @@ Owns `<html>`, `<head>`, `<body>`, the skip link, `Header`, `<slot />`, `Footer`
 ```ts
 interface Props {
   lang: Lang;
-  title: string;              // becomes "<title> · Keily", except on home where it is used verbatim
+  title: string;              // becomes "<title> · Keily Mar Couselo", except on home (used verbatim)
   description: string;
   image?: string;             // OG image path, defaults to /og-default.jpg
   noindex?: boolean;
@@ -20,7 +20,7 @@ interface Props {
 ```
 
 Responsibilities: font imports, `global.css` import, canonical + `hreflang` links (from `alternatePath`),
-OG/Twitter meta, JSON-LD, `<meta name="theme-color" content="#0E0A08">`, favicon links,
+OG/Twitter meta, JSON-LD, `<meta name="theme-color" content="#000000">`, favicon links,
 `ClientRouter` for view transitions, and the skip link (`t.nav.skipToContent` → `#main`).
 
 ### `PageLayout.astro`
@@ -72,7 +72,7 @@ allowlist of Tailwind classes — no dynamic class string construction, since Ta
 
 ### `PhotoCard.astro`
 ```ts
-type PhotoInteraction = 'none' | 'lightbox' | 'link';   // see open decision #2
+type PhotoInteraction = 'none' | 'lightbox' | 'link';   // ships as 'lightbox' everywhere
 
 interface Props {
   photo: Photo;
@@ -83,25 +83,47 @@ interface Props {
 }
 ```
 Renders `<li><figure>` with the `<Image>` and an optional `<figcaption>`. `interaction` selects the wrapper:
-`none` → no wrapper; `lightbox` → `<button>` with `aria-haspopup="dialog"` and the photo title as its
-accessible name; `link` → `<a>` to the detail page. **This one prop is the entire surface area of open
-decision #2.**
+`none` → no wrapper; `lightbox` → `<button>` with `aria-haspopup="dialog"` and the photo title (falling
+back to its `alt`) as its accessible name; `link` → `<a>` to a detail page.
 
-### `GalleryFilters.astro` — gated on open decision #1
+**Every gallery ships `interaction="lightbox"`** ([decision #2 = A](./09-open-decisions.md#2--photo-click-behaviour-resolved-a-custom-lightbox)).
+`none` and `link` stay in the union because they cost one line each and they are the escape hatches if the
+lightbox ever has to be disabled or replaced by per-photo pages.
+
+The card also carries `data-tone` (from `photo.tone`) and `data-index`; `gallery-filters.ts` toggles on the
+first and `lightbox.ts` indexes on the second. Neither script needs to know anything else about the card.
+
+### `GalleryFilters.astro`
 ```ts
+type ToneFilter = 'all' | 'bw' | 'colour';
+
 interface Props {
   lang: Lang;
-  filters: { slug: string; label: string; count: number }[];
-  active: string;
+  filters: { slug: ToneFilter; label: string; count: number }[];   // always in this order
+  active: ToneFilter;                                              // 'all' on first load
 }
 ```
-`role="group"` with an `aria-label`; each filter a `<button aria-pressed>`. Filtering is client-side
-(`hidden` attribute toggled per item, plus a URL param update via `history.replaceState`) — all photos are
-in the DOM, so there is no re-layout flash and no data fetch.
+Three chips — *Todas · Blanco y negro · Color*
+([decision #1 = D](./09-open-decisions.md#1--gallery-organisation-resolved-d-tone)). `role="group"`
+labelled by `t.work.filters.label`; each filter a `<button aria-pressed>`. Filtering is client-side
+(the `hidden` attribute toggled per item, plus a URL param update via `history.replaceState`) — every photo
+is in the DOM, so there is no re-layout flash and no data fetch.
 
-### `Lightbox.astro` — gated on open decision #2
-Specified in full in [09-open-decisions.md](./09-open-decisions.md#2--photo-click-behaviour) so it can be
-built or dropped without touching anything else.
+Two rules the component enforces rather than the page: a chip with `count === 0` renders `disabled` with its
+count still visible, and the component **renders nothing at all** if every photo shares one tone. See
+[05-pages-and-sections.md](./05-pages-and-sections.md#my-work).
+
+### `Lightbox.astro`
+Built in Phase 5. Specified in full — dialog semantics, chrome, keyboard, focus, touch, `inert`, motion,
+announcements, preloading — in
+[09-open-decisions.md](./09-open-decisions.md#build-spec-for-the-lightbox).
+```ts
+interface Props {
+  lang: Lang;      // for t.lightbox.* — the dialog is rendered once per page, not once per photo
+}
+```
+It reads its photo list from the gallery already in the DOM, so it takes no `photos` prop and the two
+components never disagree about ordering. When a filter is active it walks only the non-`hidden` cards.
 
 ## Form
 
@@ -120,7 +142,7 @@ built or dropped without touching anything else.
 | `Eyebrow.astro` | `text` |
 | `Chip.astro` | `label`, `count?`, `active`, `value` |
 | `Container.astro` | `size?: 'content' \| 'narrow' \| 'wide'`, `as?: string` |
-| `Section.astro` | `background: 'ink' \| 'bark'`, `spacing?: 'default' \| 'tight'`, `id?` |
+| `Section.astro` | `background: 'ink' \| 'coal'`, `spacing?: 'default' \| 'tight'`, `id?` |
 | `icons/*.astro` | `class?`, `title?` |
 
 ## Motion
@@ -143,8 +165,8 @@ fully visible, so a reveal that never fires can never hide content.
 | `scroll-header.ts` | all pages | Toggles the header's scrolled class |
 | `mobile-menu.ts` | all pages | Open/close, focus trap, scroll lock |
 | `contact-form.ts` | landing only | Validation, state machine, calls `submitContact` |
-| `gallery-filters.ts` | `/my-work`, if enabled | Filter toggling + URL param sync |
-| `lightbox.ts` | if enabled | Lightbox controller |
+| `gallery-filters.ts` | `/my-work` | Tone filter toggling, chip `aria-pressed`, count announcement, `?filter=` sync |
+| `lightbox.ts` | any page with a gallery (`/` and `/my-work`) | Lightbox controller — open/close, focus trap, keyboard, swipe, preload |
 
 All scripts are idempotent and re-initialise on `astro:page-load` (fired by `ClientRouter`), so view
 transitions do not leave dead listeners. Every script guards on the existence of its root element and exits

@@ -7,7 +7,7 @@ files; no string in this document is to be hard-coded in a component.
 
 # `/` — Landing
 
-Section order: **Hero → About Me → My Work → Contact Me**. Backgrounds alternate `ink` → `bark` → `ink` → `bark`.
+Section order: **Hero → About Me → My Work → Contact Me**. Backgrounds alternate `ink` → `coal` → `ink` → `coal`.
 
 ## 1. Hero
 
@@ -26,31 +26,31 @@ chrome does not clip it), `max-height: 900px` on desktop so it does not become a
 
 | Element | Spec |
 |---|---|
-| `<h1>` | `t.hero.headline` — three segments, each its own `<span class="block">` for line-by-line reveal. `display-xl`, `font-display`, `linen`. The segment "photographer." is coloured `gold` — the only place gold appears at display size |
-| Subline | `t.hero.subline`, `body-lg`, `sand`, `max-width: 42ch`, `mt-6` |
+| `<h1>` | `t.hero.headline` — three segments, each its own `<span class="block">` for line-by-line reveal. `display-xl`, `font-display`, `bone`. The third segment ("fotógrafa." / "photographer.") is `mustang-soft` with a 1px `mustang` underline that draws in as part of the hero timeline — the only place the accent appears at display size |
+| Subline | `t.hero.subline`, `body-lg`, `mist`, `max-width: 42ch`, `mt-6` |
 | CTA row | `mt-10`, flex, gap 4, wraps on mobile. Primary button `t.hero.ctaPrimary` → `#contact` (smooth scroll). Ghost button `t.hero.ctaSecondary` → `path('work', lang)` |
-| Scroll hint | Bottom-centre, `eyebrow` style in `sand`, with a 1px 40px gold vertical rule beneath it that animates (see [07-motion.md](./07-motion.md#hero)). Hidden below `md`. `aria-hidden="true"` |
+| Scroll hint | Bottom-centre, `eyebrow` style in `mist`, with a 1px 40px mustang vertical rule beneath it that animates (see [07-motion.md](./07-motion.md#hero)). Hidden below `md`. `aria-hidden="true"` |
 
 **Image handling:** `<Image>` with `loading="eager"`, `fetchpriority="high"`, `widths={[640, 1024, 1536, 2048, 2400]}`,
 `sizes="100vw"`, `format="avif"` with WebP fallback, explicit `width`/`height` to reserve space. This image is
 the LCP element and is preloaded in `<head>`.
 
-**Header interaction:** on `/` only, the header starts transparent and gains its `bark` background past 24px scroll.
+**Header interaction:** on `/` only, the header starts transparent and gains its `coal` background past 24px scroll.
 
 ## 2. About Me
 
 **Purpose:** a short, warm introduction with a picture of her, leading to the full `/about` page.
 
 **Layout:** two columns at `lg` (image 5/12, text 7/12, gap 16), stacked on mobile with the image first.
-Background `bark`. Vertical padding `--section-y`.
+Background `coal`. Vertical padding `--section-y`.
 
 | Element | Spec |
 |---|---|
-| Image | `portrait.jpg`, 4:5, square corners, `width: 100%`. A 1px `gold` rule offset 16px down-right behind the image (a framing device, `::after`, hidden below `md`) |
-| Eyebrow | `t.about.eyebrow`, `eyebrow` style, `gold` |
-| Heading | `t.about.heading`, `<h2>`, `display-md`, `font-display`, `linen` |
-| Lead | `t.about.lead`, `body-lg`, `linen`, `max-width: 58ch` |
-| Body | `t.about.body[]` → 2 paragraphs, `body`, `sand`, `max-width: 68ch`, `space-y-4` |
+| Image | `portrait.jpg`, 4:5, square corners, `width: 100%`. A 1px `mustang` rule offset 16px down-right behind the image (a framing device, `::after`, hidden below `md`) |
+| Eyebrow | `t.about.eyebrow`, `eyebrow` style, `mustang` |
+| Heading | `t.about.heading`, `<h2>`, `display-md`, `font-display`, `bone` |
+| Lead | `t.about.lead`, `body-lg`, `bone`, `max-width: 58ch` |
+| Body | `t.about.body[]` → 2 paragraphs, `body`, `mist`, `max-width: 68ch`, `space-y-4` |
 | CTA | Ghost button `t.about.cta` → `path('about', lang)`, `mt-8` |
 
 Image is `loading="lazy"`, `widths={[400, 600, 900, 1200]}`, `sizes="(min-width: 1024px) 40vw, 100vw"`.
@@ -63,9 +63,9 @@ Image is `loading="lazy"`, `widths={[400, 600, 900, 1200]}`, `sizes="(min-width:
 
 | Element | Spec |
 |---|---|
-| Eyebrow | `t.work.eyebrow`, `gold` |
+| Eyebrow | `t.work.eyebrow`, `mustang` |
 | Heading | `t.work.heading`, `<h2>`, `display-md` |
-| Lead | `t.work.lead`, `body-lg`, `sand`, centred, `max-width: 52ch`, `mx-auto` |
+| Lead | `t.work.lead`, `body-lg`, `mist`, centred, `max-width: 52ch`, `mx-auto` |
 | Grid | **Exactly 6 featured photos.** Masonry, same component as `/my-work` but with `columns={{ base: 1, sm: 2, lg: 3 }}` and no filters |
 | CTA | Primary button `t.work.cta` → `path('work', lang)`, centred, `mt-12` |
 
@@ -76,7 +76,7 @@ short grid. If more than 6, the first 6 by `order` are used and a build warning 
 
 **Purpose:** the conversion point. Contact form plus social links.
 
-**Layout:** background `bark`, `id="contact"` with `scroll-margin-top` equal to the header height so the
+**Layout:** background `coal`, `id="contact"` with `scroll-margin-top` equal to the header height so the
 smooth-scroll anchor does not tuck the heading under the sticky header. Two columns at `lg`
 (form 7/12, sidebar 5/12), stacked on mobile with the **form first**.
 
@@ -86,11 +86,11 @@ smooth-scroll anchor does not tuck the heading under the sticky header. Two colu
 
 | Element | Spec |
 |---|---|
-| Eyebrow | `t.contact.eyebrow`, `gold` |
+| Eyebrow | `t.contact.eyebrow`, `mustang` |
 | Heading | `t.contact.heading`, `<h2>`, `display-md` |
-| Lead | `t.contact.lead`, `body`, `sand`, `max-width: 42ch` |
-| Direct email | `t.contact.directEmail` + a `mailto:` link to `SITE.email`, styled as a text link |
-| Socials | `t.contact.socials.heading` then the `SITE.socials` list rendered as icon + label rows, 44px min height, gold icon on hover |
+| Lead | `t.contact.lead`, `body`, `mist`, `max-width: 42ch` |
+| Direct email | `t.contact.directEmail` + a **plain, visible `mailto:`** link to `SITE.email`, styled as a text link. No JavaScript obfuscation, no image, no "click to reveal" ([decision 5.5](./09-open-decisions.md#5--delivery--launch-decisions)) — in v1 the form does not deliver, so this link is the only working contact path and must survive JS being off |
+| Socials | `t.contact.socials.heading` then the `SITE.socials` list rendered as icon + label rows, 44px min height. Icons `mist` → `bone` on hover. **Three rows:** Instagram · galería, Instagram · personal, and email — the two Instagram rows share an icon and must not share a label |
 
 ---
 
@@ -112,12 +112,12 @@ Rendered by `ContactForm.astro` in the Contact section on `/` only. It does **no
 The honeypot is included **now** even though there is no backend, so the future provider inherits basic spam
 protection with no rework.
 
-A live character counter appears under `message` once past 1800 characters (`body-sm`, `sand`; `danger` at 2000).
+A live character counter appears under `message` once past 1800 characters (`body-sm`, `mist`; `danger` at 2000).
 
 ## Field markup requirements
 
 - Every input has a real `<label>` bound by `for`/`id`. No placeholder-as-label.
-- Required fields are marked with a gold `*` **and** `required` **and** the label text includes the
+- Required fields are marked with a `mustang-soft` `*` **and** `required` **and** the label text includes the
   accessible required indication via `aria-describedby` pointing at a visually-hidden `t.contact.form.required`.
 - Errors: `aria-invalid="true"` on the field, error text in a `<p id="{field}-error" role="alert">` linked via
   `aria-describedby`, `danger` coloured, `body-sm`, with a small alert icon.
@@ -141,10 +141,10 @@ A live character counter appears under `message` once past 1800 characters (`bod
 |---|---|
 | `idle` | Form as authored. Submit button enabled |
 | `submitting` | Button label swaps to `t.contact.form.submitting`, button disabled + `aria-busy="true"`, an inline spinner appears, all fields `readonly` (not `disabled`, so values remain announced) |
-| `success` | The form element is replaced by a success panel: gold check icon, `t.contact.form.success.heading` (`display-sm`), `t.contact.form.success.body`, and a ghost button `t.contact.form.success.again` that restores the empty form. Focus is moved to the panel heading (`tabindex="-1"`). The panel is `role="status"` |
+| `success` | The form element is replaced by a success panel: `success`-coloured check icon, `t.contact.form.success.heading` (`display-sm`), `t.contact.form.success.body`, and a ghost button `t.contact.form.success.again` that restores the empty form. Focus is moved to the panel heading (`tabindex="-1"`). The panel is `role="status"` |
 | `error` | A `danger`-bordered alert appears **above** the submit button with `t.contact.form.error.heading` / `.body` and a retry affordance. The form retains all values. `role="alert"`, focus moved to the alert |
 
-## The submit seam — `src/lib/contact.ts`
+## The submit seam (`src/lib/contact.ts`)
 
 There is no backend. The submit path is complete and real up to a single documented boundary:
 
@@ -173,6 +173,10 @@ export type ContactResult = { ok: true } | { ok: false; reason: 'network' | 'ser
 export async function submitContact(payload: ContactPayload): Promise<ContactResult>;
 ```
 
+**This is what ships at launch** ([decision #4](./09-open-decisions.md#4--contact-form-delivery-resolved-stub-at-launch)):
+the form is complete and correct, and it delivers nothing. The visible `mailto:` beside it is the real
+contact path until the backend lands.
+
 **Stub behaviour:** waits 900ms (so the `submitting` state is genuinely exercised), logs the payload with
 `console.info('[contact] stubbed submission', payload)`, and resolves `{ ok: true }`. If the honeypot is
 non-empty it resolves `{ ok: true }` **without** logging — bots get a success page, exactly as the real
@@ -195,27 +199,36 @@ Background `ink` throughout. Container `--container-content`, prose column `--co
 
 | Section | Spec |
 |---|---|
-| Page header | `<h1>` `t.about.page.title`, `display-lg`, `font-display`. Eyebrow above it in `gold`. Top padding accounts for the sticky header |
-| Lead | `t.about.page.lead`, `body-lg`, `linen`, `max-width: 58ch` |
+| Page header | `<h1>` `t.about.page.title`, `display-lg`, `font-display`. Eyebrow above it in `mustang`. Top padding accounts for the sticky header |
+| Lead | `t.about.page.lead`, `body-lg`, `bone`, `max-width: 58ch` |
 | Portrait | `portrait.jpg`, 4:5. On `lg` it floats right of the lead in a 2-column arrangement; on mobile it sits full-width between lead and body |
-| Body | `t.about.page.body[]` → 4–6 paragraphs, `body`, `sand`, `max-width: 68ch`, `space-y-5`. First paragraph has no indent; there are no drop caps |
-| Secondary image | `about-secondary.jpg`, 3:2, full container width, with a `body-sm` `sand` caption beneath |
-| Facts list | `t.about.page.factsHeading` (`display-sm`) + a `<dl>` of label/value rows separated by 1px `cocoa` rules. Labels `sand` `label`-size uppercase-tracked; values `linen` `body`. Expected rows: Based in · Working since · Shoots · Speaks · Equipment (final list confirmed by Keily) |
-| Closing CTA | Full-width band, background `bark`, centred: a `display-md` line and a primary button to `/#contact` |
+| Body | `t.about.page.body[]` → 4–6 paragraphs, `body`, `mist`, `max-width: 68ch`, `space-y-5`. First paragraph has no indent; there are no drop caps |
+| Secondary image | `about-secondary.jpg`, 3:2, full container width, with a `body-sm` `mist` caption beneath |
+| Facts list | `t.about.page.factsHeading` (`display-sm`) + a `<dl>` of label/value rows separated by 1px `iron` rules. Labels `mist` `label`-size uppercase-tracked; values `bone` `body`. Five rows, values in [12-copy-from-keily.md](./12-copy-from-keily.md#facts-list-taboutpagefacts): Con base en *Holguín* · Trabajando desde *2020* · Fotografío *Calle, mar, animales, eventos culturales, personas* · Idiomas *Español e Inglés* · Equipo *Canon PowerShot SX400 IS*. Provisional — she left the question blank, which is read as accepting the proposal |
+| Closing CTA | Full-width band, background `coal`, centred: a `display-md` line and a primary button to `/#contact` |
 
 ## `/my-work`
 
 | Section | Spec |
 |---|---|
-| Page header | `<h1>` `t.work.page.title`, `display-lg`. Eyebrow in `gold`. Lead `t.work.page.lead`, `body-lg`, `sand`, `max-width: 58ch` |
-| Filters | **Gated on [open decision #1](./09-open-decisions.md#1--gallery-organisation).** When enabled: a horizontally scrollable row of `Chip` controls, "All" first and active by default, each showing a count. Implemented as `<button>`s in a `role="group"` with `aria-pressed`; the active filter is also written to the URL as `?filter=slug` so a filtered view is linkable and survives reload |
+| Page header | `<h1>` `t.work.page.title`, `display-lg`. Eyebrow in `mustang`. Lead `t.work.page.lead`, `body-lg`, `mist`, `max-width: 58ch` |
+| Filters | A horizontally scrollable row of three `Chip` controls — **`Todas` · `Blanco y negro` · `Color`** ([decision #1 = D](./09-open-decisions.md#1--gallery-organisation-resolved-d-tone)), "Todas" first and active by default, each showing its count. `<button>`s in a `role="group"` labelled by `t.work.filters.label`, with `aria-pressed`. The active filter is written to the URL as `?filter=bw` / `?filter=colour` (`all` writes no param) so a filtered view is linkable and survives reload |
 | Gallery | `MasonryGallery`, all non-draft photos, `columns={{ base: 1, sm: 2, lg: 3, xl: 3 }}`, container `--container-wide` |
-| Count | `t.work.photoCount(n)` under the filters, `body-sm`, `sand`, in an `aria-live="polite"` region so filtering is announced |
-| Footer CTA | Band with background `bark`: a line inviting contact + primary button to `/#contact` |
+| Count | `t.work.photoCount(n)` under the filters, `body-sm`, `mist`, in an `aria-live="polite"` region so filtering is announced |
+| Footer CTA | Band with background `coal`: a line inviting contact + primary button to `/#contact` |
 
-**Empty state:** if a filter yields zero photos (only reachable via a hand-edited URL), show a `sand`
-`body` message and a "show all" ghost button. The URL filter param is validated against known slugs and
-falls back to "all" if unknown.
+**Empty state:** if a filter yields zero photos, show `t.work.filters.empty` in `mist` `body` and a
+`t.work.filters.showAll` ghost button. The URL filter param is validated against `all` | `bw` | `colour`
+and falls back to `all` if unknown.
+
+With the tone filter this state is **reachable without a hand-edited URL**: if every photograph she sends is
+black and white, the *Color* chip empties. Two consequences, both required:
+
+- A chip whose count is 0 is rendered `disabled` with its count shown, not hidden — a filter row that
+  changes shape depending on the content reads as a bug, and hiding it would silently drop the fact that
+  the colour work is missing.
+- If **all** photos share one tone, the entire filter row is omitted and the gallery renders unfiltered.
+  One chip plus a disabled one is not a choice, it is decoration.
 
 ## Gallery mechanics (shared)
 
@@ -229,8 +242,15 @@ falls back to "all" if unknown.
   `format="avif"`, explicit `width`/`height`.
 - Loading: the first 3 photos are `loading="eager"`; everything else `loading="lazy"` with `decoding="async"`.
 - Hover (pointer devices only, `@media (hover: hover)`): image scales to 1.04 over 600ms; if the photo has a
-  `title`, it fades in bottom-left over a bottom-anchored `ink`→transparent scrim, `body-sm`, `linen`.
+  `title`, it fades in bottom-left over a bottom-anchored `ink`→transparent scrim, `body-sm`, `bone`.
 - Touch devices show the title permanently beneath the image instead of on hover.
-- Click behaviour is **[open decision #2](./09-open-decisions.md#2--photo-click-behaviour)**. Until it is
-  answered, `PhotoCard` renders a non-interactive `<figure>`; the `interaction` prop is the single seam where
-  the answer plugs in.
+- **Clicking a photo opens the lightbox** ([decision #2 = A](./09-open-decisions.md#2--photo-click-behaviour-resolved-a-custom-lightbox)).
+  `PhotoCard` is rendered with `interaction="lightbox"` in both the featured grid on `/` and the full
+  gallery, so the card is a `<button>` wrapping the figure. The complete build spec — dialog semantics,
+  keyboard, focus, touch, `inert`, motion, announcements, preloading — is in
+  [09-open-decisions.md](./09-open-decisions.md#build-spec-for-the-lightbox).
+- **Filtering and the lightbox share one source of truth.** With a tone filter active, the lightbox's
+  previous/next and its counter operate over the *filtered* set, not the full one.
+- **Widths are clamped to each file's native size** via `responsiveWidths()` — some of Keily's photographs
+  are under 2400px and nothing is ever upscaled. See
+  [04-content-model.md](./04-content-model.md#photographs-smaller-than-2400px).
