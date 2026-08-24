@@ -1,0 +1,35 @@
+---
+// Phase 0 placeholder. This page exists so the deploy pipeline has something to build
+// and so a broken commit fails loudly. Phase 2 replaces it with the real Spanish landing page.
+const builtAt = new Date().toISOString();
+---
+
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="robots" content="noindex, nofollow" />
+    <title>Keily Mar Couselo — en construcción</title>
+    <style>
+      body {
+        margin: 0;
+        min-height: 100svh;
+        display: grid;
+        place-content: center;
+        gap: 0.75rem;
+        background: #000;
+        color: #f2f1ef;
+        font: 400 1rem/1.6 system-ui, sans-serif;
+        text-align: center;
+        padding: 2rem;
+      }
+      p { margin: 0; color: #a3a19e; }
+      span { color: #7e7d7b; }
+    </style>
+  </head>
+  <body>
+    <p>Keily Mar Couselo</p>
+    <p><span>Pipeline OK · {builtAt}</span></p>
+  </body>
+</html>
