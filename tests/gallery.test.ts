@@ -141,7 +141,7 @@ describe('lightbox semantics', () => {
   for (const route of ['/mi-trabajo', '/en/my-work', '/', '/en']) {
     test(`${route} has exactly one dialog, closed`, () => {
       const page = html(route);
-      const dialogs = page.match(/<div\s+data-lightbox\b[^>]*>/g) ?? [];
+      const dialogs = page.match(/<div\s+data-lightbox(?=[\s>])[^>]*>/g) ?? [];
       assert.equal(dialogs.length, 1, 'one dialog per page, not one per photo');
 
       const dialog = dialogs[0];
@@ -178,7 +178,7 @@ describe('lightbox semantics', () => {
   });
 
   test('prev and next exist for both pointer and touch layouts', () => {
-    const dialog = html('/mi-trabajo').match(/<div\s+data-lightbox\b[\s\S]*?<script/)![0];
+    const dialog = html('/mi-trabajo').match(/<div\s+data-lightbox(?=[\s>])[\s\S]*?<script/)![0];
     assert.equal((dialog.match(/data-lightbox-prev/g) ?? []).length, 2, 'edge button + mobile bar');
     assert.equal((dialog.match(/data-lightbox-next/g) ?? []).length, 2);
   });
@@ -214,5 +214,70 @@ describe('structured data', () => {
       assert.ok(media.contentUrl.startsWith('https://'), 'contentUrl must be absolute');
       assert.ok(media.description?.length > 10, 'every image needs its alt as a description');
     }
+  });
+});
+
+describe('lightbox bugs that shipped once', () => {
+  const script = readFileSync(join(import.meta.dirname, '..', 'src/scripts/lightbox.ts'), 'utf8');
+
+  /**
+   * The dialog is authored inside the page, so it renders inside <main>. open() marks
+   * every body child except the dialog as inert — which put <main> inert with the
+   * dialog inside it. Close, arrows, focus and swipe were all dead, and nothing in the
+   * markup looked wrong.
+   */
+  test('the dialog is moved to <body> before the inert set is computed', () => {
+    assert.match(
+      script,
+      /dialog\.parentElement !== document\.body.*document\.body\.appendChild\(dialog\)/s,
+      'without the portal, marking <main> inert disables the dialog itself',
+    );
+
+    const portalAt = script.indexOf('document.body.appendChild(dialog)');
+    const inertAt = script.indexOf('sibling.inert = true');
+    assert.ok(portalAt > 0 && portalAt < inertAt, 'the portal must happen before open()');
+  });
+
+  test('the dialog is authored inside the page, which is why the portal is required', () => {
+    // If this ever stops being true the portal is harmless, but the comment explaining
+    // it would become misleading — so the assumption is pinned rather than assumed.
+    const page = html('/mi-trabajo');
+    const dialogAt = page.search(/<div\s+data-lightbox(?=[\s>])/);
+    assert.ok(dialogAt > page.indexOf('<main'), 'dialog is no longer inside <main>');
+  });
+
+  /**
+   * Navigating to a photograph that had not loaded left the PREVIOUS one on screen:
+   * the counter moved, the picture did not, and on a slow connection it read as a
+   * dead control.
+   */
+  test('the previous frame is hidden and a spinner shown until the next decodes', () => {
+    assert.match(script, /image\.removeAttribute\('data-shown'\)/, 'the old frame is not cleared');
+    assert.match(script, /spinner\.hidden = false/, 'no loading state while decoding');
+    assert.match(script, /image\s*\n?\s*\.decode\(\)/, 'reveal must wait for a paintable frame');
+
+    for (const route of ['/mi-trabajo', '/']) {
+      const page = html(route);
+      assert.match(page, /data-lightbox-spinner[^>]*hidden/, `${route}: no spinner, or not hidden`);
+      assert.match(
+        page,
+        /data-lightbox-spinner[^>]*role="status"/,
+        `${route}: spinner is not announced`,
+      );
+    }
+  });
+
+  test('a slow decode cannot overwrite a newer navigation', () => {
+    assert.match(script, /let requestToken = 0/, 'no race guard');
+    assert.match(script, /if \(token !== requestToken\) return/, 'a stale decode can still win');
+  });
+
+  test('the swipe follows the finger rather than firing only on release', () => {
+    assert.match(script, /pointermove/, 'no drag tracking');
+    assert.match(script, /setPointerCapture/, 'the gesture is lost once it leaves the element');
+    assert.match(script, /axis \?\?=/, 'a diagonal drag would jitter between axes');
+
+    // The browser must not claim the horizontal gesture for scrolling first.
+    assert.match(html('/mi-trabajo'), /data-lightbox-stage[^>]*touch-none/);
   });
 });

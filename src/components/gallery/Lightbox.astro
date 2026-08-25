@@ -48,7 +48,11 @@ const counterTemplate = t.lightbox.counter(0, 0).replace('0', '{i}').replace('0'
     </button>
   </div>
 
-  <div class="relative flex min-h-0 flex-1 items-center justify-center px-4">
+  {/* touch-action: none — the browser must not claim the horizontal gesture first. */}
+  <div
+    data-lightbox-stage
+    class="relative flex min-h-0 flex-1 touch-none items-center justify-center px-4"
+  >
     <button
       type="button"
       data-lightbox-prev
@@ -62,7 +66,23 @@ const counterTemplate = t.lightbox.counter(0, 0).replace('0', '{i}').replace('0'
       /* Populated by lightbox.ts from the gallery's own <img>, so the srcset and the
         no-upscale clamp come along with it. */
     }
-    <figure class="flex max-h-[82vh] max-w-[90vw] flex-col items-center">
+    {
+      /* Shown while the next photograph decodes: without it the previous image stays
+        on screen and navigation reads as "nothing happened". */
+    }
+    <div
+      data-lightbox-spinner
+      hidden
+      role="status"
+      aria-label={t.common.imageLoading}
+      class="pointer-events-none absolute inset-0 z-0 flex items-center justify-center"
+    >
+      <span
+        class="border-iron border-t-mustang-soft size-8 rounded-full border-2 motion-safe:animate-spin"
+      ></span>
+    </div>
+
+    <figure data-lightbox-frame class="flex max-h-[82vh] max-w-[90vw] flex-col items-center">
       <img
         data-lightbox-image
         alt=""

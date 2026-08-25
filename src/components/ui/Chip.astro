@@ -1,9 +1,16 @@
 ---
 /**
- * Filter chip. A chip with a zero count renders disabled rather than hidden — a
- * filter row that changes shape depending on the content reads as a bug, and hiding
- * it would silently drop the fact that a whole tone is missing.
- * See specs/05-pages-and-sections.md § My work.
+ * Filter chip.
+ *
+ * The active styling is driven by `aria-pressed`, not by a server-rendered class.
+ * Those two can drift: the first version painted the active chip at build time while
+ * the script only flipped the attribute, so the row stayed stuck on "all" no matter
+ * what was pressed. Binding the paint to the attribute makes that impossible — the
+ * thing a screen reader reads and the thing an eye sees are now the same state.
+ *
+ * A chip with a zero count renders disabled rather than hidden: a filter row that
+ * changes shape depending on the content reads as a bug, and hiding it would silently
+ * drop the fact that a whole tone is missing.
  */
 interface Props {
   label: string;
@@ -13,7 +20,7 @@ interface Props {
   class?: string;
 }
 
-const { label, count, active, value, class: className } = Astro.props;
+const { label, count, active, value, class: className }: Props = Astro.props;
 const disabled = count === 0;
 ---
 
@@ -24,9 +31,8 @@ const disabled = count === 0;
   {disabled}
   class:list={[
     'text-label duration-base inline-flex min-h-11 items-center gap-2 rounded-sm border px-4 py-2 whitespace-nowrap transition-colors',
-    active
-      ? 'border-mustang bg-mustang text-ink'
-      : 'border-iron text-mist hover:border-steel hover:text-bone',
+    'border-iron text-mist hover:border-steel hover:text-bone',
+    'aria-pressed:border-mustang aria-pressed:bg-mustang aria-pressed:text-ink aria-pressed:hover:border-mustang aria-pressed:hover:text-ink',
     disabled && 'hover:border-iron hover:text-mist cursor-not-allowed opacity-40',
     className,
   ]}

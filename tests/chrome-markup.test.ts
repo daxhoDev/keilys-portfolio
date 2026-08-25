@@ -267,3 +267,32 @@ describe('dark chrome while the header sits over the hero', () => {
     assert.ok(!footer.includes('over-hero'), 'dark chrome leaked into the footer');
   });
 });
+
+describe('filter chips paint from the state they announce', () => {
+  /**
+   * The active chip was painted server-side while the script only flipped
+   * `aria-pressed`. The row therefore stayed visually stuck on "Todas" no matter what
+   * was pressed — the attribute a screen reader reads and the colour an eye sees had
+   * drifted apart. Binding the paint to the attribute makes that impossible.
+   */
+  test('active styling is driven by aria-pressed, not a build-time class', () => {
+    const chip = readFileSync(
+      join(import.meta.dirname, '..', 'src/components/ui/Chip.astro'),
+      'utf8',
+    );
+    assert.match(chip, /aria-pressed:bg-mustang/, 'the active paint is not bound to the attribute');
+    // Setting the initial aria-pressed from the prop is correct and required. What must
+    // not happen is choosing CLASSES from it, which freezes the paint at build time.
+    const classList = chip.match(/class:list=\{\[[\s\S]*?\]\}/)![0];
+    assert.ok(
+      !/\bactive\b/.test(classList),
+      'the class list still branches on the active prop, so it cannot update client-side',
+    );
+  });
+
+  test('the emitted CSS really contains the attribute-driven rules', () => {
+    const sheet = readdirSync(join(DIST, '_astro')).find((f: string) => f.endsWith('.css'))!;
+    const css = readFileSync(join(DIST, '_astro', sheet), 'utf8');
+    assert.match(css, /\[aria-pressed=true\]\{background-color:var\(--color-mustang\)\}/);
+  });
+});

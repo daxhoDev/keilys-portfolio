@@ -22,18 +22,35 @@ function initLightbox(): void {
   const gallery = document.querySelector<HTMLElement>('[data-gallery]');
   if (!dialog || !gallery) return;
 
+  /**
+   * The dialog is authored inside the page, which puts it inside <main>. open() marks
+   * every body child except the dialog as inert — so <main> went inert WITH the dialog
+   * inside it, and every control died: no close, no arrows, no focus, no swipe.
+   *
+   * Moving it to be a direct child of <body> makes the inert set correct by
+   * construction. Idempotent, and re-run on each astro:page-load.
+   */
+  if (dialog.parentElement !== document.body) document.body.appendChild(dialog);
+
   const image = dialog.querySelector<HTMLImageElement>('[data-lightbox-image]');
   const titleEl = dialog.querySelector<HTMLElement>('[data-lightbox-title]');
   const captionEl = dialog.querySelector<HTMLElement>('[data-lightbox-caption]');
   const counterEl = dialog.querySelector<HTMLElement>('[data-lightbox-counter]');
   const liveEl = dialog.querySelector<HTMLElement>('[data-lightbox-live]');
   const closeButton = dialog.querySelector<HTMLButtonElement>('[data-lightbox-close]');
+  const spinner = dialog.querySelector<HTMLElement>('[data-lightbox-spinner]');
   if (!image || !counterEl || !closeButton) return;
 
   const counterTemplate = counterEl.dataset.template ?? '{i} / {n}';
 
   let index = 0;
   let openedFrom: HTMLElement | null = null;
+
+  /**
+   * Guards against a slow image winning a race it lost. Navigate twice quickly and the
+   * first decode can resolve last, painting a photograph the viewer has already passed.
+   */
+  let requestToken = 0;
 
   /** Visible cards only — this is what makes filtering and the lightbox agree. */
   const cards = () =>
@@ -56,12 +73,35 @@ function initLightbox(): void {
     if (!source) return;
 
     // Reuse the gallery's own srcset: the no-upscale clamp comes with it.
+    const token = ++requestToken;
+
+    // Hide the previous frame immediately. Leaving it up while the next one loads is
+    // what makes navigation look broken: the counter moves and the picture does not.
     image.removeAttribute('data-shown');
+    if (spinner) spinner.hidden = false;
+
     image.src = source.currentSrc || source.src;
     image.srcset = source.srcset;
     image.sizes = '90vw';
     image.alt = source.alt;
-    requestAnimationFrame(() => image.setAttribute('data-shown', ''));
+
+    frame?.style.removeProperty('transform');
+
+    const reveal = () => {
+      if (token !== requestToken) return; // a newer navigation has taken over
+      if (spinner) spinner.hidden = true;
+      image.setAttribute('data-shown', '');
+    };
+
+    // decode() resolves when the frame is actually paintable, so there is no flash of a
+    // half-decoded image. It rejects if the src changes underneath — which the token
+    // already covers, so the rejection is deliberately ignored.
+    image
+      .decode()
+      .then(reveal)
+      .catch(() => {
+        if (image.complete) reveal();
+      });
 
     const title = card.dataset.title ?? '';
     const caption = card.dataset.caption ?? '';
@@ -188,46 +228,94 @@ function initLightbox(): void {
     }
   };
 
-  // Pointer events rather than a gesture library: horizontal swipes navigate,
-  // a downward swipe closes.
+  /**
+   * Direct manipulation on touch: the photograph follows the finger and settles either
+   * onto the next one or back where it was. A swipe that only fires on release feels
+   * like a button; this feels like paper.
+   *
+   * Pointer events, no gesture library. The stage sets touch-action: none so the
+   * browser does not claim the gesture for scrolling first.
+   */
+  const stage = dialog.querySelector<HTMLElement>('[data-lightbox-stage]');
+  const frame = dialog.querySelector<HTMLElement>('[data-lightbox-frame]');
+
   let startX = 0;
   let startY = 0;
-  let tracking = false;
+  let dragging = false;
+  let axis: 'x' | 'y' | null = null;
+
+  const setOffset = (dx: number, dy: number, animate: boolean) => {
+    if (!frame) return;
+    frame.style.transition = animate
+      ? 'transform var(--duration-base) var(--ease-out-quart)'
+      : 'none';
+    frame.style.transform = dx || dy ? `translate3d(${dx}px, ${dy}px, 0)` : '';
+  };
 
   const onPointerDown = (event: PointerEvent) => {
-    if (event.pointerType === 'mouse') return;
-    tracking = true;
+    if (event.pointerType === 'mouse' || !isOpen()) return;
+    dragging = true;
+    axis = null;
     startX = event.clientX;
     startY = event.clientY;
+    (event.currentTarget as HTMLElement).setPointerCapture?.(event.pointerId);
+  };
+
+  const onPointerMove = (event: PointerEvent) => {
+    if (!dragging) return;
+    const dx = event.clientX - startX;
+    const dy = event.clientY - startY;
+
+    // Decide the axis once, so a slightly diagonal drag does not jitter between them.
+    axis ??= Math.abs(dx) > Math.abs(dy) ? 'x' : 'y';
+
+    if (axis === 'x') setOffset(dx, 0, false);
+    else if (dy > 0) setOffset(0, dy, false); // downward only: a drag up is not a close
   };
 
   const onPointerUp = (event: PointerEvent) => {
-    if (!tracking) return;
-    tracking = false;
+    if (!dragging) return;
+    dragging = false;
 
     const dx = event.clientX - startX;
     const dy = event.clientY - startY;
 
-    if (Math.abs(dx) > Math.abs(dy) && Math.abs(dx) > SWIPE_THRESHOLD) {
+    if (axis === 'x' && Math.abs(dx) > SWIPE_THRESHOLD) {
+      setOffset(0, 0, false);
       show(dx < 0 ? index + 1 : index - 1);
-    } else if (dy > SWIPE_THRESHOLD && Math.abs(dy) > Math.abs(dx)) {
+    } else if (axis === 'y' && dy > SWIPE_THRESHOLD) {
+      setOffset(0, 0, false);
       close();
+    } else {
+      setOffset(0, 0, true); // settle back
     }
+
+    axis = null;
+  };
+
+  const onPointerCancel = () => {
+    dragging = false;
+    axis = null;
+    setOffset(0, 0, true);
   };
 
   gallery.addEventListener('click', onGalleryClick);
   dialog.addEventListener('click', onDialogClick);
   document.addEventListener('keydown', onKeydown);
-  dialog.addEventListener('pointerdown', onPointerDown);
-  dialog.addEventListener('pointerup', onPointerUp);
+  stage?.addEventListener('pointerdown', onPointerDown);
+  stage?.addEventListener('pointermove', onPointerMove);
+  stage?.addEventListener('pointerup', onPointerUp);
+  stage?.addEventListener('pointercancel', onPointerCancel);
 
   teardown = () => {
     close({ restoreFocus: false });
     gallery.removeEventListener('click', onGalleryClick);
     dialog.removeEventListener('click', onDialogClick);
     document.removeEventListener('keydown', onKeydown);
-    dialog.removeEventListener('pointerdown', onPointerDown);
-    dialog.removeEventListener('pointerup', onPointerUp);
+    stage?.removeEventListener('pointerdown', onPointerDown);
+    stage?.removeEventListener('pointermove', onPointerMove);
+    stage?.removeEventListener('pointerup', onPointerUp);
+    stage?.removeEventListener('pointercancel', onPointerCancel);
     teardown = null;
   };
 }

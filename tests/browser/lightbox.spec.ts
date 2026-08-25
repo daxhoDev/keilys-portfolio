@@ -179,3 +179,118 @@ test.describe('tone filters', () => {
     await expect(count).toHaveText('27 fotografías');
   });
 });
+
+test.describe('bugs that shipped once', () => {
+  test('the close and arrow buttons actually respond', async ({ page }) => {
+    // They were inside <main>, which open() marked inert — every control was dead.
+    await page.goto('/mi-trabajo');
+    await page.locator('[data-lightbox-open]').first().click();
+
+    await page.locator('[data-lightbox-next]').first().click();
+    await expect(page.locator('[data-lightbox-counter]')).toHaveText('2 de 27');
+
+    await page.locator('[data-lightbox-prev]').first().click();
+    await expect(page.locator('[data-lightbox-counter]')).toHaveText('1 de 27');
+
+    await page.locator('[data-lightbox-close]').click();
+    await expect(page.locator('[data-lightbox]')).toBeHidden();
+  });
+
+  test('the dialog is a direct child of body once initialised', async ({ page }) => {
+    await page.goto('/mi-trabajo');
+    const parent = await page.evaluate(
+      () => document.querySelector('[data-lightbox]')?.parentElement?.tagName,
+    );
+    expect(parent).toBe('BODY');
+  });
+
+  test('a not-yet-loaded photograph shows a spinner, not the previous one', async ({ page }) => {
+    await page.route('**/_astro/*.avif', async (route) => {
+      await new Promise((resolve) => setTimeout(resolve, 800));
+      await route.continue();
+    });
+
+    await page.goto('/mi-trabajo');
+    await page.locator('[data-lightbox-open]').first().click();
+    await page.keyboard.press('ArrowRight');
+
+    // The old frame must be gone the moment the counter moves.
+    await expect(page.locator('[data-lightbox-spinner]')).toBeVisible();
+    await expect(page.locator('[data-lightbox-image]')).not.toHaveAttribute('data-shown', '');
+
+    await expect(page.locator('[data-lightbox-image]')).toHaveAttribute('data-shown', '', {
+      timeout: 5000,
+    });
+    await expect(page.locator('[data-lightbox-spinner]')).toBeHidden();
+  });
+
+  test('the active filter chip repaints when pressed', async ({ page }) => {
+    // The chip announced the change but never repainted: the paint was baked at build.
+    await page.goto('/mi-trabajo');
+    const all = page.locator('[data-filter="all"]');
+    const bw = page.locator('[data-filter="bw"]');
+
+    const background = (locator: typeof all) =>
+      locator.evaluate((el) => getComputedStyle(el).backgroundColor);
+
+    const activeColour = await background(all);
+    await bw.click();
+
+    await expect(bw).toHaveAttribute('aria-pressed', 'true');
+    expect(await background(bw), 'the pressed chip did not repaint').toBe(activeColour);
+    expect(await background(all), 'the old chip stayed painted').not.toBe(activeColour);
+  });
+});
+
+test.describe('mobile', () => {
+  test.use({ viewport: { width: 375, height: 812 }, hasTouch: true });
+
+  test('a horizontal swipe moves to the next photograph', async ({ page }) => {
+    await page.goto('/mi-trabajo');
+    await page.locator('[data-lightbox-open]').first().click();
+    await expect(page.locator('[data-lightbox-counter]')).toHaveText('1 de 27');
+
+    const stage = page.locator('[data-lightbox-stage]');
+    const box = (await stage.boundingBox())!;
+    const y = box.y + box.height / 2;
+
+    await page.mouse.move(box.x + box.width * 0.8, y);
+    await page.mouse.down();
+    await page.mouse.move(box.x + box.width * 0.2, y, { steps: 10 });
+    await page.mouse.up();
+
+    await expect(page.locator('[data-lightbox-counter]')).toHaveText('2 de 27');
+  });
+
+  test('a short drag settles back instead of navigating', async ({ page }) => {
+    await page.goto('/mi-trabajo');
+    await page.locator('[data-lightbox-open]').first().click();
+
+    const stage = page.locator('[data-lightbox-stage]');
+    const box = (await stage.boundingBox())!;
+    const y = box.y + box.height / 2;
+
+    await page.mouse.move(box.x + box.width * 0.5, y);
+    await page.mouse.down();
+    await page.mouse.move(box.x + box.width * 0.5 - 20, y, { steps: 5 });
+    await page.mouse.up();
+
+    await expect(page.locator('[data-lightbox-counter]')).toHaveText('1 de 27');
+  });
+
+  test('a downward drag closes it', async ({ page }) => {
+    await page.goto('/mi-trabajo');
+    await page.locator('[data-lightbox-open]').first().click();
+
+    const stage = page.locator('[data-lightbox-stage]');
+    const box = (await stage.boundingBox())!;
+    const x = box.x + box.width / 2;
+
+    await page.mouse.move(x, box.y + box.height * 0.3);
+    await page.mouse.down();
+    await page.mouse.move(x, box.y + box.height * 0.8, { steps: 10 });
+    await page.mouse.up();
+
+    await expect(page.locator('[data-lightbox]')).toBeHidden();
+  });
+});
