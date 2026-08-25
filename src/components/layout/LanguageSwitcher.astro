@@ -19,10 +19,12 @@ import { useTranslations, HTML_LANG } from '~/i18n/utils.ts';
 interface Props {
   lang: Lang;
   variant?: 'inline' | 'stacked';
+  /** True only in the header, which goes dark while it sits over the hero photograph. */
+  overHero?: boolean;
   class?: string;
 }
 
-const { lang, variant = 'inline', class: className }: Props = Astro.props;
+const { lang, variant = 'inline', overHero = false, class: className }: Props = Astro.props;
 const t = useTranslations(lang);
 ---
 
@@ -35,12 +37,18 @@ const t = useTranslations(lang);
     LANGS.map((code, index) => (
       <>
         {index > 0 && (
-          <span aria-hidden="true" class="text-mustang-dim">
+          <span
+            aria-hidden="true"
+            class:list={['text-mustang-dim', overHero && 'group-data-[over-hero]:text-ink/45']}
+          >
             /
           </span>
         )}
         {code === lang ? (
-          <span aria-current="true" class="text-bone">
+          <span
+            aria-current="true"
+            class:list={['text-bone', overHero && 'group-data-[over-hero]:text-ink']}
+          >
             {t.lang[code]}
           </span>
         ) : (
@@ -48,7 +56,11 @@ const t = useTranslations(lang);
             href={alternatePath(Astro.url, code)}
             hreflang={HTML_LANG[code]}
             lang={HTML_LANG[code]}
-            class="text-mist hover:text-bone duration-base inline-flex min-h-11 items-center transition-colors"
+            class:list={[
+              'text-mist hover:text-bone duration-base inline-flex min-h-11 items-center transition-colors',
+              overHero &&
+                'group-data-[over-hero]:text-ink/70 group-data-[over-hero]:hover:text-ink',
+            ]}
           >
             {t.lang[code]}
           </a>

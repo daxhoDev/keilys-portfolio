@@ -22,10 +22,14 @@ chrome does not clip it), `max-height: 900px` on desktop so it does not become a
 
   | Layer | Purpose |
   |---|---|
-  | Radial vignette, `ellipse 57.5% 45% at 50% 42%` | Darkens outwards; carries the corners and the nav |
-  | Top scrim, 70% → 0 by 34% | Gives the transparent header something to sit on |
-  | Bottom scrim, solid → 0 by the top | Where the headline, subline and buttons live |
+  | Bottom gradient, solid → 0 by the top | Where the headline, subline and buttons live |
   | Flat dim, ink at 32% | Overall brightness reduction |
+
+  **No vignette and no top gradient.** Both were tried and removed: the radial vignette read as a visible
+  circle over the photograph, and the top gradient was a dark band the design did not want. The nav is made
+  legible a different way — **the header itself goes dark while it sits over the hero**, and returns to the
+  light palette once it scrolls onto its own `coal` background. See
+  [03-information-architecture.md](./03-information-architecture.md#header).
 
   `ink` is `#000000`, so compositing black at 32% **is** `brightness(0.68)` — the same result as a CSS
   filter without the extra paint pass on a full-bleed image. Because every layer is black, the order of
@@ -34,7 +38,7 @@ chrome does not clip it), `max-height: 900px` on desktop so it does not become a
   **Why this is not just a bottom scrim.** Keily's first hero is a bright photograph: the headline block
   sits on mean 197 grey, **1.53 : 1** against `bone`. A bottom-only scrim left the nav at 1.18 : 1 and the
   top of the headline at 3.02 : 1. With the veil, every text region clears 4.5 : 1 at its **brightest**
-  pixel — headline 5.51, subline 6.38, nav 5.08, scroll hint 7.89.
+  pixel — headline 4.95, subline 5.15, scroll hint 7.45.
 
   ```
   npm run check:hero

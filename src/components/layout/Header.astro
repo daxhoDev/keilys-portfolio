@@ -4,6 +4,14 @@
  * scroll it takes a coal background, a blur and a hairline. On About, Work and 404 it
  * starts in the scrolled state, because there is no hero for it to sit over.
  *
+ * While it sits over the photograph (data-over-hero) the whole header switches to dark
+ * ink, because the hero is a bright image and light chrome disappears into it. Once it
+ * scrolls onto its own coal background the normal light styling returns. Children read
+ * this through group-data-[over-hero], so the state lives in exactly one place.
+ *
+ * data-over-hero is server-rendered as well as script-toggled: the page always loads at
+ * the top, so the dark state must be correct on the first paint, before any JS runs.
+ *
  * Deliberately NOT transition:persist, despite specs/06-components.md having asked for
  * it. Persist keeps the *old* element across a client-side navigation, and this header
  * carries per-page state: aria-current on the nav, and the language switcher hrefs,
@@ -37,9 +45,10 @@ const t = useTranslations(lang);
 <header
   data-header
   data-transparent={transparent ? '' : undefined}
+  data-over-hero={transparent ? '' : undefined}
   transition:name="site-header"
   class:list={[
-    'duration-base fixed inset-x-0 top-0 z-40 transition-colors',
+    'group duration-base fixed inset-x-0 top-0 z-40 transition-colors',
     'border-b',
     transparent
       ? 'data-[scrolled]:border-iron data-[scrolled]:bg-coal/92 border-transparent bg-transparent data-[scrolled]:backdrop-blur-sm'
@@ -49,21 +58,21 @@ const t = useTranslations(lang);
   <div class="gutter-x max-w-wide mx-auto flex h-18 items-center justify-between md:h-22">
     <a
       href={path('home', lang)}
-      class="font-display text-display-sm text-bone hover:text-mustang-soft duration-base transition-colors"
+      class="font-display text-display-sm text-bone hover:text-mustang-soft duration-base group-data-[over-hero]:text-ink group-data-[over-hero]:hover:text-ink/70 transition-colors"
     >
       {SITE.wordmark}
     </a>
 
     <div class="flex items-center gap-8">
       <Nav {lang} variant="header" class="hidden md:flex" />
-      <LanguageSwitcher {lang} class="hidden md:flex" />
+      <LanguageSwitcher {lang} overHero={transparent} class="hidden md:flex" />
 
       <button
         type="button"
         data-menu-open
         aria-expanded="false"
         aria-controls="mobile-menu"
-        class="text-mist hover:text-bone -mr-2 flex size-11 items-center justify-center transition-colors md:hidden"
+        class="text-mist hover:text-bone duration-base group-data-[over-hero]:text-ink -mr-2 flex size-11 items-center justify-center transition-colors md:hidden"
         aria-label={t.nav.menu}
       >
         <MenuIcon class="size-6" />

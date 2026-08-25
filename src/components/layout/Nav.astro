@@ -57,6 +57,12 @@ const linkSizes = {
               linkSizes[variant],
               variant === 'header' && 'min-h-11 content-center',
               isCurrent ? 'text-bone border-mustang border-b pb-0.5' : 'text-mist hover:text-bone',
+              // Dark chrome while the header sits over the hero photograph. Header only:
+              // the footer and mobile menu have their own coal background.
+              variant === 'header' &&
+                (isCurrent
+                  ? 'group-data-[over-hero]:border-ink group-data-[over-hero]:text-ink'
+                  : 'group-data-[over-hero]:text-ink/80 group-data-[over-hero]:hover:text-ink'),
             ]}
           >
             {item.label}

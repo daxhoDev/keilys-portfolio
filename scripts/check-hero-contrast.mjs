@@ -24,17 +24,6 @@ const MIST = [0xa3, 0xa1, 0x9e];
 /** Mirrors @utility hero-veil. Stops are [position, alpha]. */
 export const VEIL = {
   flatDim: 0.32,
-  vignette: [
-    [0.26, 0],
-    [0.66, 0.32],
-    [1.0, 0.66],
-  ],
-  top: [
-    [0, 0.7],
-    [0.14, 0.34],
-    [0.34, 0.05],
-    [1, 0],
-  ],
   bottom: [
     [0, 1],
     [0.06, 1],
@@ -51,7 +40,6 @@ export const VEIL = {
 export const REGIONS = [
   { name: 'headline', box: [0.05, 0.33, 0.55, 0.7], fg: BONE, min: 4.5 },
   { name: 'subline', box: [0.05, 0.7, 0.5, 0.8], fg: MIST, min: 4.5 },
-  { name: 'nav links', box: [0.6, 0.0, 1.0, 0.12], fg: MIST, min: 4.5 },
   { name: 'scroll hint', box: [0.42, 0.85, 0.58, 0.98], fg: MIST, min: 4.5 },
 ];
 
@@ -76,7 +64,7 @@ const alphaAt = (stops, t) => {
   return t < stops[0][0] ? stops[0][1] : stops.at(-1)[1];
 };
 
-export async function measureHero(imagePath = HERO) {
+export async function measureHero(imagePath = HERO, veil = VEIL) {
   const W = 320;
   const H = 180; // a 16:9 viewport
   const { data } = await sharp(imagePath)
@@ -87,19 +75,9 @@ export async function measureHero(imagePath = HERO) {
   const veiled = (x, y) => {
     const i = (y * W + x) * 3;
     let px = [data[i], data[i + 1], data[i + 2]];
-    const u = x / W;
     const v = y / H;
 
-    const dx = (u - 0.5) / 0.575;
-    const dy = (v - 0.42) / 0.45;
-    const distance = Math.sqrt(dx * dx + dy * dy);
-
-    const alphas = [
-      VEIL.flatDim,
-      alphaAt(VEIL.vignette, distance),
-      alphaAt(VEIL.top, v),
-      alphaAt(VEIL.bottom, 1 - v),
-    ];
+    const alphas = [veil.flatDim, alphaAt(veil.bottom, 1 - v)];
 
     // Every layer is pure black, so compositing is a multiply. Order does not matter.
     for (const alpha of alphas) px = px.map((c) => c * (1 - alpha));
@@ -131,6 +109,53 @@ export async function measureHero(imagePath = HERO) {
   });
 }
 
+/**
+ * The header switches to dark ink while it sits over the photograph, so its legibility
+ * depends on the image being LIGHT where the chrome sits — the opposite of everything
+ * else here, and the flat dim works against it.
+ *
+ * Reported as a warning rather than a failure: whether to accept a dip, lighten the
+ * dim, or put something behind the header is a design decision, not a bug to fix
+ * silently. The numbers are printed so the decision is made with them in view.
+ */
+export const DARK_CHROME = [
+  { name: 'wordmark', box: [0.06, 0.03, 0.22, 0.12] },
+  { name: 'nav links', box: [0.66, 0.04, 0.86, 0.11] },
+  { name: 'switcher', box: [0.87, 0.04, 0.94, 0.11] },
+];
+
+export async function measureDarkChrome(imagePath = HERO) {
+  const W = 640;
+  const H = 360;
+  const { data } = await sharp(imagePath)
+    .resize(W, H, { fit: 'cover' })
+    .raw()
+    .toBuffer({ resolveWithObject: true });
+
+  // Only the flat dim reaches the header band; the bottom gradient is long gone by then.
+  const dimmed = (x, y) => {
+    const i = (y * W + x) * 3;
+    return [data[i], data[i + 1], data[i + 2]].map((c) => c * (1 - VEIL.flatDim));
+  };
+
+  return DARK_CHROME.map(({ name, box: [x0, y0, x1, y1] }) => {
+    let darkest = [255, 255, 255];
+    let below = 0;
+    let count = 0;
+
+    for (let y = Math.round(y0 * H); y < Math.round(y1 * H); y++) {
+      for (let x = Math.round(x0 * W); x < Math.round(x1 * W); x++) {
+        const px = dimmed(x, y);
+        count += 1;
+        if (contrast(px, [0, 0, 0]) < 4.5) below += 1;
+        if (luminance(px) < luminance(darkest)) darkest = px;
+      }
+    }
+
+    return { name, worst: contrast(darkest, [0, 0, 0]), belowShare: below / count };
+  });
+}
+
 // Run directly: print a report and fail the process if any region is short.
 if (process.argv[1] === fileURLToPath(import.meta.url)) {
   const results = await measureHero();
@@ -141,6 +166,25 @@ if (process.argv[1] === fileURLToPath(import.meta.url)) {
         `mean ${r.mean.toFixed(2)}:1   brightest pixel ${r.worst.toFixed(2)}:1   (needs ${r.min}:1)`,
     );
   }
+  const chrome = await measureDarkChrome();
+  console.log('\nDark header chrome, over the dimmed photograph (needs 4.5:1 against ink)\n');
+  for (const c of chrome) {
+    const ok = c.belowShare === 0;
+    console.log(
+      `  ${ok ? 'ok  ' : 'warn'} ${c.name.padEnd(13)} darkest patch ${c.worst.toFixed(2)}:1   ` +
+        `${(c.belowShare * 100).toFixed(0)}% of the area below AA`,
+    );
+  }
+  if (chrome.some((c) => c.belowShare > 0)) {
+    console.log(
+      '\n  The dark header dips below AA where the photograph darkens. Options:\n' +
+        '    · lighten the flat dim in hero-veil (currently 32%)\n' +
+        '    · give the header its own light backdrop while it is over the hero\n' +
+        '    · choose a hero whose top edge stays bright\n' +
+        '  Left as a warning because this is a design decision, not a defect.',
+    );
+  }
+
   const failed = results.filter((r) => !r.passes);
   console.log(
     failed.length

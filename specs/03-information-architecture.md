@@ -130,6 +130,21 @@ Sticky, full width, `z-50`. Height 72px mobile / 88px desktop.
   border. Transition 320ms.
 - **On the About, Work and 404 pages:** starts in the scrolled state immediately.
 
+**Dark chrome over the hero.** Keily's hero is a bright photograph, and light chrome disappears into it —
+measured, the nav read **1.18 : 1**. While the header sits over the image it carries `data-over-hero` and the
+whole header switches to dark `ink`: wordmark, nav links, current-page rule and language switcher. Past 24px
+of scroll the attribute is dropped and the normal light palette returns, against the `coal` background.
+
+- `data-over-hero` is **server-rendered** as well as script-toggled. A page always loads at the top, so the
+  dark state has to be correct on the first paint, before any JavaScript runs.
+- Children read it through `group-data-[over-hero]`, so the state lives on the header alone.
+- Only the header opts in. The footer and mobile menu have their own `coal` background and stay light —
+  `LanguageSwitcher` takes an explicit `overHero` prop rather than inferring it, so the dark classes cannot
+  leak into either.
+- **This depends on the photograph.** `npm run check:hero` measures the header band against the real file and
+  warns when it dips below AA. On the current hero the nav links pass everywhere, while the wordmark and the
+  switcher fall to 3.4 : 1 and 3.2 : 1 over the darker corners.
+
 Contents, left → right:
 1. **Wordmark** — `SITE.wordmark` ("Keily Mar") in `font-display` at `display-sm`, linking to
    `path('home', lang)`. It is the site's logotype; there is no image logo. The **full** name

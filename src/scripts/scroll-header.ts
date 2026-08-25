@@ -21,7 +21,11 @@ function initScrollHeader(): void {
 
   const apply = () => {
     ticking = false;
-    header.toggleAttribute('data-scrolled', window.scrollY > SCROLL_THRESHOLD);
+    const scrolled = window.scrollY > SCROLL_THRESHOLD;
+    header.toggleAttribute('data-scrolled', scrolled);
+    // The inverse of scrolled, but only meaningful on a transparent header: it drives
+    // the dark chrome that keeps the nav legible over a bright photograph.
+    header.toggleAttribute('data-over-hero', !scrolled);
   };
 
   const onScroll = () => {

@@ -8,7 +8,7 @@
  */
 import { test, describe, before } from 'node:test';
 import assert from 'node:assert/strict';
-import { readFileSync, existsSync } from 'node:fs';
+import { readFileSync, existsSync, readdirSync } from 'node:fs';
 import { join } from 'node:path';
 
 import { ROUTES, LANGS, type PageKey } from '../src/i18n/routes.ts';
@@ -221,5 +221,49 @@ describe('the header must not be persisted across navigations', () => {
     assert.equal(currentLabel('/mi-trabajo'), 'Mi trabajo');
     assert.equal(currentLabel('/en/about'), 'About');
     assert.equal(currentLabel('/en/my-work'), 'My work');
+  });
+});
+
+describe('dark chrome while the header sits over the hero', () => {
+  /**
+   * The hero is a bright photograph, so light chrome disappears into it. The header
+   * switches to dark ink while it is over the image and back to light once it scrolls
+   * onto its own coal background.
+   */
+  test('the landing header is in the dark state on first paint, before any script runs', () => {
+    for (const route of ['/', '/en']) {
+      const tag = html(route).match(/<header[^>]*>/)![0];
+      assert.match(tag, /data-over-hero/, `${route}: dark state is not server-rendered`);
+      assert.match(tag, /class="[^"]*\bgroup\b/, 'children read the state through group-data-*');
+    }
+  });
+
+  test('pages without a hero never get the dark state', () => {
+    for (const route of ['/sobre-mi', '/mi-trabajo', '/en/about', '/en/my-work']) {
+      const tag = html(route).match(/<header[^>]*>/)![0];
+      assert.ok(!tag.includes('data-over-hero'), `${route}: dark chrome over a coal header`);
+    }
+  });
+
+  test('the wordmark, nav links and switcher all carry the dark variant', () => {
+    const header = html('/').match(/<header[\s\S]*?<\/header>/)![0];
+    for (const fragment of [
+      'group-data-[over-hero]:text-ink', // wordmark and current nav link
+      'group-data-[over-hero]:text-ink/80', // inactive nav links
+      'group-data-[over-hero]:text-ink/70', // the switcher's link
+    ]) {
+      assert.ok(header.includes(fragment), `no dark treatment: ${fragment}`);
+    }
+  });
+
+  test('the dark variants are actually emitted as CSS, not just written in the markup', () => {
+    const sheet = readdirSync(join(DIST, '_astro')).find((f: string) => f.endsWith('.css'))!;
+    const css = readFileSync(join(DIST, '_astro', sheet), 'utf8');
+    assert.match(css, /\[data-over-hero\]/, 'the group-data variant produced no rules');
+  });
+
+  test('the footer is untouched — it never sits over the photograph', () => {
+    const footer = html('/').match(/<footer[\s\S]*?<\/footer>/)![0];
+    assert.ok(!footer.includes('over-hero'), 'dark chrome leaked into the footer');
   });
 });

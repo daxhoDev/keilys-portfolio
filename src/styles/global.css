@@ -170,37 +170,21 @@
 }
 
 /**
- * The hero veil. Four black layers over the photograph, in one element.
- *
- * Keily's hero is a bright photograph — the headline block sits on mean 197 grey,
- * which is 1.53:1 against bone. A bottom-only scrim cannot carry that: it leaves the
- * nav at 1.18:1 and the top of the headline at 3.02:1.
+ * The hero veil. Two black layers over the photograph, in one element.
  *
  * Layers (order is irrelevant — black over black multiplies commutatively):
- *   1. radial vignette, darkening outwards from just above centre
- *   2. top scrim, so the transparent header has something to sit on
- *   3. bottom scrim, where the headline, subline and buttons live
- *   4. a flat dim. ink is #000000, so compositing black at 32% IS brightness(0.68) —
+ *   1. bottom gradient, where the headline, subline and buttons live.
+ *   2. a flat dim. ink is #000000, so compositing black at 32% IS brightness(0.68) —
  *      same result as a CSS filter, without the extra paint pass on a full-bleed image.
  *
- * Values were chosen by measuring the composite against the real photograph, not by
- * eye: npm run check:hero. Every text region clears 4.5:1 at its brightest pixel.
+ * There is deliberately NO top gradient and NO vignette. The nav is made legible over
+ * the hero by switching the header to dark ink while it sits over the photograph, and
+ * back to light once it scrolls onto its own coal background — see Header.astro.
+ *
+ * Values are measured, not eyeballed: npm run check:hero.
  */
 @utility hero-veil {
   background-image:
-    radial-gradient(
-      ellipse 57.5% 45% at 50% 42%,
-      transparent 26%,
-      color-mix(in srgb, var(--color-ink) 32%, transparent) 66%,
-      color-mix(in srgb, var(--color-ink) 66%, transparent) 100%
-    ),
-    linear-gradient(
-      to bottom,
-      color-mix(in srgb, var(--color-ink) 70%, transparent) 0%,
-      color-mix(in srgb, var(--color-ink) 34%, transparent) 14%,
-      color-mix(in srgb, var(--color-ink) 5%, transparent) 34%,
-      transparent 100%
-    ),
     linear-gradient(
       to top,
       var(--color-ink) 0%,
