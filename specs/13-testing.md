@@ -39,9 +39,14 @@ tests/
 ├── images.test.ts          responsiveWidths never upscales
 ├── build-output.test.ts    canonical, hreflang, noindex, JSON-LD, CSS, fonts
 ├── chrome-markup.test.ts   header/nav/footer as emitted
+├── landing.test.ts         hero, featured grid, about preview, contact shell
+├── hero-contrast.test.ts   the veil, measured against the real photograph
+├── css-utilities.test.ts   token utilities emitting no CSS, and invalid calc()
+├── gallery.test.ts         tone-filter rules, gallery markup, lightbox semantics
 └── browser/
     ├── chrome.spec.ts      header state, nav, switcher, footer, skip link
-    ├── menu.spec.ts        the mobile menu's accessibility contract
+    ├── menu.spec.ts        the mobile menu accessibility contract
+    ├── lightbox.spec.ts    focus, keyboard, inert, live region, filtered navigation
     └── a11y.spec.ts        axe on all seven routes and on the open menu
 ```
 
@@ -72,8 +77,15 @@ Focus trapping, `Esc`, focus return, scroll lock and `inert` are only proved by
 `routes.test.ts` iterates every page × language × direction rather than picking
 examples. Same for canonical, `hreflang` and `noindex`: every route, every time.
 
-**6. Every bug found gets a test before it gets a fix.** Both bugs found so far — the
-dynamic class name and the too-broad 404 assertion — are now permanent cases.
+**6. Every bug found gets a test before it gets a fix.** So far: the dynamic class name,
+the too-broad 404 assertion, `transition:persist` freezing the nav, a straight apostrophe
+in a display headline, duration tokens that emitted no CSS at all, and a negative margin
+that compiled to invalid `calc()`. Each is now a permanent case.
+
+**7. Beware the source scanner.** Tailwind scans *everything* as source text — comments
+and test files included. Naming a broken class in a comment is enough to emit the broken
+rule, which happened twice while fixing exactly that bug. Describe such classes; do not
+write them out.
 
 ## What tests do *not* cover
 
@@ -94,12 +106,16 @@ Stated plainly, so a green suite is never mistaken for a finished audit:
 | Suite | Cases | State |
 |---|---|---|
 | `routes.test.ts` | 13 | passing |
-| `dictionary.test.ts` | 21 | passing |
+| `dictionary.test.ts` | 22 | passing |
 | `images.test.ts` | 9 | passing |
 | `build-output.test.ts` | 43 | passing |
-| `chrome-markup.test.ts` | 27 | passing |
-| **Total, non-browser** | **113** | **passing** |
-| `browser/*.spec.ts` | 33 | **cannot run in this environment — see below** |
+| `chrome-markup.test.ts` | 32 | passing |
+| `landing.test.ts` | 27 | passing |
+| `hero-contrast.test.ts` | 5 | passing |
+| `css-utilities.test.ts` | 7 | passing |
+| `gallery.test.ts` | 31 | passing |
+| **Total, non-browser** | **193** | **passing** |
+| `browser/*.spec.ts` | 52 | **cannot run in this environment — see below** |
 
 ### The browser suite is blocked, and it is an environment problem
 
@@ -109,13 +125,13 @@ Installing them needs root:
 
 ```bash
 sudo npx playwright install-deps chromium
-# or: sudo apt-get install -y libglib2.0-0 libnss3 libnspr4 libdbus-1-3 \
-#       libatk1.0-0 libatk-bridge2.0-0 libcups2 libdrm2 libxkbcommon0 \
-#       libatspi2.0-0 libxcomposite1 libxdamage1 libxfixes3 libxrandr2 \
-#       libgbm1 libpango-1.0-0 libcairo2 libasound2
 ```
 
-Until that runs, **33 browser assertions are written but unproven**, and they cover the
-things least likely to be right by accident: the focus trap, focus return, `Esc`,
-scroll lock, `inert`, and axe across all seven routes. The Phase 3 acceptance criteria
-that depend on them are **not** met yet, and are not claimed to be.
+Until that runs, **52 browser assertions are written but unproven** — the focus traps,
+focus return, `Esc`, arrow navigation, scroll lock, `inert`, the live region, filtered
+lightbox navigation, and axe across all seven routes.
+
+This is not hypothetical. The navigation bug reported during Phase 3 —
+`transition:persist` freezing `aria-current` and the language switcher — was already
+covered by `chrome.spec.ts`, written before the bug shipped. A person found it instead,
+because that file has never run.
