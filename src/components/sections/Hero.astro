@@ -5,8 +5,10 @@
  * never clipped by an address bar that appears on scroll. Capped on tall monitors so
  * it does not become absurd.
  *
- * The scrim is required, not decorative: it is what guarantees text contrast over
- * whatever photograph sits behind it.
+ * The veil is required, not decorative: it is what guarantees text contrast over
+ * whatever photograph sits behind it. Her hero is a bright image, so it carries a
+ * vignette and an overall dim as well as the bottom scrim. Verified by measurement
+ * against the real file — npm run check:hero.
  */
 import { Image } from 'astro:assets';
 
@@ -42,12 +44,8 @@ const widths = responsiveWidths(heroImage, [640, 1024, 1536, 2048, 2400]);
     class="absolute inset-0 -top-[7.5%] z-0 h-[115%] w-full object-cover object-center"
   />
 
-  <!-- Required for contrast. Darkest at the bottom, where the copy sits. -->
-  <div
-    class="from-ink via-ink/55 to-ink/15 absolute inset-0 z-10 bg-linear-to-t from-[8%] via-[45%]"
-    aria-hidden="true"
-  >
-  </div>
+  {/* Required for contrast, not decoration — see hero-veil in global.css. */}
+  <div class="hero-veil absolute inset-0 z-10" aria-hidden="true"></div>
 
   <div class="gutter-x max-w-content relative z-20 mx-auto w-full pb-[clamp(4rem,10vh,7rem)]">
     <h1 class="font-display text-display-xl text-bone">

@@ -17,8 +17,32 @@ Section order: **Hero → About Me → My Work → Contact Me**. Backgrounds alt
 chrome does not clip it), `max-height: 900px` on desktop so it does not become absurd on tall monitors.
 
 - Background: `hero.jpg`, `object-fit: cover`, `object-position: center`, absolutely positioned, `z-0`.
-- Scrim: absolutely positioned gradient over the image — `linear-gradient(to top, ink 92%, ink/55% 45%, ink/15% 100%)`.
-  This guarantees text contrast whatever photograph is used. **The scrim is required, not optional.**
+- **Veil:** one absolutely positioned element carrying four black layers — `@utility hero-veil` in
+  `global.css`. **Required, not optional**, and measured rather than eyeballed.
+
+  | Layer | Purpose |
+  |---|---|
+  | Radial vignette, `ellipse 57.5% 45% at 50% 42%` | Darkens outwards; carries the corners and the nav |
+  | Top scrim, 70% → 0 by 34% | Gives the transparent header something to sit on |
+  | Bottom scrim, solid → 0 by the top | Where the headline, subline and buttons live |
+  | Flat dim, ink at 32% | Overall brightness reduction |
+
+  `ink` is `#000000`, so compositing black at 32% **is** `brightness(0.68)` — the same result as a CSS
+  filter without the extra paint pass on a full-bleed image. Because every layer is black, the order of
+  the layers does not matter.
+
+  **Why this is not just a bottom scrim.** Keily's first hero is a bright photograph: the headline block
+  sits on mean 197 grey, **1.53 : 1** against `bone`. A bottom-only scrim left the nav at 1.18 : 1 and the
+  top of the headline at 3.02 : 1. With the veil, every text region clears 4.5 : 1 at its **brightest**
+  pixel — headline 5.51, subline 6.38, nav 5.08, scroll hint 7.89.
+
+  ```
+  npm run check:hero
+  ```
+
+  composites the veil over the real file and fails if any region drops below AA. **Run it whenever the hero
+  photograph changes** — the contrast is a property of her image, not of the CSS. `tests/hero-contrast.test.ts`
+  runs it in the suite and also pins the CSS and the probe to the same numbers.
 - Content: bottom-left aligned on desktop (`items-end`, container gutter, `pb-[clamp(4rem,10vh,7rem)]`);
   bottom-left on mobile too, with the headline allowed to wrap to 3–4 lines.
 

@@ -47,12 +47,14 @@ describe('hero', () => {
       assert.match(hero, /max-h-\[900px\]/, 'uncapped on tall monitors');
     });
 
-    test(`${route} renders the scrim that guarantees text contrast`, () => {
-      // Prettier's Tailwind plugin sorts classes, so assert on the tokens, not their order.
-      const scrim = html(route).match(/<div class="[^"]*bg-linear-to-t[^"]*"/)?.[0] ?? '';
-      assert.ok(scrim, 'the scrim is required, not optional');
-      assert.match(scrim, /from-ink/);
-      assert.match(scrim, /via-ink\/55/);
+    test(`${route} renders the veil that guarantees text contrast`, () => {
+      // The measured proof lives in tests/hero-contrast.test.ts; this only checks the
+      // element is actually on the page, since the veil is what carries legibility.
+      assert.match(
+        html(route),
+        /<div class="hero-veil[^"]*"/,
+        'the hero veil is required, not decoration',
+      );
     });
 
     test(`${route} renders the headline in three masked segments`, () => {
