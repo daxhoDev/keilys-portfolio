@@ -1,5 +1,14 @@
 import { getCollection, type CollectionEntry } from 'astro:content';
 
+// Re-exported so call sites have one import, while the rules themselves stay in a
+// module free of astro: imports and therefore unit-testable.
+export {
+  TONE_FILTERS,
+  parseToneFilter,
+  shouldShowToneFilters,
+  type ToneFilter,
+} from './tone-filter.ts';
+
 export type Photo = CollectionEntry<'photos'>;
 export type Tone = Photo['data']['tone'];
 

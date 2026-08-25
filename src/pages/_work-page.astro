@@ -1,18 +1,52 @@
 ---
 /**
  * The Work page, shared by /mi-trabajo (Spanish) and /en/my-work (English).
- * Phase 5 adds the tone filters, the masonry gallery and the lightbox.
  */
 import PageLayout from '~/layouts/PageLayout.astro';
-import type { Lang } from '~/i18n/routes';
-import { useTranslations } from '~/i18n/utils';
+import type { Lang } from '~/i18n/routes.ts';
+import { path } from '~/i18n/routes.ts';
+import { useTranslations } from '~/i18n/utils.ts';
+import { getAllPhotos, getToneCounts } from '~/lib/photos.ts';
+import { SITE, absoluteUrl } from '~/lib/site.ts';
+import MasonryGallery from '~/components/gallery/MasonryGallery.astro';
+import GalleryFilters from '~/components/gallery/GalleryFilters.astro';
+import Lightbox from '~/components/gallery/Lightbox.astro';
+import Section from '~/components/ui/Section.astro';
+import Container from '~/components/ui/Container.astro';
+import Button from '~/components/ui/Button.astro';
 
 interface Props {
   lang: Lang;
 }
 
-const { lang } = Astro.props;
+const { lang }: Props = Astro.props;
 const t = useTranslations(lang);
+
+const photos = await getAllPhotos();
+const counts = await getToneCounts();
+
+/**
+ * The count is localised and pluralised, but the number changes client-side. Both
+ * forms are handed to the script so "1 fotografía" never becomes "1 fotografías".
+ */
+const countOne = t.work.photoCount(1);
+const countOther = t.work.photoCount(0).replace('0', '{n}');
+
+const galleryJsonLd = [
+  {
+    '@context': 'https://schema.org',
+    '@type': 'ImageGallery',
+    name: t.work.page.title,
+    url: absoluteUrl(Astro.url.pathname),
+    author: { '@id': `${SITE.url}/#person` },
+    associatedMedia: photos.map((photo) => ({
+      '@type': 'ImageObject',
+      contentUrl: absoluteUrl(photo.data.src.src),
+      description: photo.data.alt[lang],
+      ...(photo.data.title ? { name: photo.data.title[lang] } : {}),
+    })),
+  },
+];
 ---
 
 <PageLayout
@@ -23,6 +57,40 @@ const t = useTranslations(lang);
   heading={t.work.page.title}
   lead={t.work.page.lead}
   container="wide"
+  jsonLd={galleryJsonLd}
 >
-  <!-- GalleryFilters + MasonryGallery + Lightbox — Phase 5 -->
+  <div class="mt-12">
+    <GalleryFilters {lang} {counts} />
+
+    <p
+      data-photo-count
+      data-template-one={countOne}
+      data-template-other={countOther}
+      aria-live="polite"
+      class="text-body-sm text-mist mt-4"
+    >
+      {t.work.photoCount(photos.length)}
+    </p>
+  </div>
+
+  <div class="mt-8">
+    <MasonryGallery {photos} {lang} interaction="lightbox" />
+
+    <div data-gallery-empty hidden class="py-16 text-center">
+      <p class="text-body text-mist">{t.work.filters.empty}</p>
+      <Button data-show-all variant="ghost" class="mt-6">{t.work.filters.showAll}</Button>
+    </div>
+  </div>
+
+  <Lightbox {lang} />
+
+  <Section slot="full" background="coal" spacing="tight" class="mt-16">
+    <Container>
+      <div class="flex flex-wrap items-center justify-between gap-6">
+        <p class="text-body-lg measure-lead">{t.contact.lead}</p>
+        <Button href={`${path('home', lang)}#contact`} variant="primary">{t.hero.ctaPrimary}</Button
+        >
+      </div>
+    </Container>
+  </Section>
 </PageLayout>

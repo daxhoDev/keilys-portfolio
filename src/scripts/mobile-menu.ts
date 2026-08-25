@@ -129,3 +129,7 @@ function initMobileMenu(): void {
 initMobileMenu();
 document.addEventListener('astro:page-load', initMobileMenu);
 document.addEventListener('astro:before-swap', () => teardown?.());
+
+// Module scope: these files share a global namespace for type-checking otherwise,
+// and two of them legitimately want a variable called `teardown`.
+export {};

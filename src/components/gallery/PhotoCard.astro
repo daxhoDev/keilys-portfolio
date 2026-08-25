@@ -1,0 +1,102 @@
+---
+/**
+ * One photograph. `interaction` selects the wrapper — every gallery ships "lightbox",
+ * the other two exist as escape hatches if it ever has to be disabled.
+ *
+ * Carries data-tone for gallery-filters.ts and data-index for lightbox.ts. Neither
+ * script needs to know anything else about this card.
+ */
+import { Image } from 'astro:assets';
+
+import type { Lang } from '~/i18n/routes.ts';
+import type { Photo } from '~/lib/photos.ts';
+import { responsiveWidths } from '~/lib/images.ts';
+
+export type PhotoInteraction = 'none' | 'lightbox' | 'link';
+
+interface Props {
+  photo: Photo;
+  lang: Lang;
+  loading: 'eager' | 'lazy';
+  index: number;
+  interaction: PhotoInteraction;
+  sizes?: string;
+  class?: string;
+}
+
+const {
+  photo,
+  lang,
+  loading,
+  index,
+  interaction,
+  sizes = '(min-width: 1024px) 33vw, (min-width: 640px) 50vw, 100vw',
+  class: className,
+}: Props = Astro.props;
+
+const { src, alt, title, caption, tone } = photo.data;
+const label = title?.[lang] ?? alt[lang];
+const widths = responsiveWidths(src, [400, 700, 1000, 1400]);
+---
+
+<li
+  class:list={['mb-4 break-inside-avoid', className]}
+  data-photo
+  data-tone={tone}
+  data-index={index}
+  data-id={photo.id}
+  data-title={title?.[lang]}
+  data-caption={caption?.[lang]}
+>
+  {
+    interaction === 'lightbox' ? (
+      <button
+        type="button"
+        data-lightbox-open
+        aria-haspopup="dialog"
+        aria-label={label}
+        class="group/photo block w-full cursor-pointer text-left"
+      >
+        <figure class="relative overflow-hidden">
+          <Image
+            {src}
+            alt={alt[lang]}
+            {widths}
+            {sizes}
+            {loading}
+            decoding="async"
+            format="avif"
+            class="duration-slow ease-out-expo motion-safe:hover-hover:group-hover/photo:scale-104 w-full transition-transform"
+          />
+
+          {title && (
+            <>
+              {/* Pointer devices: the title fades in over a scrim on hover. */}
+              <figcaption class="from-ink duration-base hover-hover:block pointer-events-none absolute inset-x-0 bottom-0 hidden bg-linear-to-t to-transparent p-4 opacity-0 transition-opacity group-hover/photo:opacity-100 group-focus-visible/photo:opacity-100">
+                <span class="text-body-sm text-bone">{title[lang]}</span>
+              </figcaption>
+              {/* Touch: no hover to reveal it, so it sits permanently beneath. */}
+              <figcaption class="text-body-sm text-mist hover-hover:hidden mt-3">
+                {title[lang]}
+              </figcaption>
+            </>
+          )}
+        </figure>
+      </button>
+    ) : (
+      <figure class="relative overflow-hidden">
+        <Image
+          {src}
+          alt={alt[lang]}
+          {widths}
+          {sizes}
+          {loading}
+          decoding="async"
+          format="avif"
+          class="w-full"
+        />
+        {title && <figcaption class="text-body-sm text-mist mt-3">{title[lang]}</figcaption>}
+      </figure>
+    )
+  }
+</li>

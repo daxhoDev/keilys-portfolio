@@ -1,0 +1,124 @@
+---
+/**
+ * One dialog per page, not one per photo.
+ *
+ * It reads its photo list from the gallery already in the DOM rather than taking a
+ * `photos` prop, so the two can never disagree about ordering — and when a tone filter
+ * is active it walks only the visible cards, which is what makes "navigates within the
+ * filtered set" true by construction rather than by reconciliation.
+ *
+ * Full contract in specs/09-open-decisions.md § Build spec for the Lightbox.
+ */
+import type { Lang } from '~/i18n/routes.ts';
+import { useTranslations } from '~/i18n/utils.ts';
+import CloseIcon from '~/components/ui/icons/CloseIcon.astro';
+import ArrowIcon from '~/components/ui/icons/ArrowIcon.astro';
+
+interface Props {
+  lang: Lang;
+}
+
+const { lang }: Props = Astro.props;
+const t = useTranslations(lang);
+
+/**
+ * The counter is localised ("3 de 20" / "3 of 20"), but the numbers change client-side.
+ * Calling it with zeroes and swapping them for placeholders keeps the translation in
+ * es.ts rather than duplicating the wording in the script.
+ */
+const counterTemplate = t.lightbox.counter(0, 0).replace('0', '{i}').replace('0', '{n}');
+---
+
+<div
+  data-lightbox
+  hidden
+  role="dialog"
+  aria-modal="true"
+  aria-label={t.lightbox.label}
+  class="bg-ink/96 duration-base fixed inset-0 z-60 flex flex-col opacity-0 backdrop-blur-sm transition-opacity data-[open]:opacity-100"
+>
+  <div class="gutter-x flex min-h-18 shrink-0 items-center justify-end">
+    <button
+      type="button"
+      data-lightbox-close
+      aria-label={t.lightbox.close}
+      class="text-mist hover:text-bone flex size-11 items-center justify-center transition-colors"
+    >
+      <CloseIcon class="size-6" />
+    </button>
+  </div>
+
+  <div class="relative flex min-h-0 flex-1 items-center justify-center px-4">
+    <button
+      type="button"
+      data-lightbox-prev
+      aria-label={t.lightbox.previous}
+      class="text-mist hover:text-bone absolute left-2 z-10 hidden size-11 items-center justify-center transition-colors md:flex"
+    >
+      <ArrowIcon class="size-6 rotate-180" />
+    </button>
+
+    {
+      /* Populated by lightbox.ts from the gallery's own <img>, so the srcset and the
+        no-upscale clamp come along with it. */
+    }
+    <figure class="flex max-h-[82vh] max-w-[90vw] flex-col items-center">
+      <img
+        data-lightbox-image
+        alt=""
+        class="duration-base ease-out-quart max-h-[82vh] max-w-[90vw] scale-96 object-contain opacity-0 transition-[opacity,scale] data-[shown]:scale-100 data-[shown]:opacity-100 motion-reduce:scale-100 motion-reduce:transition-opacity"
+      />
+    </figure>
+
+    <button
+      type="button"
+      data-lightbox-next
+      aria-label={t.lightbox.next}
+      class="text-mist hover:text-bone absolute right-2 z-10 hidden size-11 items-center justify-center transition-colors md:flex"
+    >
+      <ArrowIcon class="size-6" />
+    </button>
+  </div>
+
+  <div class="gutter-x flex shrink-0 flex-col gap-3 py-5">
+    <div class="flex items-end justify-between gap-6">
+      <div class="min-w-0">
+        <p data-lightbox-title class="text-body-sm text-mustang-soft truncate"></p>
+        <p data-lightbox-caption class="text-body-sm text-mist mt-1 line-clamp-2"></p>
+      </div>
+      <p
+        data-lightbox-counter
+        data-template={counterTemplate}
+        class="text-body-sm text-mist shrink-0 tabular-nums"
+      >
+      </p>
+    </div>
+
+    {/* Mobile has no edge buttons — the arrows live here instead. */}
+    <div class="flex justify-center gap-4 md:hidden">
+      <button
+        type="button"
+        data-lightbox-prev
+        aria-label={t.lightbox.previous}
+        class="text-mist hover:text-bone border-iron flex size-11 items-center justify-center rounded-sm border transition-colors"
+      >
+        <ArrowIcon class="size-5 rotate-180" />
+      </button>
+      <button
+        type="button"
+        data-lightbox-next
+        aria-label={t.lightbox.next}
+        class="text-mist hover:text-bone border-iron flex size-11 items-center justify-center rounded-sm border transition-colors"
+      >
+        <ArrowIcon class="size-5" />
+      </button>
+    </div>
+  </div>
+
+  {/* Announces the counter and title on every navigation. */}
+  <p data-lightbox-live aria-live="polite" class="sr-only"></p>
+</div>
+
+<script>
+  import '~/scripts/lightbox.ts';
+</script>

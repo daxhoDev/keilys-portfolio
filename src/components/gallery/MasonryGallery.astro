@@ -1,0 +1,46 @@
+---
+/**
+ * CSS-columns masonry. No JS layout, no library, no cumulative layout shift.
+ *
+ * Accepted caveat: CSS columns fill top-to-bottom per column, so visual order is not
+ * DOM order across columns. Gallery order is curatorial rather than sequential, and
+ * DOM order stays the correct reading order for screen readers and keyboard users —
+ * which is the part that matters.
+ */
+import type { Lang } from '~/i18n/routes.ts';
+import type { Photo } from '~/lib/photos.ts';
+import PhotoCard, { type PhotoInteraction } from '~/components/gallery/PhotoCard.astro';
+
+interface Props {
+  photos: Photo[];
+  lang: Lang;
+  eagerCount?: number;
+  interaction?: PhotoInteraction;
+  sizes?: string;
+  class?: string;
+}
+
+const {
+  photos,
+  lang,
+  eagerCount = 3,
+  interaction = 'lightbox',
+  sizes,
+  class: className,
+}: Props = Astro.props;
+---
+
+<ul data-gallery class:list={['columns-1 gap-4 sm:columns-2 lg:columns-3', className]}>
+  {
+    photos.map((photo, index) => (
+      <PhotoCard
+        {photo}
+        {lang}
+        {index}
+        {interaction}
+        {sizes}
+        loading={index < eagerCount ? 'eager' : 'lazy'}
+      />
+    ))
+  }
+</ul>

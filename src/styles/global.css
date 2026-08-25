@@ -1,5 +1,8 @@
 @import 'tailwindcss';
 
+/* Hover effects apply to pointer devices only: on touch, :hover sticks after a tap. */
+@custom-variant hover-hover (@media (hover: hover));
+
 /* ---------------------------------------------------------------------------
    Design tokens. The authority for every value here is specs/02-design-system.md.
    Palette: pure black with details in "gris mustang" #7E7D7B — Keily's choice.
@@ -85,6 +88,7 @@
 
   --duration-fast: 180ms;
   --duration-base: 320ms;
+  --duration-menu: 280ms;
   --duration-slow: 600ms;
   --duration-reveal: 800ms;
 }
@@ -161,6 +165,34 @@
    more times and names a real concept (see specs/01-tech-stack.md § Conventions).
 --------------------------------------------------------------------------- */
 
+/**
+ * Duration utilities.
+ *
+ * Tailwind v4 has no --duration-* theme namespace: duration-* takes a bare number, so
+ * `duration-base` silently produced NO rule at all. Every transition written against
+ * the design tokens since Phase 1 was falling back to the default 150ms. Defining them
+ * as utilities keeps the token names and makes them real.
+ */
+@utility duration-fast {
+  transition-duration: var(--duration-fast);
+}
+
+@utility duration-base {
+  transition-duration: var(--duration-base);
+}
+
+@utility duration-menu {
+  transition-duration: var(--duration-menu);
+}
+
+@utility duration-slow {
+  transition-duration: var(--duration-slow);
+}
+
+@utility duration-reveal {
+  transition-duration: var(--duration-reveal);
+}
+
 /* Playfair is used exclusively in italic. A non-italic Playfair is a bug, so the
    utility sets the style itself rather than trusting every call site. */
 @utility font-display {
@@ -196,6 +228,17 @@
       color-mix(in srgb, var(--color-ink) 32%, transparent),
       color-mix(in srgb, var(--color-ink) 32%, transparent)
     );
+}
+
+/** Cancels the container gutter so a row can bleed to the screen edge and still scroll
+ *  with its padding intact. Written as a utility because the arbitrary-value form
+ *  compiles to a calc() containing a bare custom-property name with no var() around
+ *  it, which is invalid CSS and silently dropped by every browser.
+ *
+ *  Note: the broken form is deliberately not written out here. Tailwind scans comments
+ *  as source text, so naming the class in a comment is enough to emit the broken rule. */
+@utility gutter-bleed {
+  margin-inline: calc(var(--gutter) * -1);
 }
 
 @utility gutter-x {

@@ -45,3 +45,7 @@ function initScrollHeader(): void {
 
 initScrollHeader();
 document.addEventListener('astro:page-load', initScrollHeader);
+
+// Module scope: these files share a global namespace for type-checking otherwise,
+// and two of them legitimately want a variable called `teardown`.
+export {};

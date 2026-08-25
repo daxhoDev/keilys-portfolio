@@ -91,19 +91,19 @@ describe('css', () => {
 describe('featured work', () => {
   for (const { route } of LANDINGS) {
     test(`${route} shows exactly six photographs`, () => {
-      const grid = html(route).match(/<ul class="mt-12 grid[\s\S]*?<\/ul>/)![0];
-      assert.equal((grid.match(/<figure>/g) ?? []).length, 6);
+      const grid = html(route).match(/<ul[^>]*data-gallery[\s\S]*?<\/ul>/)![0];
+      assert.equal((grid.match(/<figure[\s>]/g) ?? []).length, 6);
     });
 
     test(`${route} gives every photograph alt text in this language`, () => {
-      const grid = html(route).match(/<ul class="mt-12 grid[\s\S]*?<\/ul>/)![0];
+      const grid = html(route).match(/<ul[^>]*data-gallery[\s\S]*?<\/ul>/)![0];
       const alts = [...grid.matchAll(/alt="([^"]*)"/g)].map((m) => m[1]);
       assert.equal(alts.length, 6);
       for (const alt of alts) assert.ok(alt.trim().length > 10, `weak alt text: "${alt}"`);
     });
 
     test(`${route} loads the first row eagerly and the rest lazily`, () => {
-      const grid = html(route).match(/<ul class="mt-12 grid[\s\S]*?<\/ul>/)![0];
+      const grid = html(route).match(/<ul[^>]*data-gallery[\s\S]*?<\/ul>/)![0];
       assert.equal((grid.match(/loading="eager"/g) ?? []).length, 3);
       assert.equal((grid.match(/loading="lazy"/g) ?? []).length, 3);
     });

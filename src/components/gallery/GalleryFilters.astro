@@ -1,0 +1,59 @@
+---
+/**
+ * Three tone chips: Todas · Blanco y negro · Color (decision #1 = D).
+ *
+ * Two rules the component enforces rather than the page:
+ *  · a chip with count 0 renders disabled with its count still visible — hiding it
+ *    would silently drop the fact that a whole tone is missing from her work;
+ *  · if every photograph shares one tone the component renders NOTHING. One chip plus
+ *    a disabled one is not a choice, it is decoration.
+ */
+import type { Lang } from '~/i18n/routes.ts';
+import { useTranslations } from '~/i18n/utils.ts';
+import { shouldShowToneFilters, type Tone } from '~/lib/tone-filter.ts';
+import Chip from '~/components/ui/Chip.astro';
+
+export type ToneFilter = 'all' | Tone;
+
+interface Props {
+  lang: Lang;
+  counts: Record<Tone, number>;
+  active?: ToneFilter;
+}
+
+const { lang, counts, active = 'all' }: Props = Astro.props;
+const t = useTranslations(lang);
+
+const total = counts.bw + counts.colour;
+const showFilters = shouldShowToneFilters(counts);
+
+const filters: { slug: ToneFilter; label: string; count: number }[] = [
+  { slug: 'all', label: t.work.filters.all, count: total },
+  { slug: 'bw', label: t.work.filters.bw, count: counts.bw },
+  { slug: 'colour', label: t.work.filters.colour, count: counts.colour },
+];
+---
+
+{
+  showFilters && (
+    <div
+      data-gallery-filters
+      role="group"
+      aria-label={t.work.filters.label}
+      class="gutter-bleed gutter-x flex gap-3 overflow-x-auto pb-1"
+    >
+      {filters.map((filter) => (
+        <Chip
+          label={filter.label}
+          count={filter.count}
+          value={filter.slug}
+          active={filter.slug === active}
+        />
+      ))}
+    </div>
+  )
+}
+
+<script>
+  import '~/scripts/gallery-filters.ts';
+</script>
