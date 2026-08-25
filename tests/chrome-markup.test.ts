@@ -158,3 +158,68 @@ describe('landmarks', () => {
     assert.ok(!/<main id="main" class="[^"]*pt-18/.test(html('/')));
   });
 });
+
+describe('the header must not be persisted across navigations', () => {
+  /**
+   * Regression. specs/06-components.md originally asked for transition:persist on the
+   * header. Persist keeps the *old* DOM element across a client-side navigation, and
+   * this header carries per-page state: aria-current, and the language switcher hrefs
+   * from alternatePath(Astro.url). With persist on, both froze at whatever the first
+   * page rendered — the switcher kept pointing at the previous page's counterpart and
+   * no nav item was ever marked current.
+   */
+  test('no element in the header is marked transition:persist', () => {
+    for (const { route } of ALL_ROUTES) {
+      const header = html(route).match(/<header[\s\S]*?<\/header>/)?.[0] ?? '';
+      assert.ok(
+        !header.includes('data-astro-transition-persist'),
+        `${route}: the header is persisted, so its nav and switcher state cannot update`,
+      );
+    }
+  });
+
+  test('the switcher points at this page’s counterpart, not a fixed URL', () => {
+    const switcherTarget = (route: string) => {
+      const header = html(route).match(/<header[\s\S]*?<\/header>/)![0];
+      const group = header.match(/role="group"[\s\S]*?<\/div>/)![0];
+      return group.match(/href="([^"]+)"/)?.[1];
+    };
+
+    assert.equal(switcherTarget('/'), '/en');
+    assert.equal(switcherTarget('/sobre-mi'), '/en/about');
+    assert.equal(switcherTarget('/mi-trabajo'), '/en/my-work');
+    assert.equal(switcherTarget('/en/about'), '/sobre-mi');
+    assert.equal(switcherTarget('/en/my-work'), '/mi-trabajo');
+
+    // Every route resolves to a distinct target — a frozen switcher would repeat one.
+    const targets = ALL_ROUTES.map(({ route }) => switcherTarget(route));
+    assert.equal(new Set(targets).size, targets.length, 'two routes share a switcher target');
+  });
+
+  test('header and footer share one transition scope across every page', () => {
+    // transition:name is what replaces persist: it pairs the old and new element so
+    // they morph rather than cross-fade. Pairing only happens if the scope matches,
+    // so a per-page scope would silently reintroduce the flash persist was hiding.
+    const scope = (route: string, tag: 'header' | 'footer') =>
+      html(route).match(new RegExp(`<${tag}[^>]*data-astro-transition-scope="([^"]+)"`))?.[1];
+
+    for (const tag of ['header', 'footer'] as const) {
+      const scopes = ALL_ROUTES.map(({ route }) => scope(route, tag));
+      assert.ok(scopes[0], `no transition scope on the ${tag}`);
+      assert.equal(new Set(scopes).size, 1, `the ${tag} scope differs between pages`);
+    }
+  });
+
+  test('the current-page marker names this page, not another one', () => {
+    const currentLabel = (route: string) =>
+      html(route)
+        .match(/<header[\s\S]*?<\/header>/)![0]
+        .match(/aria-current="page"[^>]*>\s*([^<]+)/)?.[1]
+        .trim();
+
+    assert.equal(currentLabel('/sobre-mi'), 'Sobre mí');
+    assert.equal(currentLabel('/mi-trabajo'), 'Mi trabajo');
+    assert.equal(currentLabel('/en/about'), 'About');
+    assert.equal(currentLabel('/en/my-work'), 'My work');
+  });
+});

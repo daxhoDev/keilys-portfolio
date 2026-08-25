@@ -3,6 +3,10 @@
  * Three zones plus a bottom bar. The year is computed at build time, which is correct
  * for a static site that is rebuilt on content change — the requirement is only that
  * it is not hard-coded.
+ *
+ * Like the header, this is transition:name and NOT transition:persist: the footer
+ * carries a nav with aria-current and a language switcher whose href comes from the
+ * current URL, and persist would freeze both. See specs/06-components.md.
  */
 import type { Lang } from '~/i18n/routes.ts';
 import { path } from '~/i18n/routes.ts';
@@ -23,7 +27,7 @@ const t = useTranslations(lang);
 const currentYear = new Date().getFullYear();
 ---
 
-<footer class="bg-coal border-iron border-t">
+<footer transition:name="site-footer" class="bg-coal border-iron border-t">
   <div class="gutter-x section-y-tight max-w-content mx-auto">
     <div class="grid gap-12 sm:grid-cols-2 lg:grid-cols-3">
       <div>

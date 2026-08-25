@@ -3,6 +3,18 @@
  * Sticky, full width. Transparent over the hero on the landing page; from 24px of
  * scroll it takes a coal background, a blur and a hairline. On About, Work and 404 it
  * starts in the scrolled state, because there is no hero for it to sit over.
+ *
+ * Deliberately NOT transition:persist, despite specs/06-components.md having asked for
+ * it. Persist keeps the *old* element across a client-side navigation, and this header
+ * carries per-page state: aria-current on the nav, and the language switcher hrefs,
+ * which come from alternatePath(Astro.url). Persisting it froze both — after one
+ * navigation the switcher still pointed at the previous page's counterpart and no nav
+ * item was marked current. The header is visually identical between pages, so letting
+ * it swap costs nothing.
+ *
+ * transition:name is the right tool for the flash that persist was reaching for: it
+ * pairs the old and new header so they morph instead of cross-fading, while the DOM
+ * is still replaced and the per-page state still updates.
  */
 import type { Lang } from '~/i18n/routes.ts';
 import { path } from '~/i18n/routes.ts';
@@ -25,7 +37,7 @@ const t = useTranslations(lang);
 <header
   data-header
   data-transparent={transparent ? '' : undefined}
-  transition:persist
+  transition:name="site-header"
   class:list={[
     'duration-base fixed inset-x-0 top-0 z-40 transition-colors',
     'border-b',

@@ -40,11 +40,28 @@ interface Props extends Omit<BaseProps, 'transparentHeader'> {
 
 | Component | Props | Notes |
 |---|---|---|
-| `Header.astro` | `lang`, `transparent?: boolean` | Sticky. Scroll-state class toggled by `scroll-header.ts` using a passive listener + `requestAnimationFrame`. Persisted across view transitions (`transition:persist`) |
+| `Header.astro` | `lang`, `transparent?: boolean` | Sticky. Scroll-state attribute toggled by `scroll-header.ts` using a passive listener + `requestAnimationFrame`. **Not** `transition:persist` — see below |
 | `Nav.astro` | `lang`, `variant: 'header' \| 'mobile' \| 'footer'` | Single source of nav items, built from `ROUTES`. Sets `aria-current="page"` by comparing `getPageKey(Astro.url)` |
 | `MobileMenu.astro` | `lang` | `<dialog>`-free custom overlay. Focus trap, `Esc`, scroll lock, `inert` on the page behind |
 | `LanguageSwitcher.astro` | `lang`, `variant: 'inline' \| 'stacked'` | Uses `alternatePath(Astro.url, other)`. Active language is a `<span aria-current="true">`, not a link. Link carries `hreflang` and `lang` |
 | `Footer.astro` | `lang` | Three zones + bottom bar. Year computed at build time |
+
+### Why the header is not persisted
+
+An earlier draft of this document specified `transition:persist` on the header. That is
+wrong, and it shipped as a bug: persist keeps the **old** DOM element across a
+client-side navigation, and this header carries per-page state —
+
+- `aria-current="page"` on the nav, derived from `getPageKey(Astro.url)`
+- the language switcher's `href`, derived from `alternatePath(Astro.url, other)`
+
+With persist on, both froze at whatever the first page rendered. After one navigation
+the switcher still pointed at the previous page's counterpart, and no nav item was
+marked as current.
+
+The header is visually identical between pages, so letting it swap costs nothing. Any
+element given `transition:persist` must hold **no** state derived from the URL.
+Regression tests: `tests/chrome-markup.test.ts`.
 
 ## Sections
 

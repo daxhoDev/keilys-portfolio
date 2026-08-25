@@ -107,7 +107,11 @@ sticky hover states.
 `ClientRouter` from `astro:transitions` in `BaseLayout`.
 
 - Default cross-fade, 300ms, `--ease-in-out-soft`.
-- The header and footer carry `transition:persist` so they do not flash between pages.
+- The header and footer carry `transition:name` (`site-header` / `site-footer`) so the browser morphs
+  them between pages instead of cross-fading, which is what stops the flash.
+- They must **not** carry `transition:persist`. Persist keeps the old DOM element, and both contain
+  URL-derived state — `aria-current` and the language switcher target — which then never updates. This
+  shipped as a bug once; see [06-components.md](./06-components.md#why-the-header-is-not-persisted).
 - The scroll position resets to top on navigation (Astro's default), except for same-page hash links.
 - On navigation, `astro:page-load` re-runs every client script's `init()`; each `init()` first tears down any
   listener it previously registered.
