@@ -1,0 +1,75 @@
+---
+/**
+ * Three zones plus a bottom bar. The year is computed at build time, which is correct
+ * for a static site that is rebuilt on content change — the requirement is only that
+ * it is not hard-coded.
+ */
+import type { Lang } from '~/i18n/routes.ts';
+import { path } from '~/i18n/routes.ts';
+import { SITE } from '~/lib/site.ts';
+import { useTranslations } from '~/i18n/utils.ts';
+import Nav from '~/components/layout/Nav.astro';
+import LanguageSwitcher from '~/components/layout/LanguageSwitcher.astro';
+import InstagramIcon from '~/components/ui/icons/InstagramIcon.astro';
+import MailIcon from '~/components/ui/icons/MailIcon.astro';
+
+interface Props {
+  lang: Lang;
+}
+
+const { lang }: Props = Astro.props;
+const t = useTranslations(lang);
+
+const currentYear = new Date().getFullYear();
+---
+
+<footer class="bg-coal border-iron border-t">
+  <div class="gutter-x section-y-tight max-w-content mx-auto">
+    <div class="grid gap-12 sm:grid-cols-2 lg:grid-cols-3">
+      <div>
+        <a
+          href={path('home', lang)}
+          class="font-display text-display-sm text-bone hover:text-mustang-soft duration-base transition-colors"
+        >
+          {SITE.wordmark}
+        </a>
+        <p class="font-display text-body-sm text-mist mt-3">{t.footer.tagline}</p>
+      </div>
+
+      <nav aria-label={t.footer.navHeading}>
+        <h2 class="text-eyebrow text-mustang uppercase">{t.footer.navHeading}</h2>
+        <Nav {lang} variant="footer" class="mt-4" />
+      </nav>
+
+      <div>
+        <h2 class="text-eyebrow text-mustang uppercase">{t.footer.contactHeading}</h2>
+        <ul class="mt-4 flex flex-col gap-2">
+          {
+            SITE.socials.map((social) => (
+              <li>
+                <a
+                  href={social.href}
+                  class="text-body text-mist hover:text-bone inline-flex min-h-11 items-center gap-3 transition-colors"
+                  {...(social.icon === 'instagram' ? { rel: 'me noopener', target: '_blank' } : {})}
+                >
+                  {social.icon === 'instagram' ? (
+                    <InstagramIcon class="size-5" />
+                  ) : (
+                    <MailIcon class="size-5" />
+                  )}
+                  {t.contact.socials[social.id]}
+                </a>
+              </li>
+            ))
+          }
+        </ul>
+        <LanguageSwitcher {lang} variant="stacked" class="mt-6" />
+      </div>
+    </div>
+
+    <p class="text-body-sm text-mist border-iron mt-12 border-t pt-6">
+      © {currentYear}
+      {SITE.name}. {t.footer.rights}
+    </p>
+  </div>
+</footer>

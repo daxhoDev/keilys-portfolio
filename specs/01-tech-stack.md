@@ -44,7 +44,12 @@ prettier                                ^3
 prettier-plugin-astro                   ^0.14
 prettier-plugin-tailwindcss             ^0.6
 sharp                                   ^0.33   # explicit, for the placeholder generator script
+@playwright/test                        ^1      # browser tests, from Phase 3
+@axe-core/playwright                    ^4      # automated accessibility pass
 ```
+
+Unit and built-output tests use **`node:test`**, which is built into Node and adds no
+dependency. See [13-testing.md](./13-testing.md).
 
 Nothing else is added without amending this document. In particular: no animation library (motion is
 hand-written, see [07-motion.md](./07-motion.md)), no form library, no icon package (icons are inline SVG

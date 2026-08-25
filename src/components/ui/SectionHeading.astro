@@ -1,0 +1,37 @@
+---
+import Eyebrow from '~/components/ui/Eyebrow.astro';
+
+interface Props {
+  eyebrow?: string;
+  heading: string;
+  lead?: string;
+  as?: 'h1' | 'h2' | 'h3';
+  size?: 'lg' | 'md';
+  align?: 'start' | 'center';
+  class?: string;
+}
+
+const {
+  eyebrow,
+  heading,
+  lead,
+  as: Tag = 'h2',
+  size = 'md',
+  align = 'start',
+  class: className,
+}: Props = Astro.props;
+
+const headingSize = size === 'lg' ? 'text-display-lg' : 'text-display-md';
+---
+
+<header class:list={[align === 'center' && 'text-center', className]}>
+  {eyebrow && <Eyebrow text={eyebrow} />}
+  <Tag class:list={['font-display mt-4', headingSize]}>{heading}</Tag>
+  {
+    lead && (
+      <p class:list={['text-body-lg measure-lead text-mist mt-6', align === 'center' && 'mx-auto']}>
+        {lead}
+      </p>
+    )
+  }
+</header>

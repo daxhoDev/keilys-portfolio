@@ -1,0 +1,63 @@
+---
+/**
+ * Sticky, full width. Transparent over the hero on the landing page; from 24px of
+ * scroll it takes a coal background, a blur and a hairline. On About, Work and 404 it
+ * starts in the scrolled state, because there is no hero for it to sit over.
+ */
+import type { Lang } from '~/i18n/routes.ts';
+import { path } from '~/i18n/routes.ts';
+import { SITE } from '~/lib/site.ts';
+import { useTranslations } from '~/i18n/utils.ts';
+import Nav from '~/components/layout/Nav.astro';
+import LanguageSwitcher from '~/components/layout/LanguageSwitcher.astro';
+import MobileMenu from '~/components/layout/MobileMenu.astro';
+import MenuIcon from '~/components/ui/icons/MenuIcon.astro';
+
+interface Props {
+  lang: Lang;
+  transparent?: boolean;
+}
+
+const { lang, transparent = false }: Props = Astro.props;
+const t = useTranslations(lang);
+---
+
+<header
+  data-header
+  data-transparent={transparent ? '' : undefined}
+  transition:persist
+  class:list={[
+    'duration-base fixed inset-x-0 top-0 z-40 transition-colors',
+    'border-b',
+    transparent
+      ? 'data-[scrolled]:border-iron data-[scrolled]:bg-coal/92 border-transparent bg-transparent data-[scrolled]:backdrop-blur-sm'
+      : 'border-iron bg-coal/92 backdrop-blur-sm',
+  ]}
+>
+  <div class="gutter-x max-w-wide mx-auto flex h-18 items-center justify-between md:h-22">
+    <a
+      href={path('home', lang)}
+      class="font-display text-display-sm text-bone hover:text-mustang-soft duration-base transition-colors"
+    >
+      {SITE.wordmark}
+    </a>
+
+    <div class="flex items-center gap-8">
+      <Nav {lang} variant="header" class="hidden md:flex" />
+      <LanguageSwitcher {lang} class="hidden md:flex" />
+
+      <button
+        type="button"
+        data-menu-open
+        aria-expanded="false"
+        aria-controls="mobile-menu"
+        class="text-mist hover:text-bone -mr-2 flex size-11 items-center justify-center transition-colors md:hidden"
+        aria-label={t.nav.menu}
+      >
+        <MenuIcon class="size-6" />
+      </button>
+    </div>
+  </div>
+</header>
+
+<MobileMenu {lang} />

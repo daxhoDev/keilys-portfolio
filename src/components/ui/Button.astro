@@ -1,0 +1,55 @@
+---
+/**
+ * Renders <a> when href is present, <button> otherwise. The two are never
+ * interchangeable to a keyboard or a screen reader, so the prop decides the element.
+ */
+interface Props {
+  variant?: 'primary' | 'ghost';
+  size?: 'md' | 'lg';
+  href?: string;
+  type?: 'button' | 'submit' | 'reset';
+  disabled?: boolean;
+  class?: string;
+  [key: string]: unknown;
+}
+
+const {
+  variant = 'primary',
+  size = 'md',
+  href,
+  type = 'button',
+  disabled = false,
+  class: className,
+  ...rest
+} = Astro.props;
+
+const base =
+  'text-label duration-base inline-flex items-center justify-center gap-2 rounded-sm transition-colors';
+
+const variants = {
+  primary: 'bg-mustang text-ink hover:bg-mustang-soft',
+  ghost: 'border border-steel text-bone hover:border-mustang-soft hover:text-bone',
+};
+
+const sizes = { md: 'min-h-11 px-5 py-3', lg: 'min-h-12 px-7 py-4' };
+
+const classes = [
+  base,
+  variants[variant],
+  sizes[size],
+  disabled && 'pointer-events-none opacity-50',
+  className,
+];
+---
+
+{
+  href ? (
+    <a {href} class:list={classes} aria-disabled={disabled ? 'true' : undefined} {...rest}>
+      <slot />
+    </a>
+  ) : (
+    <button {type} {disabled} class:list={classes} {...rest}>
+      <slot />
+    </button>
+  )
+}

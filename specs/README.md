@@ -28,6 +28,7 @@ Her answers, in her own words: **[preguntas-para-keily.md](./preguntas-para-keil
 | 10 | [Content checklist](./10-content-checklist.md) | Everything Keily must supply before launch |
 | 11 | [Implementation plan](./11-implementation-plan.md) | **Eleven phases, empty repo → live site**, with acceptance criteria per phase |
 | 12 | [Copy from Keily](./12-copy-from-keily.md) | Her delivered Spanish copy, verbatim, mapped to translation keys |
+| 13 | [Testing](./13-testing.md) | What is tested, how it runs, and what tests deliberately do not cover |
 
 ## Decisions already locked
 

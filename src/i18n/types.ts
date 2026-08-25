@@ -1,4 +1,4 @@
-import type { es } from './es';
+import type { es } from './es.ts';
 
 /**
  * The dictionary shape is derived from Spanish, because Spanish is the default
@@ -8,4 +8,4 @@ import type { es } from './es';
  */
 export type Dictionary = typeof es;
 
-export type { Lang, PageKey } from './routes';
+export type { Lang, PageKey } from './routes.ts';

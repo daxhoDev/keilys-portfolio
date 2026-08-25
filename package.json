@@ -13,7 +13,11 @@
     "format": "prettier --write .",
     "format:check": "prettier --check .",
     "placeholders": "node scripts/generate-placeholders.mjs",
-    "astro": "astro"
+    "astro": "astro",
+    "test": "npm run build && node --test tests/*.test.ts && playwright test",
+    "test:unit": "node --test tests/routes.test.ts tests/dictionary.test.ts tests/images.test.ts",
+    "test:build": "node --test tests/build-output.test.ts",
+    "test:browser": "playwright test"
   },
   "dependencies": {
     "@astrojs/sitemap": "^3.7.3",
@@ -25,6 +29,8 @@
   },
   "devDependencies": {
     "@astrojs/check": "^0.9.0",
+    "@axe-core/playwright": "^4.13.0",
+    "@playwright/test": "^1.62.1",
     "prettier": "^3.9.6",
     "prettier-plugin-astro": "^0.14.1",
     "prettier-plugin-tailwindcss": "^0.6.14",

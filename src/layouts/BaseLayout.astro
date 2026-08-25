@@ -18,6 +18,8 @@ import '@fontsource/playfair-display/latin-ext-600-italic.css';
 import { ClientRouter } from 'astro:transitions';
 
 import { SITE, absoluteUrl } from '~/lib/site';
+import Header from '~/components/layout/Header.astro';
+import Footer from '~/components/layout/Footer.astro';
 import type { Lang } from '~/i18n/routes';
 import { alternatePath, path } from '~/i18n/routes';
 import { useTranslations, HTML_LANG, OG_LOCALE } from '~/i18n/utils';
@@ -47,8 +49,9 @@ const {
   imageAlt,
   noindex = false,
   noAlternates = false,
+  transparentHeader = false,
   jsonLd = [],
-} = Astro.props;
+}: Props = Astro.props;
 
 const t = useTranslations(lang);
 
@@ -141,12 +144,20 @@ const person = {
       {t.nav.skipToContent}
     </a>
 
-    {/* Header lands here in Phase 3. */}
+    <Header {lang} transparent={transparentHeader} />
 
-    <main id="main">
+    {
+      /* Header is fixed, so the page needs its height back. The landing page opts out:
+        its hero sits underneath the transparent header by design. */
+    }
+    <main id="main" class:list={[!transparentHeader && 'pt-18 md:pt-22']}>
       <slot />
     </main>
 
-    {/* Footer lands here in Phase 3. */}
+    <Footer {lang} />
+    <script>
+      import '~/scripts/scroll-header.ts';
+      import '~/scripts/mobile-menu.ts';
+    </script>
   </body>
 </html>

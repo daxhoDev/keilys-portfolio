@@ -1,4 +1,4 @@
-import type { Dictionary } from './types';
+import type { Dictionary } from './types.ts';
 
 /**
  * English — translated from Spanish, not authored independently.

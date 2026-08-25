@@ -9,6 +9,9 @@ and do not wait for them.
 
 Estimates are working days for one developer, and they describe focused build time, not calendar time.
 
+**Every phase ships with tests.** A phase is done when its acceptance criteria are proved by something that
+runs, not when it renders — see [13-testing.md](./13-testing.md).
+
 | # | Phase | Days | Gated on |
 |---|---|---|---|
 | 0 | [Repo, pipeline & first deploy](#phase-0--repo-pipeline--first-deploy) | 0.25 | — |

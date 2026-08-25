@@ -1,0 +1,22 @@
+---
+interface Props {
+  background: 'ink' | 'coal';
+  spacing?: 'default' | 'tight';
+  id?: string;
+  class?: string;
+}
+const { background, spacing = 'default', id, class: className } = Astro.props;
+
+const backgrounds = { ink: 'bg-ink', coal: 'bg-coal' };
+---
+
+<section
+  {id}
+  class:list={[
+    backgrounds[background],
+    spacing === 'tight' ? 'section-y-tight' : 'section-y',
+    className,
+  ]}
+>
+  <slot />
+</section>

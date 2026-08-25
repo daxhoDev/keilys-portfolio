@@ -1,0 +1,72 @@
+---
+/**
+ * Full-screen overlay panel. Not a <dialog>: Safari's dialog focus behaviour with
+ * view transitions is inconsistent, and the trap here is small enough to own.
+ *
+ * The contract mobile-menu.ts implements: focus trapped while open, Esc closes,
+ * focus returns to the trigger, background scroll locked with scrollbar compensation,
+ * the rest of the document inert, and the menu closes on route change.
+ */
+import type { Lang } from '~/i18n/routes.ts';
+import { SITE } from '~/lib/site.ts';
+import { useTranslations } from '~/i18n/utils.ts';
+import Nav from '~/components/layout/Nav.astro';
+import LanguageSwitcher from '~/components/layout/LanguageSwitcher.astro';
+import CloseIcon from '~/components/ui/icons/CloseIcon.astro';
+import InstagramIcon from '~/components/ui/icons/InstagramIcon.astro';
+import MailIcon from '~/components/ui/icons/MailIcon.astro';
+
+interface Props {
+  lang: Lang;
+}
+
+const { lang }: Props = Astro.props;
+const t = useTranslations(lang);
+---
+
+<div
+  id="mobile-menu"
+  data-mobile-menu
+  hidden
+  class="bg-coal fixed inset-0 z-50 flex translate-x-full flex-col transition-transform duration-[280ms] ease-[cubic-bezier(0.22,1,0.36,1)] data-[open]:translate-x-0 md:hidden"
+>
+  <div class="gutter-x flex min-h-18 items-center justify-end">
+    <button
+      type="button"
+      data-menu-close
+      class="text-mist hover:text-bone flex size-11 items-center justify-center transition-colors"
+      aria-label={t.nav.closeMenu}
+    >
+      <CloseIcon class="size-6" />
+    </button>
+  </div>
+
+  <div class="gutter-x flex flex-1 flex-col justify-between gap-10 pb-10">
+    <Nav {lang} variant="mobile" />
+
+    <div class="flex flex-col gap-6">
+      <ul class="flex flex-col gap-3">
+        {
+          SITE.socials.map((social) => (
+            <li>
+              <a
+                href={social.href}
+                class="text-body text-mist hover:text-bone inline-flex min-h-11 items-center gap-3 transition-colors"
+                {...(social.icon === 'instagram' ? { rel: 'me noopener', target: '_blank' } : {})}
+              >
+                {social.icon === 'instagram' ? (
+                  <InstagramIcon class="size-5" />
+                ) : (
+                  <MailIcon class="size-5" />
+                )}
+                {t.contact.socials[social.id]}
+              </a>
+            </li>
+          ))
+        }
+      </ul>
+
+      <LanguageSwitcher {lang} variant="stacked" />
+    </div>
+  </div>
+</div>

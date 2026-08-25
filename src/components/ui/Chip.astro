@@ -1,0 +1,36 @@
+---
+/**
+ * Filter chip. A chip with a zero count renders disabled rather than hidden — a
+ * filter row that changes shape depending on the content reads as a bug, and hiding
+ * it would silently drop the fact that a whole tone is missing.
+ * See specs/05-pages-and-sections.md § My work.
+ */
+interface Props {
+  label: string;
+  count?: number;
+  active: boolean;
+  value: string;
+  class?: string;
+}
+
+const { label, count, active, value, class: className } = Astro.props;
+const disabled = count === 0;
+---
+
+<button
+  type="button"
+  data-filter={value}
+  aria-pressed={active ? 'true' : 'false'}
+  {disabled}
+  class:list={[
+    'text-label duration-base inline-flex min-h-11 items-center gap-2 rounded-sm border px-4 py-2 whitespace-nowrap transition-colors',
+    active
+      ? 'border-mustang bg-mustang text-ink'
+      : 'border-iron text-mist hover:border-steel hover:text-bone',
+    disabled && 'hover:border-iron hover:text-mist cursor-not-allowed opacity-40',
+    className,
+  ]}
+>
+  {label}
+  {count !== undefined && <span class="text-body-sm tabular-nums opacity-70">{count}</span>}
+</button>

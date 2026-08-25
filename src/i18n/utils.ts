@@ -1,7 +1,7 @@
-import type { Lang } from './routes';
-import type { Dictionary } from './types';
-import { es } from './es';
-import { en } from './en';
+import type { Lang } from './routes.ts';
+import type { Dictionary } from './types.ts';
+import { es } from './es.ts';
+import { en } from './en.ts';
 
 const DICTIONARIES: Record<Lang, Dictionary> = { es, en };
 

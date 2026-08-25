@@ -25,3 +25,7 @@ pnpm-debug.log*
 Thumbs.db
 .idea/
 *.swp
+
+# test artefacts
+test-results/
+playwright-report/

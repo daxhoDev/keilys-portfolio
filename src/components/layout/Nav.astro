@@ -1,0 +1,68 @@
+---
+/**
+ * The single source of nav items, built from ROUTES so a route change never has to
+ * be mirrored here. "Contact" is an in-page anchor that exists only on the landing
+ * page, so from About and Work it links to the homepage's #contact.
+ */
+import type { Lang, PageKey } from '~/i18n/routes.ts';
+import { path, getPageKey } from '~/i18n/routes.ts';
+import { useTranslations } from '~/i18n/utils.ts';
+
+interface Props {
+  lang: Lang;
+  variant: 'header' | 'mobile' | 'footer';
+  class?: string;
+}
+
+const { lang, variant, class: className }: Props = Astro.props;
+const t = useTranslations(lang);
+
+const currentKey = getPageKey(Astro.url);
+const onHome = currentKey === 'home';
+
+const items: { key: PageKey | 'contact'; label: string; href: string }[] = [
+  { key: 'about', label: t.nav.about, href: path('about', lang) },
+  { key: 'work', label: t.nav.work, href: path('work', lang) },
+  {
+    key: 'contact',
+    label: t.nav.contact,
+    href: onHome ? '#contact' : `${path('home', lang)}#contact`,
+  },
+];
+
+const layouts = {
+  header: 'flex items-center gap-8',
+  mobile: 'flex flex-col gap-6',
+  footer: 'flex flex-col gap-3',
+};
+
+const linkSizes = {
+  header: 'text-label',
+  mobile: 'font-display text-display-md',
+  footer: 'text-body',
+};
+---
+
+<ul class:list={[layouts[variant], className]}>
+  {
+    items.map((item) => {
+      const isCurrent = item.key === currentKey;
+      return (
+        <li>
+          <a
+            href={item.href}
+            aria-current={isCurrent ? 'page' : undefined}
+            class:list={[
+              'duration-base inline-block transition-colors',
+              linkSizes[variant],
+              variant === 'header' && 'min-h-11 content-center',
+              isCurrent ? 'text-bone border-mustang border-b pb-0.5' : 'text-mist hover:text-bone',
+            ]}
+          >
+            {item.label}
+          </a>
+        </li>
+      );
+    })
+  }
+</ul>

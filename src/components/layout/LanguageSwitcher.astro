@@ -1,0 +1,59 @@
+---
+/**
+ * The only route into English — there is no language detection anywhere on the site
+ * (specs/03-information-architecture.md § Language detection), so this is visible at
+ * every breakpoint rather than buried in the mobile menu.
+ *
+ * The active language is a <span>, not a link: a link to the page you are already on
+ * is noise to a screen reader and a dead end to a mouse.
+ *
+ * role="group" rather than <nav>: the switcher appears up to three times on a page
+ * (header, mobile menu, footer), and three identically-labelled landmarks is worse
+ * than none. A group carries the label without adding a landmark, and needs no id —
+ * ids would collide between the header and the mobile menu.
+ */
+import type { Lang } from '~/i18n/routes.ts';
+import { LANGS, alternatePath } from '~/i18n/routes.ts';
+import { useTranslations, HTML_LANG } from '~/i18n/utils.ts';
+
+interface Props {
+  lang: Lang;
+  variant?: 'inline' | 'stacked';
+  class?: string;
+}
+
+const { lang, variant = 'inline', class: className }: Props = Astro.props;
+const t = useTranslations(lang);
+---
+
+<div
+  role="group"
+  aria-label={t.lang.switchTo}
+  class:list={['text-label flex items-center gap-2', variant === 'stacked' && 'gap-3', className]}
+>
+  {
+    LANGS.map((code, index) => (
+      <>
+        {index > 0 && (
+          <span aria-hidden="true" class="text-mustang-dim">
+            /
+          </span>
+        )}
+        {code === lang ? (
+          <span aria-current="true" class="text-bone">
+            {t.lang[code]}
+          </span>
+        ) : (
+          <a
+            href={alternatePath(Astro.url, code)}
+            hreflang={HTML_LANG[code]}
+            lang={HTML_LANG[code]}
+            class="text-mist hover:text-bone duration-base inline-flex min-h-11 items-center transition-colors"
+          >
+            {t.lang[code]}
+          </a>
+        )}
+      </>
+    ))
+  }
+</div>
