@@ -29,3 +29,6 @@ Thumbs.db
 # test artefacts
 test-results/
 playwright-report/
+
+# Keily's original camera exports — ingested into src/assets/, not shipped
+Fotos para portfolio/

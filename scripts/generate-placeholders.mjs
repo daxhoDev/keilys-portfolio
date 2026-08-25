@@ -10,7 +10,7 @@
  *   npm run placeholders
  */
 
-import { mkdir, access } from 'node:fs/promises';
+import { mkdir, access, readdir } from 'node:fs/promises';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import sharp from 'sharp';
@@ -93,10 +93,36 @@ async function exists(path) {
   }
 }
 
+/**
+ * Keily's real photographs landed in src/assets/photos/ as `img-<n>.jpg`. The
+ * per-file exists() guard below would still happily add `photo-01.jpg`…`photo-20.jpg`
+ * alongside them, and every one of those would show up in the gallery. Once the
+ * directory holds anything that is not a `photo-NN.jpg` placeholder, the gallery
+ * half of the manifest is done and gets skipped wholesale.
+ */
+async function galleryIsReal() {
+  try {
+    const files = await readdir(join(root, PHOTOS));
+    return files.some((f) => !/^photo-\d{2}\.jpg$/.test(f));
+  } catch {
+    return false;
+  }
+}
+
+const skipGallery = await galleryIsReal();
+if (skipGallery) {
+  console.log('  · src/assets/photos/ holds real photographs — skipping the gallery placeholders');
+}
+
 let written = 0;
 let skipped = 0;
 
 for (const entry of manifest) {
+  if (skipGallery && entry.dir === PHOTOS) {
+    skipped += 1;
+    continue;
+  }
+
   const dir = join(root, entry.dir);
   const path = join(dir, entry.name);
 

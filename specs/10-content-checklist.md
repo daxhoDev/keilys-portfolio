@@ -21,23 +21,30 @@ critical path.
 | English translation | ✅ Ours, ships without her review |
 | URL | ✅ `keilymargallery.vercel.app`, `noindex` until a custom domain |
 | Contact form delivery | ✅ Stub at launch, email visible beside it |
-| **The 20 photographs** | ✗ **Not sent — the only real blocker** |
-| **Alt text ×20 + tone ×20 + the featured 6** | ✗ Not sent — depends on the photos |
-| **Hero / portrait / secondary / OG images** | ✗ Not sent |
+| **The photographs** | ✅ **27 delivered** — ingested into `src/assets/photos/` |
+| Tone ×27 + the featured 6 | ✅ Tone from her two folders (17 `bw` / 10 `colour`); featured 6 chosen |
+| Alt text ×27 + titles + years | ⚠️ **20 of 27 in her words**; the 6 featured, `img-4482` and 3 fragment alts are our proposals, flagged in [fichas-de-fotos.md](./fichas-de-fotos.md) and awaiting her yes/no |
+| English translation of the photo metadata | ✅ Ours, ships without her review — already written into the entries |
+| Hero image | ✅ Delivered and in place |
+| **Portrait / secondary / OG images** | ✗ Not sent — placeholders still in `src/assets/` |
 
 ---
 
-## ✗ Blocking: the photographs
+## ✅ Received: the photographs
 
-She is sending **20**, which sits inside the 18–30 guide.
+She sent **27**, which sits inside the 18–30 guide. They arrived in two folders — *blanco y negro* (17)
+and *a color* (10) — which is where `tone` comes from. All 27 are ingested into `src/assets/photos/` as
+`img-<número>.jpg`, EXIF-rotated, metadata stripped, capped at 2400px on the long edge.
+**The smallest is 1681px on the long edge, so nothing falls under the 1400px floor** and the
+undersized-image warning stays silent.
 
 | Item | Count | Spec |
 |---|---|---|
-| Gallery photographs | 20 | Longest edge 2400px where possible, JPEG quality 85, sRGB, EXIF stripped. Mixed orientations welcome — the masonry is built for it and nothing is cropped |
-| Hero image | 1 | Landscape. Must work with text over its lower-left third; a calm, darker lower-left works best. The scrim guarantees legibility, but a busy bottom-left still fights the headline. **This is the one image where a small file shows** — send the largest available, ideally ≥ 2000px wide |
-| Portrait of Keily | 1 | Portrait orientation, 4:5, ideally ≥ 1200 × 1500 |
-| Secondary about image | 1 | Landscape, 3:2, ideally ≥ 1800 × 1200 |
-| Open Graph image | 1 | 1200 × 630. Can be a crop of a strong photograph |
+| Gallery photographs ✅ | 27 | Longest edge 2400px where possible, JPEG quality 85, sRGB, EXIF stripped. Mixed orientations welcome — the masonry is built for it and nothing is cropped |
+| Hero image ✅ | 1 | Delivered — 2400 × 1350. Landscape. Must work with text over its lower-left third; a calm, darker lower-left works best. The scrim guarantees legibility, but a busy bottom-left still fights the headline. **This is the one image where a small file shows** — send the largest available, ideally ≥ 2000px wide |
+| Portrait of Keily ✗ | 1 | Portrait orientation, 4:5, ideally ≥ 1200 × 1500 |
+| Secondary about image ✗ | 1 | Landscape, 3:2, ideally ≥ 1800 × 1200 |
+| Open Graph image ✗ | 1 | 1200 × 630. Can be a crop of a strong photograph |
 
 ### Photographs under 2400px — she flagged this, and it is fine
 
