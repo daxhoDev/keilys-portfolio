@@ -1,0 +1,83 @@
+---
+/**
+ * Full-viewport hero. min-height: 100svh rather than 100vh — svh is the *small*
+ * viewport height, measured with mobile browser chrome visible, so the section is
+ * never clipped by an address bar that appears on scroll. Capped on tall monitors so
+ * it does not become absurd.
+ *
+ * The scrim is required, not decorative: it is what guarantees text contrast over
+ * whatever photograph sits behind it.
+ */
+import { Image } from 'astro:assets';
+
+import type { Lang } from '~/i18n/routes.ts';
+import { path } from '~/i18n/routes.ts';
+import { useTranslations } from '~/i18n/utils.ts';
+import { responsiveWidths } from '~/lib/images.ts';
+import Button from '~/components/ui/Button.astro';
+import heroImage from '~/assets/hero.jpg';
+
+interface Props {
+  lang: Lang;
+}
+
+const { lang }: Props = Astro.props;
+const t = useTranslations(lang);
+
+const [first, second, accent] = t.hero.headline;
+
+// Clamped to the source: her hero file is not guaranteed to reach 2400px.
+const widths = responsiveWidths(heroImage, [640, 1024, 1536, 2048, 2400]);
+---
+
+<section data-hero class="relative flex max-h-[900px] min-h-svh items-end overflow-hidden">
+  <Image
+    src={heroImage}
+    alt={t.hero.imageAlt}
+    {widths}
+    sizes="100vw"
+    loading="eager"
+    fetchpriority="high"
+    data-parallax
+    class="absolute inset-0 -top-[7.5%] z-0 h-[115%] w-full object-cover object-center"
+  />
+
+  <!-- Required for contrast. Darkest at the bottom, where the copy sits. -->
+  <div
+    class="from-ink via-ink/55 to-ink/15 absolute inset-0 z-10 bg-linear-to-t from-[8%] via-[45%]"
+    aria-hidden="true"
+  >
+  </div>
+
+  <div class="gutter-x max-w-content relative z-20 mx-auto w-full pb-[clamp(4rem,10vh,7rem)]">
+    <h1 class="font-display text-display-xl text-bone">
+      <span class="block overflow-hidden pb-[0.14em]"><span class="block">{first}</span></span>
+      <span class="block overflow-hidden pb-[0.14em]"><span class="block">{second}</span></span>
+      <span class="block overflow-hidden pb-[0.14em]">
+        <span class="text-mustang-soft relative block">
+          {accent}
+          {/* The accent word is only a step away from bone, so the rule carries the emphasis. */}
+          <span
+            data-hero-underline
+            class="bg-mustang absolute bottom-[0.1em] left-0 block h-px w-full origin-left"
+            aria-hidden="true"></span>
+        </span>
+      </span>
+    </h1>
+
+    <p class="text-body-lg text-mist mt-6 max-w-[42ch]">{t.hero.subline}</p>
+
+    <div class="mt-10 flex flex-wrap gap-4">
+      <Button href="#contact" variant="primary" size="lg">{t.hero.ctaPrimary}</Button>
+      <Button href={path('work', lang)} variant="ghost" size="lg">{t.hero.ctaSecondary}</Button>
+    </div>
+  </div>
+
+  <div
+    class="absolute inset-x-0 bottom-8 z-20 hidden flex-col items-center gap-3 md:flex"
+    aria-hidden="true"
+  >
+    <span class="text-eyebrow text-mist uppercase">{t.hero.scrollHint}</span>
+    <span data-scroll-rule class="bg-mustang-dim relative block h-10 w-px overflow-hidden"></span>
+  </div>
+</section>

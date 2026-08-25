@@ -48,7 +48,7 @@ export const en: Dictionary = {
   },
 
   hero: {
-    headline: ["Hello, I'm Keily,", 'and I’m a', 'photographer.'],
+    headline: ['Hello, I’m Keily,', 'and I’m a', 'photographer.'],
     subline:
       'A self-taught artist. I explore the everyday in search of artistic meaning, above all through what black and white can give.',
     ctaPrimary: 'Get in touch',

@@ -1,0 +1,68 @@
+---
+/**
+ * The six featured photographs. Receives them rather than querying, so the page owns
+ * the data and this component stays a layout.
+ *
+ * interaction is "lightbox" everywhere (decision #2 = A), but the lightbox itself
+ * arrives in Phase 5 — until then PhotoCard renders the figure without a wrapper.
+ */
+import type { Lang } from '~/i18n/routes.ts';
+import { path } from '~/i18n/routes.ts';
+import { useTranslations } from '~/i18n/utils.ts';
+import type { Photo } from '~/lib/photos.ts';
+import { FEATURED_COUNT } from '~/lib/photos.ts';
+import { Image } from 'astro:assets';
+import { responsiveWidths } from '~/lib/images.ts';
+import Section from '~/components/ui/Section.astro';
+import Container from '~/components/ui/Container.astro';
+import SectionHeading from '~/components/ui/SectionHeading.astro';
+import Button from '~/components/ui/Button.astro';
+
+interface Props {
+  lang: Lang;
+  photos: Photo[];
+}
+
+const { lang, photos }: Props = Astro.props;
+const t = useTranslations(lang);
+
+if (photos.length !== FEATURED_COUNT) {
+  throw new Error(
+    `FeaturedWork expects exactly ${FEATURED_COUNT} photographs, received ${photos.length}.`,
+  );
+}
+---
+
+<Section background="ink">
+  <Container>
+    <SectionHeading eyebrow={t.work.eyebrow} heading={t.work.heading} lead={t.work.lead} />
+
+    <ul class="mt-12 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+      {
+        photos.map((photo, index) => (
+          <li>
+            <figure>
+              <Image
+                src={photo.data.src}
+                alt={photo.data.alt[lang]}
+                widths={responsiveWidths(photo.data.src, [400, 700, 1000, 1400])}
+                sizes="(min-width: 1024px) 33vw, (min-width: 640px) 50vw, 100vw"
+                loading={index < 3 ? 'eager' : 'lazy'}
+                class="w-full"
+              />
+              {photo.data.title && (
+                <figcaption class="text-body-sm text-mist mt-3">
+                  {photo.data.title[lang]}
+                </figcaption>
+              )}
+            </figure>
+          </li>
+        ))
+      }
+    </ul>
+
+    <div class="mt-12">
+      <Button href={path('work', lang)} variant="primary">{t.work.cta}</Button>
+    </div>
+  </Container>
+</Section>

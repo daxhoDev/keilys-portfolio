@@ -221,3 +221,26 @@ describe('language coverage', () => {
     for (const lang of LANGS) assert.ok(useTranslations(lang).meta.siteName);
   });
 });
+
+describe('typography of the copy itself', () => {
+  test('apostrophes are typographic, not straight, in display copy', () => {
+    // A straight quote beside a curly one in a Playfair headline reads as a typo.
+    // This shipped once: "Hello, I'm Keily," next to "and I’m a".
+    for (const [lang, dict] of [
+      ['es', es],
+      ['en', en],
+    ] as const) {
+      for (const segment of dict.hero.headline) {
+        assert.ok(
+          !segment.includes("'"),
+          `${lang} headline uses a straight apostrophe: ${segment}`,
+        );
+      }
+      for (const path of leaves(dict)) {
+        const value = at(dict, path);
+        if (typeof value !== 'string') continue;
+        assert.ok(!/\w'\w/.test(value), `${lang}.${path} uses a straight apostrophe`);
+      }
+    }
+  });
+});

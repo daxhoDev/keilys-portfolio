@@ -1,23 +1,24 @@
 ---
 /**
  * The landing page, shared by / (Spanish) and /en (English).
- *
- * Phase 2 renders the copy in document order so routing, metadata and the
- * dictionary can be verified. Phase 4 replaces the bodies of these sections with
- * Hero, AboutPreview, FeaturedWork and ContactSection.
  */
 import BaseLayout from '~/layouts/BaseLayout.astro';
-import type { Lang } from '~/i18n/routes';
-import { path } from '~/i18n/routes';
-import { useTranslations } from '~/i18n/utils';
-import { SITE } from '~/lib/site';
+import type { Lang } from '~/i18n/routes.ts';
+import { useTranslations } from '~/i18n/utils.ts';
+import { getFeaturedPhotos } from '~/lib/photos.ts';
+import Hero from '~/components/sections/Hero.astro';
+import AboutPreview from '~/components/sections/AboutPreview.astro';
+import FeaturedWork from '~/components/sections/FeaturedWork.astro';
+import ContactSection from '~/components/sections/ContactSection.astro';
 
 interface Props {
   lang: Lang;
 }
 
-const { lang } = Astro.props;
+const { lang }: Props = Astro.props;
 const t = useTranslations(lang);
+
+const featured = await getFeaturedPhotos();
 ---
 
 <BaseLayout
@@ -27,59 +28,8 @@ const t = useTranslations(lang);
   imageAlt={t.hero.imageAlt}
   transparentHeader
 >
-  <!-- Hero — Phase 4 -->
-  <section class="gutter-x section-y max-w-content mx-auto">
-    <h1 class="font-display text-display-xl">
-      {t.hero.headline[0]}{' '}{t.hero.headline[1]}{' '}
-      <span class="text-mustang-soft">{t.hero.headline[2]}</span>
-    </h1>
-    <p class="text-body-lg measure-lead text-mist mt-6">{t.hero.subline}</p>
-    <p class="mt-8 flex flex-wrap gap-4">
-      <a href="#contact" class="text-label bg-mustang text-ink rounded-sm px-5 py-3">
-        {t.hero.ctaPrimary}
-      </a>
-      <a
-        href={path('work', lang)}
-        class="text-label border-steel text-bone rounded-sm border px-5 py-3"
-      >
-        {t.hero.ctaSecondary}
-      </a>
-    </p>
-  </section>
-
-  <!-- About preview — Phase 4 -->
-  <section class="gutter-x section-y max-w-content bg-coal mx-auto">
-    <p class="text-eyebrow text-mustang uppercase">{t.about.eyebrow}</p>
-    <h2 class="font-display text-display-md mt-4">{t.about.heading}</h2>
-    <p class="text-body-lg measure-lead mt-6">{t.about.lead}</p>
-    {t.about.body.map((paragraph) => <p class="text-body measure text-mist mt-4">{paragraph}</p>)}
-    <p class="mt-8">
-      <a href={path('about', lang)} class="text-label border-mustang border-b pb-1">
-        {t.about.cta}
-      </a>
-    </p>
-  </section>
-
-  <!-- Featured work — Phase 4, needs the content collection -->
-  <section class="gutter-x section-y max-w-content mx-auto">
-    <p class="text-eyebrow text-mustang uppercase">{t.work.eyebrow}</p>
-    <h2 class="font-display text-display-md mt-4">{t.work.heading}</h2>
-    <p class="text-body-lg measure-lead text-mist mt-6">{t.work.lead}</p>
-    <p class="mt-8">
-      <a href={path('work', lang)} class="text-label bg-mustang text-ink rounded-sm px-5 py-3">
-        {t.work.cta}
-      </a>
-    </p>
-  </section>
-
-  <!-- Contact — Phase 6 builds the form itself -->
-  <section id="contact" class="gutter-x section-y max-w-content bg-coal mx-auto">
-    <p class="text-eyebrow text-mustang uppercase">{t.contact.eyebrow}</p>
-    <h2 class="font-display text-display-md mt-4">{t.contact.heading}</h2>
-    <p class="text-body-lg measure-lead text-mist mt-6">{t.contact.lead}</p>
-    <p class="text-body mt-6">
-      {t.contact.directEmail}{' '}
-      <a href={`mailto:${SITE.email}`} class="border-mustang border-b pb-0.5">{SITE.email}</a>
-    </p>
-  </section>
+  <Hero {lang} />
+  <AboutPreview {lang} />
+  <FeaturedWork {lang} photos={featured} />
+  <ContactSection {lang} />
 </BaseLayout>

@@ -1,0 +1,68 @@
+---
+/**
+ * Owns id="contact". The form itself is Phase 6; what ships today is the copy, the
+ * socials and the plain mailto — which is the ONLY working contact path in v1, since
+ * the form is a documented stub (decision #4).
+ */
+import type { Lang } from '~/i18n/routes.ts';
+import { SITE } from '~/lib/site.ts';
+import { useTranslations } from '~/i18n/utils.ts';
+import Section from '~/components/ui/Section.astro';
+import Container from '~/components/ui/Container.astro';
+import SectionHeading from '~/components/ui/SectionHeading.astro';
+import InstagramIcon from '~/components/ui/icons/InstagramIcon.astro';
+import MailIcon from '~/components/ui/icons/MailIcon.astro';
+
+interface Props {
+  lang: Lang;
+}
+
+const { lang }: Props = Astro.props;
+const t = useTranslations(lang);
+---
+
+<Section background="coal" id="contact">
+  <Container>
+    <div class="grid gap-12 lg:grid-cols-[1fr_0.7fr] lg:gap-20">
+      <div>
+        <SectionHeading
+          eyebrow={t.contact.eyebrow}
+          heading={t.contact.heading}
+          lead={t.contact.lead}
+        />
+        {/* ContactForm — Phase 6 */}
+      </div>
+
+      <aside class="lg:pt-4">
+        <h3 class="text-eyebrow text-mustang uppercase">{t.contact.socials.heading}</h3>
+        <ul class="mt-4 flex flex-col gap-2">
+          {
+            SITE.socials.map((social) => (
+              <li>
+                <a
+                  href={social.href}
+                  class="text-body text-mist hover:text-bone inline-flex min-h-11 items-center gap-3 transition-colors"
+                  {...(social.icon === 'instagram' ? { rel: 'me noopener', target: '_blank' } : {})}
+                >
+                  {social.icon === 'instagram' ? (
+                    <InstagramIcon class="size-5" />
+                  ) : (
+                    <MailIcon class="size-5" />
+                  )}
+                  {t.contact.socials[social.id]}
+                </a>
+              </li>
+            ))
+          }
+        </ul>
+
+        <p class="text-body text-mist border-iron mt-8 border-t pt-6">
+          {t.contact.directEmail}{' '}
+          <a href={`mailto:${SITE.email}`} class="text-bone border-mustang border-b pb-0.5">
+            {SITE.email}
+          </a>
+        </p>
+      </aside>
+    </div>
+  </Container>
+</Section>
