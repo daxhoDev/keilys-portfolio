@@ -125,7 +125,11 @@ export const en: Dictionary = {
       name: {
         label: 'Name',
         placeholder: 'What you go by',
-        error: { required: 'Please enter your name.', tooShort: 'That name is too short.' },
+        error: {
+          required: 'Please enter your name.',
+          tooShort: 'That name is too short.',
+          tooLong: 'That name is too long.',
+        },
       },
       email: {
         label: 'Email',
@@ -135,7 +139,11 @@ export const en: Dictionary = {
           invalid: 'That email doesn’t look right.',
         },
       },
-      subject: { label: 'Subject', placeholder: 'What it’s about (optional)' },
+      subject: {
+        label: 'Subject',
+        placeholder: 'What it’s about (optional)',
+        error: { tooLong: 'That subject is too long.' },
+      },
       message: {
         label: 'Message',
         placeholder: 'Tell me what you have in mind',

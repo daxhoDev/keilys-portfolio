@@ -1,0 +1,138 @@
+---
+/**
+ * Label + control + error slot, with all the ARIA wiring in one place.
+ *
+ * Error messages are rendered onto the element as data-error-* attributes rather than
+ * shipped inside the script: the validators return a KEY, and the localised text is
+ * produced at render time by whichever language built the page. contact-form.ts never
+ * needs to know a language exists.
+ */
+import type { ErrorKey } from '~/lib/validation.ts';
+
+interface Props {
+  id: string;
+  name: string;
+  label: string;
+  type?: 'text' | 'email' | 'textarea';
+  required?: boolean;
+  placeholder?: string;
+  autocomplete?: string;
+  rows?: number;
+  minlength?: number;
+  maxlength?: number;
+  /** Localised messages, keyed the way the validators key them. */
+  errors: Partial<Record<ErrorKey, string>>;
+  /** Visually hidden text naming a field as required, e.g. "obligatorio". */
+  requiredLabel?: string;
+  counter?: boolean;
+}
+
+const {
+  id,
+  name,
+  label,
+  type = 'text',
+  required = false,
+  placeholder,
+  autocomplete,
+  rows = 6,
+  minlength,
+  maxlength,
+  errors,
+  requiredLabel,
+  counter = false,
+}: Props = Astro.props;
+
+const errorId = `${id}-error`;
+const requiredId = `${id}-required`;
+const counterId = `${id}-counter`;
+
+// Only ids that actually exist in the DOM — a dangling aria-describedby is announced
+// as nothing and hides the reference that does matter.
+const describedBy = [required && requiredLabel ? requiredId : null, counter ? counterId : null]
+  .filter(Boolean)
+  .join(' ');
+
+const errorData = Object.fromEntries(
+  Object.entries(errors).map(([key, message]) => [`data-error-${key.toLowerCase()}`, message]),
+);
+
+const shared = {
+  id,
+  name,
+  required,
+  placeholder,
+  minlength,
+  maxlength,
+  'aria-describedby': describedBy || undefined,
+  'data-field': name,
+  ...errorData,
+};
+
+const controlClass =
+  'text-body bg-graphite border-iron placeholder:text-mustang-dim focus-visible:border-mustang-soft duration-base w-full rounded-sm border px-4 py-3 text-bone transition-colors aria-[invalid=true]:border-danger read-only:opacity-60';
+---
+
+<div class="flex flex-col gap-2">
+  <label for={id} class="text-label text-mist">
+    {label}
+    {
+      required && (
+        <>
+          <span aria-hidden="true" class="text-mustang-soft">
+            {' '}
+            *
+          </span>
+          {requiredLabel && (
+            <span id={requiredId} class="sr-only">
+              {requiredLabel}
+            </span>
+          )}
+        </>
+      )
+    }
+  </label>
+
+  {
+    type === 'textarea' ? (
+      <textarea
+        {...shared}
+        {rows}
+        autocomplete={autocomplete}
+        class:list={[controlClass, 'resize-y']}
+      />
+    ) : (
+      <input {...shared} {type} autocomplete={autocomplete} class={controlClass} />
+    )
+  }
+
+  {
+    counter && (
+      <p id={counterId} data-counter-for={name} hidden class="text-body-sm text-mist text-right">
+        <span data-counter-value>0</span>/{maxlength}
+      </p>
+    )
+  }
+
+  {/* Present in the DOM from the start so aria-describedby is never dangling. */}
+  <p
+    id={errorId}
+    data-error-for={name}
+    role="alert"
+    hidden
+    class="text-body-sm text-danger flex items-start gap-2"
+  >
+    <svg
+      viewBox="0 0 20 20"
+      class="mt-0.5 size-4 shrink-0"
+      fill="none"
+      stroke="currentColor"
+      stroke-width="1.5"
+      aria-hidden="true"
+    >
+      <circle cx="10" cy="10" r="8"></circle>
+      <path d="M10 6v5M10 13.5v.5" stroke-linecap="round"></path>
+    </svg>
+    <span data-error-text></span>
+  </p>
+</div>

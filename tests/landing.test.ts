@@ -163,7 +163,11 @@ describe('contact shell', () => {
     });
   }
 
-  test('no contact form is claimed to work yet — the stub arrives in Phase 6', () => {
-    assert.ok(!/<form/.test(html('/')), 'a form appeared before its phase');
+  test('the form is present, and the mailto beside it still is too', () => {
+    // The form ships as a stub that delivers nothing, so the address next to it is the
+    // only working contact path. Removing it would make the section a dead end.
+    const page = html('/');
+    assert.match(page, /<form[^>]*data-contact-form/, 'no form');
+    assert.ok(page.includes(`mailto:${SITE.email}`), 'the working contact path is gone');
   });
 });

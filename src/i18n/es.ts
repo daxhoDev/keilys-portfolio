@@ -132,14 +132,22 @@ export const es = {
       name: {
         label: 'Nombre',
         placeholder: 'Cómo te llamas',
-        error: { required: 'Escribe tu nombre.', tooShort: 'Tu nombre es demasiado corto.' },
+        error: {
+          required: 'Escribe tu nombre.',
+          tooShort: 'Tu nombre es demasiado corto.',
+          tooLong: 'Ese nombre es demasiado largo.',
+        },
       },
       email: {
         label: 'Correo electrónico',
         placeholder: 'donde quieres que te responda',
         error: { required: 'Escribe tu correo.', invalid: 'Ese correo no parece válido.' },
       },
-      subject: { label: 'Asunto', placeholder: 'De qué se trata (opcional)' },
+      subject: {
+        label: 'Asunto',
+        placeholder: 'De qué se trata (opcional)',
+        error: { tooLong: 'Ese asunto es demasiado largo.' },
+      },
       message: {
         label: 'Mensaje',
         placeholder: 'Cuéntame qué tienes en mente',

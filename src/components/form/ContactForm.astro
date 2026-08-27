@@ -1,0 +1,142 @@
+---
+/**
+ * The form is complete and correct, and it delivers nothing: submitContact is a
+ * documented stub (specs/09-open-decisions.md §4). The visible mailto: in the contact
+ * sidebar is the real contact path until a backend lands.
+ *
+ * novalidate turns off the browser's own bubbles so the messages can be localised and
+ * announced properly — every input still carries real type/required/minlength/maxlength
+ * attributes, which is what autofill and the no-JS case rely on.
+ */
+import type { Lang } from '~/i18n/routes.ts';
+import { useTranslations } from '~/i18n/utils.ts';
+import { LIMITS } from '~/lib/validation.ts';
+import { SITE } from '~/lib/site.ts';
+import Field from '~/components/form/Field.astro';
+import FormStatus from '~/components/form/FormStatus.astro';
+
+interface Props {
+  lang: Lang;
+}
+
+const { lang }: Props = Astro.props;
+const t = useTranslations(lang);
+const f = t.contact.form;
+---
+
+<div data-contact class="flex flex-col gap-6">
+  <form data-contact-form novalidate class="flex flex-col gap-5" data-lang={lang}>
+    <Field
+      id="contact-name"
+      name="name"
+      label={f.name.label}
+      placeholder={f.name.placeholder}
+      autocomplete="name"
+      required
+      minlength={LIMITS.name.min}
+      maxlength={LIMITS.name.max}
+      errors={f.name.error}
+      requiredLabel={f.required}
+    />
+
+    <Field
+      id="contact-email"
+      name="email"
+      type="email"
+      label={f.email.label}
+      placeholder={f.email.placeholder}
+      autocomplete="email"
+      required
+      maxlength={LIMITS.email.max}
+      errors={f.email.error}
+      requiredLabel={f.required}
+    />
+
+    <Field
+      id="contact-subject"
+      name="subject"
+      label={f.subject.label}
+      placeholder={f.subject.placeholder}
+      autocomplete="off"
+      maxlength={LIMITS.subject.max}
+      errors={f.subject.error}
+    />
+
+    <Field
+      id="contact-message"
+      name="message"
+      type="textarea"
+      label={f.message.label}
+      placeholder={f.message.placeholder}
+      autocomplete="off"
+      required
+      rows={6}
+      minlength={LIMITS.message.min}
+      maxlength={LIMITS.message.max}
+      errors={f.message.error}
+      requiredLabel={f.required}
+      counter
+    />
+
+    {
+      /*
+      Honeypot. Included now, with no backend, so whichever provider is chosen later
+      inherits basic spam protection with no rework. Hidden from people three ways:
+      off-screen, out of the tab order, and out of the accessibility tree.
+    */
+    }
+    <div aria-hidden="true" class="absolute left-[-9999px] h-px w-px overflow-hidden">
+      <label for="contact-company">Company</label>
+      <input id="contact-company" name="company" type="text" tabindex="-1" autocomplete="off" />
+    </div>
+
+    <script>
+      import '~/scripts/contact-form.ts';
+    </script>
+
+    {/* Announces "there are N fields to fix" on a failed submit. */}
+    <p
+      data-form-summary
+      data-summary-singular={f.errorSummary(1)}
+      data-summary-plural={f.errorSummary(0)}
+      role="status"
+      hidden
+      class="text-body-sm text-danger"
+    >
+    </p>
+
+    <FormStatus {lang} />
+
+    <div>
+      <button
+        type="submit"
+        data-form-submit
+        data-submitting-label={f.submitting}
+        class="text-label duration-base bg-mustang text-ink hover:bg-mustang-soft inline-flex min-h-12 items-center justify-center gap-3 rounded-sm px-7 py-4 transition-colors disabled:cursor-not-allowed disabled:opacity-60"
+      >
+        <span data-submit-label>{f.submit}</span>
+        <span
+          data-submit-spinner
+          hidden
+          aria-hidden="true"
+          class="border-ink/30 border-t-ink size-4 rounded-full border-2 motion-safe:animate-spin"
+        ></span>
+      </button>
+    </div>
+  </form>
+
+  {
+    /*
+    With JS off the form renders and native validation applies, but nothing can be
+    submitted — there is no action endpoint. The address is offered plainly instead.
+  */
+  }
+  <noscript>
+    <p class="text-body text-mist border-iron border-t pt-5">
+      {t.contact.directEmail}{' '}
+      <a href={`mailto:${SITE.email}`} class="text-bone border-mustang border-b pb-0.5">
+        {SITE.email}
+      </a>
+    </p>
+  </noscript>
+</div>

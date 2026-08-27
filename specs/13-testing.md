@@ -39,6 +39,10 @@ tests/
 ├── images.test.ts          responsiveWidths never upscales
 ├── build-output.test.ts    canonical, hreflang, noindex, JSON-LD, CSS, fonts
 ├── chrome-markup.test.ts   header/nav/footer as emitted
+├── gallery.test.ts         masonry, tone filters, lightbox markup
+├── hero-contrast.test.ts   the veil measured against the real photograph
+├── validation.test.ts      the contact validators, as pure functions
+├── contact-form.test.ts    the form as emitted, and the stub's guarantees
 ├── landing.test.ts         hero, featured grid, about preview, contact shell
 ├── hero-contrast.test.ts   the veil, measured against the real photograph
 ├── css-utilities.test.ts   token utilities emitting no CSS, and invalid calc()

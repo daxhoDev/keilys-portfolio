@@ -7,6 +7,7 @@
 import type { Lang } from '~/i18n/routes.ts';
 import { SITE } from '~/lib/site.ts';
 import { useTranslations } from '~/i18n/utils.ts';
+import ContactForm from '~/components/form/ContactForm.astro';
 import Section from '~/components/ui/Section.astro';
 import Container from '~/components/ui/Container.astro';
 import SectionHeading from '~/components/ui/SectionHeading.astro';
@@ -30,7 +31,9 @@ const t = useTranslations(lang);
           heading={t.contact.heading}
           lead={t.contact.lead}
         />
-        {/* ContactForm — Phase 6 */}
+        <div class="mt-10">
+          <ContactForm {lang} />
+        </div>
       </div>
 
       <aside class="lg:pt-4">
