@@ -4,6 +4,7 @@
  * (eyebrow, <h1>, lead) plus a slot for the page body.
  */
 import BaseLayout from '~/layouts/BaseLayout.astro';
+import Reveal from '~/components/motion/Reveal.astro';
 import type { Lang } from '~/i18n/routes';
 
 interface Props {
@@ -41,11 +42,11 @@ const containerClass = {
 
 <BaseLayout {lang} {title} {description} {image} {imageAlt} {jsonLd}>
   <div class:list={['gutter-x section-y mx-auto', containerClass]}>
-    <header>
+    <Reveal as="header">
       <p class="text-eyebrow text-mustang uppercase">{eyebrow}</p>
       <h1 class="font-display text-display-lg mt-4">{heading}</h1>
       {lead && <p class="text-body-lg measure-lead text-mist mt-6">{lead}</p>}
-    </header>
+    </Reveal>
 
     <slot />
   </div>

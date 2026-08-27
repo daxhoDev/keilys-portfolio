@@ -12,6 +12,7 @@ import type { Lang } from '~/i18n/routes.ts';
 import { useTranslations } from '~/i18n/utils.ts';
 import { LIMITS } from '~/lib/validation.ts';
 import { SITE } from '~/lib/site.ts';
+import Reveal from '~/components/motion/Reveal.astro';
 import Field from '~/components/form/Field.astro';
 import FormStatus from '~/components/form/FormStatus.astro';
 
@@ -24,7 +25,7 @@ const t = useTranslations(lang);
 const f = t.contact.form;
 ---
 
-<div data-contact class="flex flex-col gap-6">
+<Reveal data-contact class="flex flex-col gap-6">
   <form data-contact-form novalidate class="flex flex-col gap-5" data-lang={lang}>
     <Field
       id="contact-name"
@@ -139,4 +140,4 @@ const f = t.contact.form;
       </a>
     </p>
   </noscript>
-</div>
+</Reveal>

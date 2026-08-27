@@ -10,9 +10,18 @@ interface Props {
   as?: string;
   variant?: 'default' | 'gallery';
   class?: string;
+  /** Everything else is forwarded — this wraps elements that scripts query by data-*. */
+  [key: string]: unknown;
 }
 
-const { delay = 0, distance = 24, variant = 'default', class: className }: Props = Astro.props;
+const {
+  delay = 0,
+  distance = 24,
+  variant = 'default',
+  class: className,
+  as: _as,
+  ...rest
+}: Props = Astro.props;
 
 // A dynamic tag name is typed as a component by the JSX definitions, so arbitrary HTML
 // attributes are rejected. The cast says: this really is an intrinsic element.
@@ -30,6 +39,7 @@ const style = [
   data-reveal={variant === 'gallery' ? 'gallery' : ''}
   style={style || undefined}
   class={className}
+  {...rest}
 >
   <slot />
 </Tag>

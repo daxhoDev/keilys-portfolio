@@ -11,6 +11,7 @@ import { SITE, absoluteUrl } from '~/lib/site.ts';
 import MasonryGallery from '~/components/gallery/MasonryGallery.astro';
 import GalleryFilters from '~/components/gallery/GalleryFilters.astro';
 import Lightbox from '~/components/gallery/Lightbox.astro';
+import Reveal from '~/components/motion/Reveal.astro';
 import Section from '~/components/ui/Section.astro';
 import Container from '~/components/ui/Container.astro';
 import Button from '~/components/ui/Button.astro';
@@ -59,7 +60,7 @@ const galleryJsonLd = [
   container="wide"
   jsonLd={galleryJsonLd}
 >
-  <div class="mt-12">
+  <Reveal class="mt-12">
     <GalleryFilters {lang} {counts} />
 
     <p
@@ -71,26 +72,26 @@ const galleryJsonLd = [
     >
       {t.work.photoCount(photos.length)}
     </p>
-  </div>
+  </Reveal>
 
   <div class="mt-8">
     <MasonryGallery {photos} {lang} interaction="lightbox" />
 
-    <div data-gallery-empty hidden class="py-16 text-center">
+    <Reveal as="div" data-gallery-empty hidden class="py-16 text-center">
       <p class="text-body text-mist">{t.work.filters.empty}</p>
       <Button data-show-all variant="ghost" class="mt-6">{t.work.filters.showAll}</Button>
-    </div>
+    </Reveal>
   </div>
 
   <Lightbox {lang} />
 
   <Section slot="full" background="coal" spacing="tight" class="mt-16">
     <Container>
-      <div class="flex flex-wrap items-center justify-between gap-6">
+      <Reveal class="flex flex-wrap items-center justify-between gap-6">
         <p class="text-body-lg measure-lead">{t.contact.lead}</p>
         <Button href={`${path('home', lang)}#contact`} variant="primary">{t.hero.ctaPrimary}</Button
         >
-      </div>
+      </Reveal>
     </Container>
   </Section>
 </PageLayout>

@@ -39,7 +39,7 @@ const t = useTranslations(lang);
         </div>
       </div>
 
-      <aside class="lg:pt-4">
+      <Reveal as="aside" delay={120} class="lg:pt-4">
         <h3 class="text-eyebrow text-mustang uppercase">{t.contact.socials.heading}</h3>
         <ul class="mt-4 flex flex-col gap-2">
           {
@@ -68,7 +68,7 @@ const t = useTranslations(lang);
             {SITE.email}
           </a>
         </p>
-      </aside>
+      </Reveal>
     </div>
   </Container>
 </Section>

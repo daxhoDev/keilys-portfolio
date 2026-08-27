@@ -26,6 +26,9 @@ const css = () => {
 
 before(() => assert.ok(existsSync(DIST), 'run `npm run build` first'));
 
+/** The page with <script> contents removed: selector strings inside them are not markup. */
+const markup = (route: string) => html(route).replace(/<script[\s\S]*?<\/script>/g, '');
+
 describe('nothing is hidden without JavaScript', () => {
   test('every hidden state is scoped to .js', () => {
     const sheet = css();
@@ -190,5 +193,88 @@ describe('the reveal trigger point', () => {
   test('stagger is capped, so a long list has no tail', () => {
     const source = readFileSync(join(ROOT, 'src/scripts/reveal.ts'), 'utf8');
     assert.match(source, /Math\.min\(index, cap\)/);
+  });
+});
+
+describe('reveal coverage', () => {
+  /**
+   * "Every major block" is the spec's wording, so this counts rather than spot-checks.
+   * The gallery cascade in particular was specified in 07-motion.md and simply never
+   * wired to PhotoCard — the page looked finished and a third of it never animated.
+   */
+  const revealCount = (route: string) => (html(route).match(/data-reveal/g) ?? []).length;
+
+  test('every content page reveals a substantial number of blocks', () => {
+    for (const [route, minimum] of [
+      ['/', 12],
+      ['/en', 12],
+      ['/sobre-mi', 12],
+      ['/en/about', 12],
+      ['/mi-trabajo', 25],
+      ['/en/my-work', 25],
+    ] as const) {
+      assert.ok(
+        revealCount(route) >= minimum,
+        `${route} has only ${revealCount(route)} reveal targets`,
+      );
+    }
+  });
+
+  test('every gallery photograph is part of the cascade', () => {
+    const page = markup('/mi-trabajo');
+    // Not \b: a word boundary matches before a hyphen, so data-photo\b would also count
+    // data-photo-count, and scripts are stripped because a querySelector string is not
+    // markup. Both traps produced false failures here already.
+    const cards = (page.match(/data-photo(?![-\w])/g) ?? []).length;
+    const cascade = (page.match(/data-reveal="gallery"/g) ?? []).length;
+    assert.equal(cascade, cards, 'some photographs are outside the entrance animation');
+  });
+
+  test('the featured grid on the landing page cascades too', () => {
+    assert.ok((html('/').match(/data-reveal="gallery"/g) ?? []).length >= 6);
+  });
+
+  test('the blocks a person reads are all covered on the About page', () => {
+    const page = html('/sobre-mi');
+    // Header, eight paragraphs, portrait, secondary image, facts, closing band.
+    assert.ok((page.match(/data-reveal/g) ?? []).length >= 13);
+  });
+
+  test('the contact form and its sidebar are revealed, not just the heading', () => {
+    const page = html('/');
+    assert.match(page, /data-reveal[^>]*data-contact/, 'the form itself never animates');
+    assert.match(
+      page,
+      /<aside[^>]*data-reveal|data-reveal[^>]*<aside/,
+      'the socials sidebar is static',
+    );
+  });
+});
+
+describe('Reveal forwards what it wraps', () => {
+  /**
+   * Reveal wraps elements that scripts find by data-* and that carry `hidden`. An
+   * earlier version dropped unknown props, which silently detached the contact
+   * controller and the gallery's empty state from their markup.
+   */
+  test('data attributes survive the wrapper', () => {
+    assert.match(html('/'), /data-reveal[^>]*data-contact/, 'data-contact was dropped');
+    assert.match(
+      html('/mi-trabajo'),
+      /data-reveal[^>]*data-gallery-empty/,
+      'data-gallery-empty was dropped',
+    );
+  });
+
+  test('the hidden attribute survives, or the empty state shows on every load', () => {
+    assert.match(
+      html('/mi-trabajo'),
+      /data-gallery-empty[^>]*hidden|hidden[^>]*data-gallery-empty/,
+    );
+  });
+
+  test('the component actually spreads the rest of its props', () => {
+    const source = readFileSync(join(ROOT, 'src/components/motion/Reveal.astro'), 'utf8');
+    assert.match(source, /\{\.\.\.rest\}/, 'Reveal drops unknown attributes again');
   });
 });

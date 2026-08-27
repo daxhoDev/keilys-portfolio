@@ -39,7 +39,17 @@ const label = title?.[lang] ?? alt[lang];
 const widths = responsiveWidths(src, [400, 700, 1000, 1400]);
 ---
 
+{
+  /*
+  data-reveal="gallery" is the gallery entrance from specs/07-motion.md: stagger by DOM
+  order, which under CSS columns reads as a soft cascade rather than a left-to-right
+  sweep. reveal.ts derives the delay from position among siblings, so nothing here
+  needs an index. A comment cannot live inside the tag itself — Astro treats the
+  attribute list as an expression and the parse fails.
+*/
+}
 <li
+  data-reveal="gallery"
   class:list={['mb-4 break-inside-avoid', className]}
   data-photo
   data-tone={tone}
