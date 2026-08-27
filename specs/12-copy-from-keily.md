@@ -114,6 +114,19 @@ under her name it reads as a slip rather than a choice. It ships as:
 Her words, unchanged; two marks. She is told in [pendientes-para-keily.md](./pendientes-para-keily.md), and
 if the semicolon was deliberate it goes back in one string.
 
+## Interface copy conventions
+
+Ours to write ([decision 5.4](./09-open-decisions.md#5--delivery--launch-decisions)), and pinned by
+`tests/dictionary.test.ts` so they cannot drift:
+
+- **Spanish opens its questions and exclamations.** `¿Cómo te llamas?`, never `Cómo te llamas?`. A missing
+  opening mark is not a typo a Spanish reader forgives — it is the mark of copy written by someone who does
+  not speak the language.
+- **A question closes before a parenthetical**, not around it: `¿De qué se trata? (opcional)`.
+- **Placeholders and labels are sentence case.** The one deliberate exception is `contact.form.required`
+  (`obligatorio`), which is visually hidden and read as part of the label's own sentence.
+- **Apostrophes are typographic** (`’`), never straight.
+
 ## Identity and contact (`SITE`)
 
 | Field | Value |

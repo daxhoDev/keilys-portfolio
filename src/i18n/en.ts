@@ -133,7 +133,7 @@ export const en: Dictionary = {
       },
       email: {
         label: 'Email',
-        placeholder: 'where you’d like me to reply',
+        placeholder: 'Where you’d like me to reply',
         error: {
           required: 'Please enter your email.',
           invalid: 'That email doesn’t look right.',
@@ -172,8 +172,8 @@ export const en: Dictionary = {
 
     socials: {
       heading: 'Also find me on',
-      instagramGallery: 'Instagram · gallery',
-      instagramPersonal: 'Instagram · personal',
+      instagramGallery: 'Instagram · Gallery',
+      instagramPersonal: 'Instagram · Personal',
       email: 'Email',
     },
 

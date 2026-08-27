@@ -31,6 +31,14 @@ function at(dict: unknown, path: string): unknown {
   return path.split('.').reduce<unknown>((node, key) => (node as Node)?.[key], dict);
 }
 
+/** Every [path, value] pair whose value is a string. */
+function stringLeaves(dict: unknown): [string, string][] {
+  return leaves(dict)
+    .map((path) => [path, at(dict, path)] as const)
+    .filter((pair): pair is [string, string] => typeof pair[1] === 'string')
+    .map(([path, value]) => [path, value] as [string, string]);
+}
+
 describe('key parity', () => {
   test('English has exactly the keys Spanish has', () => {
     const esKeys = leaves(es).sort();
@@ -241,6 +249,56 @@ describe('typography of the copy itself', () => {
         if (typeof value !== 'string') continue;
         assert.ok(!/\w'\w/.test(value), `${lang}.${path} uses a straight apostrophe`);
       }
+    }
+  });
+});
+
+describe('Spanish punctuation and casing', () => {
+  /**
+   * Spanish opens a question or an exclamation as well as closing it. A placeholder
+   * reading "Cómo te llamas" is not a typo a Spanish reader forgives — it is the mark
+   * of copy written by someone who does not speak the language.
+   */
+  test('every Spanish question opens with ¿ and every exclamation with ¡', () => {
+    for (const [path, value] of stringLeaves(es)) {
+      if (value.includes('?'))
+        assert.ok(value.includes('¿'), `es.${path} closes a question it never opened: ${value}`);
+      if (value.includes('!'))
+        assert.ok(
+          value.includes('¡'),
+          `es.${path} closes an exclamation it never opened: ${value}`,
+        );
+    }
+  });
+
+  /**
+   * Placeholders and labels are sentence case. The exception is the visually-hidden
+   * word appended after a label ("Nombre obligatorio"), which reads as part of that
+   * sentence rather than starting one.
+   */
+  const LOWERCASE_BY_DESIGN = ['contact.form.required'];
+
+  test('user-visible strings start with a capital', () => {
+    for (const [lang, dict] of [
+      ['es', es],
+      ['en', en],
+    ] as const) {
+      for (const [path, value] of stringLeaves(dict)) {
+        if (LOWERCASE_BY_DESIGN.includes(path)) continue;
+        if (path.startsWith('hero.headline')) continue; // one sentence split across three
+        assert.ok(!/^[a-záéíóúñ]/.test(value), `${lang}.${path} starts lowercase: ${value}`);
+      }
+    }
+  });
+
+  test('a question mark inside a placeholder closes before any parenthetical', () => {
+    // "¿De qué se trata? (opcional)" — not "¿De qué se trata (opcional)?"
+    const subject = es.contact.form.subject.placeholder;
+    if (subject.includes('(')) {
+      assert.ok(
+        subject.indexOf('?') < subject.indexOf('('),
+        `the parenthetical is inside the question: ${subject}`,
+      );
     }
   });
 });

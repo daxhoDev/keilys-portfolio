@@ -131,7 +131,7 @@ export const es = {
     form: {
       name: {
         label: 'Nombre',
-        placeholder: 'Cómo te llamas',
+        placeholder: '¿Cómo te llamas?',
         error: {
           required: 'Escribe tu nombre.',
           tooShort: 'Tu nombre es demasiado corto.',
@@ -140,12 +140,12 @@ export const es = {
       },
       email: {
         label: 'Correo electrónico',
-        placeholder: 'donde quieres que te responda',
+        placeholder: '¿Dónde quieres que te responda?',
         error: { required: 'Escribe tu correo.', invalid: 'Ese correo no parece válido.' },
       },
       subject: {
         label: 'Asunto',
-        placeholder: 'De qué se trata (opcional)',
+        placeholder: '¿De qué se trata? (opcional)',
         error: { tooLong: 'Ese asunto es demasiado largo.' },
       },
       message: {
@@ -176,8 +176,8 @@ export const es = {
 
     socials: {
       heading: 'También me encuentras en',
-      instagramGallery: 'Instagram · galería',
-      instagramPersonal: 'Instagram · personal',
+      instagramGallery: 'Instagram · Galería',
+      instagramPersonal: 'Instagram · Personal',
       email: 'Correo electrónico',
     },
 
