@@ -12,7 +12,7 @@ import { join } from 'node:path';
 import { SITE } from '../src/lib/site.ts';
 import { es } from '../src/i18n/es.ts';
 import { en } from '../src/i18n/en.ts';
-import { LIMITS } from '../src/lib/validation.ts';
+import { LIMITS, errorAttribute, type ErrorKey } from '../src/lib/validation.ts';
 
 const DIST = join(import.meta.dirname, '..', 'dist');
 const html = (route: string) =>
@@ -193,6 +193,61 @@ describe('the form does not pretend to work', () => {
       const page = html(route);
       assert.ok(page.includes(`mailto:${SITE.email}`), `${route}: no mailto`);
       assert.match(page, /<noscript>[\s\S]*mailto:/, `${route}: no no-JS fallback`);
+    }
+  });
+});
+
+describe('every error message reaches the DOM', () => {
+  /**
+   * The bug this guards: an error whose <p> unhides with an empty <span>, showing an
+   * alert icon and no words. Nothing in the markup looks wrong, and the field is
+   * correctly marked invalid — it just says nothing.
+   */
+  for (const { route, dict } of LANDINGS) {
+    test(`${route}: every message in the dictionary is rendered as an attribute`, () => {
+      const page = html(route);
+      const form = dict.contact.form;
+
+      const expected: [string, Record<string, string>][] = [
+        ['name', form.name.error],
+        ['email', form.email.error],
+        ['subject', form.subject.error],
+        ['message', form.message.error],
+      ];
+
+      for (const [field, errors] of expected) {
+        const tag = page.match(
+          new RegExp(`<(?:input|textarea)[^>]*data-field="${field}"[^>]*>`),
+        )![0];
+
+        for (const [key, message] of Object.entries(errors)) {
+          const attribute = errorAttribute(key as ErrorKey);
+          assert.match(tag, new RegExp(attribute), `${field}: ${attribute} is missing`);
+          assert.ok(
+            tag.includes(message.replace(/&/g, '&amp;')) || tag.includes(message),
+            `${field}.${key}: the message is not in the attribute`,
+          );
+        }
+      }
+    });
+  }
+
+  test('no attribute uses the squashed spelling that silently resolved to undefined', () => {
+    for (const { route } of LANDINGS) {
+      const page = html(route);
+      assert.ok(!page.includes('data-error-tooshort'), `${route}: squashed tooShort`);
+      assert.ok(!page.includes('data-error-toolong'), `${route}: squashed tooLong`);
+    }
+  });
+
+  test('the error slot has a span for the text, not just an icon', () => {
+    const page = html('/');
+    for (const field of ['name', 'email', 'message']) {
+      const slot = page.match(
+        new RegExp(`<p id="[^"]*" data-error-for="${field}"[\\s\\S]*?</p>`),
+      )![0];
+      assert.match(slot, /<svg/, `${field}: no icon`);
+      assert.match(slot, /data-error-text/, `${field}: nowhere to put the message`);
     }
   });
 });

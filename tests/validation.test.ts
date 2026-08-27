@@ -13,6 +13,9 @@ import {
   REQUIRED_FIELDS,
   EMAIL_PATTERN,
   COUNTER_THRESHOLD,
+  ERROR_KEYS,
+  errorAttribute,
+  errorDatasetKey,
 } from '../src/lib/validation.ts';
 
 describe('required fields', () => {
@@ -117,5 +120,52 @@ describe('constants the UI depends on', () => {
   test('the counter appears near the limit, not from the first keystroke', () => {
     assert.ok(COUNTER_THRESHOLD > 0 && COUNTER_THRESHOLD < LIMITS.message.max);
     assert.equal(COUNTER_THRESHOLD, 1800);
+  });
+});
+
+describe('error attribute naming', () => {
+  /**
+   * This shipped broken. Field.astro lowercased the whole key, producing
+   * `data-error-tooshort`, while the controller read `dataset.errorTooShort`. The DOM
+   * camel-cases at each hyphen, so those are different properties: "required" and
+   * "invalid" happened to survive because they are single words, and "tooShort" and
+   * "tooLong" resolved to undefined — the error appeared as a bare icon with no text.
+   */
+  const toDatasetKey = (attribute: string) =>
+    attribute.replace(/^data-/, '').replace(/-([a-z])/g, (_, char: string) => char.toUpperCase());
+
+  test('every key round-trips through the DOM naming rule', () => {
+    for (const key of ERROR_KEYS) {
+      assert.equal(
+        toDatasetKey(errorAttribute(key)),
+        errorDatasetKey(key),
+        `${key}: the rendered attribute does not become the property the script reads`,
+      );
+    }
+  });
+
+  test('multi-word keys are hyphenated, not squashed', () => {
+    assert.equal(errorAttribute('tooShort'), 'data-error-too-short');
+    assert.equal(errorAttribute('tooLong'), 'data-error-too-long');
+    assert.notEqual(errorAttribute('tooShort'), 'data-error-tooshort');
+  });
+
+  test('single-word keys are unchanged', () => {
+    assert.equal(errorAttribute('required'), 'data-error-required');
+    assert.equal(errorAttribute('invalid'), 'data-error-invalid');
+  });
+
+  test('ERROR_KEYS covers every key the validators can return', () => {
+    // If a validator gains a key that is not listed, the message plumbing silently
+    // has no attribute for it.
+    const returned = new Set(
+      [
+        validateField('name', ''),
+        validateField('name', 'a'),
+        validateField('name', 'a'.repeat(LIMITS.name.max + 1)),
+        validateField('email', 'nope'),
+      ].filter(Boolean),
+    );
+    for (const key of returned) assert.ok(ERROR_KEYS.includes(key!), `${key} is not in ERROR_KEYS`);
   });
 });

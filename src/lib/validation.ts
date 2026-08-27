@@ -7,7 +7,26 @@
  */
 
 export type FieldName = 'name' | 'email' | 'subject' | 'message';
-export type ErrorKey = 'required' | 'tooShort' | 'tooLong' | 'invalid';
+
+export const ERROR_KEYS = ['required', 'tooShort', 'tooLong', 'invalid'] as const;
+export type ErrorKey = (typeof ERROR_KEYS)[number];
+
+/**
+ * The attribute Field.astro renders, and the dataset property contact-form.ts reads.
+ *
+ * These MUST be derived from the same place. The DOM lowercases an attribute name and
+ * camel-cases it back at each hyphen, so `data-error-tooshort` becomes
+ * `dataset.errorTooshort` — not `errorTooShort`. Writing the two by hand produced
+ * exactly that mismatch: "required" and "invalid" worked, while "tooShort" and
+ * "tooLong" silently resolved to undefined and the error rendered as a bare icon.
+ */
+export function errorAttribute(key: ErrorKey): string {
+  return `data-error-${key.replace(/[A-Z]/g, (char) => `-${char.toLowerCase()}`)}`;
+}
+
+export function errorDatasetKey(key: ErrorKey): string {
+  return `error${key[0].toUpperCase()}${key.slice(1)}`;
+}
 
 export const LIMITS = {
   name: { min: 2, max: 80 },

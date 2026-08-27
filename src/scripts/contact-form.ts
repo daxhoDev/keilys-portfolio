@@ -9,7 +9,14 @@
  * Messages come from data-error-* attributes rendered by Field.astro, so this file
  * never contains a user-visible string and never needs to know a language exists.
  */
-import { validateField, validateAll, COUNTER_THRESHOLD, type FieldName } from '~/lib/validation.ts';
+import {
+  validateField,
+  validateAll,
+  errorDatasetKey,
+  COUNTER_THRESHOLD,
+  type ErrorKey,
+  type FieldName,
+} from '~/lib/validation.ts';
 import { submitContact, type ContactPayload } from '~/lib/contact.ts';
 import type { Lang } from '~/i18n/routes.ts';
 
@@ -45,10 +52,10 @@ function initContactForm(): void {
   const errorSlot = (name: string) => root.querySelector<HTMLElement>(`[data-error-for="${name}"]`);
 
   /** Field.astro rendered every possible message for this field as a data attribute. */
-  const messageFor = (element: HTMLElement, key: string) =>
-    element.dataset[`error${key.charAt(0).toUpperCase()}${key.slice(1)}`] ?? '';
+  const messageFor = (element: HTMLElement, key: ErrorKey) =>
+    element.dataset[errorDatasetKey(key)] ?? '';
 
-  const showError = (name: string, key: string | null) => {
+  const showError = (name: string, key: ErrorKey | null) => {
     const element = control(name as FieldName);
     const slot = errorSlot(name);
     if (!element || !slot) return;

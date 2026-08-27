@@ -7,7 +7,7 @@
  * produced at render time by whichever language built the page. contact-form.ts never
  * needs to know a language exists.
  */
-import type { ErrorKey } from '~/lib/validation.ts';
+import { errorAttribute, type ErrorKey } from '~/lib/validation.ts';
 
 interface Props {
   id: string;
@@ -53,8 +53,10 @@ const describedBy = [required && requiredLabel ? requiredId : null, counter ? co
   .filter(Boolean)
   .join(' ');
 
+// errorAttribute, not a hand-rolled lowercase: the DOM camel-cases at hyphens, so
+// data-error-tooshort and dataset.errorTooShort are not the same thing.
 const errorData = Object.fromEntries(
-  Object.entries(errors).map(([key, message]) => [`data-error-${key.toLowerCase()}`, message]),
+  Object.entries(errors).map(([key, message]) => [errorAttribute(key as ErrorKey), message]),
 );
 
 const shared = {

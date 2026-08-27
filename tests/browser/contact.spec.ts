@@ -152,3 +152,51 @@ test.describe('the character counter', () => {
     await expect(page.locator('[data-counter-value]')).toHaveText('1850');
   });
 });
+
+test.describe('the message, not just the icon', () => {
+  /**
+   * Shipped once: the error paragraph unhid with an empty span, so a "too short" name
+   * showed an alert icon and no words. The field was correctly marked invalid, and the
+   * markup looked fine — it simply said nothing.
+   */
+  test('a too-short name shows readable text', async ({ page }) => {
+    await page.goto('/');
+    await page.locator(NAME).fill('K');
+    await page.locator(NAME).blur();
+
+    const error = page.locator('[data-error-for="name"]');
+    await expect(error).toBeVisible();
+    await expect(error).toHaveText(/\S/, { useInnerText: true });
+    await expect(error.locator('[data-error-text]')).toHaveText('Tu nombre es demasiado corto.');
+  });
+
+  test('every error state a person can reach says something', async ({ page }) => {
+    await page.goto('/');
+
+    const cases = [
+      { field: NAME, value: 'K', slot: 'name' },
+      { field: EMAIL, value: 'nope', slot: 'email' },
+      { field: MESSAGE, value: 'short', slot: 'message' },
+    ];
+
+    for (const { field, value, slot } of cases) {
+      await page.locator(field).fill(value);
+      await page.locator(field).blur();
+
+      const text = await page.locator(`[data-error-for="${slot}"] [data-error-text]`).innerText();
+      expect(text.trim(), `${slot} rendered an icon with no message`).not.toBe('');
+    }
+  });
+
+  test('the empty-field message works too, so the fix did not trade one key for another', async ({
+    page,
+  }) => {
+    await page.goto('/');
+    await page.locator('[data-form-submit]').click();
+
+    for (const slot of ['name', 'email', 'message']) {
+      const text = await page.locator(`[data-error-for="${slot}"] [data-error-text]`).innerText();
+      expect(text.trim(), `${slot} required message is empty`).not.toBe('');
+    }
+  });
+});
