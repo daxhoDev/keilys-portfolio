@@ -133,6 +133,17 @@ const person = {
       set:html={JSON.stringify(jsonLd.length ? [person, ...jsonLd] : person)}
     />
 
+    {
+      /*
+      Sets .js before first paint, which is what the reveal styles hang off. Inline and
+      synchronous on purpose: as a module it would run after paint and every revealed
+      element would flash in at full opacity first.
+    */
+    }
+    <script is:inline>
+      document.documentElement.classList.add('js');
+    </script>
+
     <ClientRouter />
   </head>
 
@@ -158,6 +169,7 @@ const person = {
     <script>
       import '~/scripts/scroll-header.ts';
       import '~/scripts/mobile-menu.ts';
+      import '~/scripts/reveal.ts';
     </script>
   </body>
 </html>

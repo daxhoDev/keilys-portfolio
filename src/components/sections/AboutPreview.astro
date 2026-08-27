@@ -8,6 +8,7 @@ import type { Lang } from '~/i18n/routes.ts';
 import { path } from '~/i18n/routes.ts';
 import { useTranslations } from '~/i18n/utils.ts';
 import { responsiveWidths } from '~/lib/images.ts';
+import Reveal from '~/components/motion/Reveal.astro';
 import Section from '~/components/ui/Section.astro';
 import Container from '~/components/ui/Container.astro';
 import SectionHeading from '~/components/ui/SectionHeading.astro';
@@ -26,7 +27,7 @@ const widths = responsiveWidths(portrait, [400, 600, 900, 1200]);
 <Section background="coal">
   <Container>
     <div class="grid items-start gap-12 lg:grid-cols-[1fr_0.8fr] lg:gap-20">
-      <div>
+      <Reveal>
         <SectionHeading eyebrow={t.about.eyebrow} heading={t.about.heading} lead={t.about.lead} />
 
         <div class="mt-8 space-y-5">
@@ -36,16 +37,18 @@ const widths = responsiveWidths(portrait, [400, 600, 900, 1200]);
         <div class="mt-10">
           <Button href={path('about', lang)} variant="ghost">{t.about.cta}</Button>
         </div>
-      </div>
+      </Reveal>
 
-      <Image
-        src={portrait}
-        alt={t.about.portraitAlt}
-        {widths}
-        sizes="(min-width: 1024px) 40vw, 100vw"
-        loading="lazy"
-        class="w-full"
-      />
+      <Reveal delay={120}>
+        <Image
+          src={portrait}
+          alt={t.about.portraitAlt}
+          {widths}
+          sizes="(min-width: 1024px) 40vw, 100vw"
+          loading="lazy"
+          class="w-full"
+        />
+      </Reveal>
     </div>
   </Container>
 </Section>

@@ -43,6 +43,8 @@ tests/
 ├── hero-contrast.test.ts   the veil measured against the real photograph
 ├── validation.test.ts      the contact validators, as pure functions
 ├── contact-form.test.ts    the form as emitted, and the stub's guarantees
+├── motion.test.ts          the .js gate, reduced motion, what may be animated
+├── about-page.test.ts      her biography, whole and in order
 ├── landing.test.ts         hero, featured grid, about preview, contact shell
 ├── hero-contrast.test.ts   the veil, measured against the real photograph
 ├── css-utilities.test.ts   token utilities emitting no CSS, and invalid calc()

@@ -41,6 +41,7 @@ const widths = responsiveWidths(heroImage, [640, 1024, 1536, 2048, 2400]);
     loading="eager"
     fetchpriority="high"
     data-parallax
+    style="--parallax-factor:0.15"
     class="absolute inset-0 -top-[7.5%] z-0 h-[115%] w-full object-cover object-center"
   />
 
@@ -49,29 +50,38 @@ const widths = responsiveWidths(heroImage, [640, 1024, 1536, 2048, 2400]);
 
   <div class="gutter-x max-w-content relative z-20 mx-auto w-full pb-[clamp(4rem,10vh,7rem)]">
     <h1 class="font-display text-display-xl text-bone">
-      <span class="block overflow-hidden pb-[0.14em]"><span class="block">{first}</span></span>
-      <span class="block overflow-hidden pb-[0.14em]"><span class="block">{second}</span></span>
       <span class="block overflow-hidden pb-[0.14em]">
-        <span class="text-mustang-soft relative block">
+        <span data-hero-line data-hero-step="line-1" class="block">{first}</span>
+      </span>
+      <span class="block overflow-hidden pb-[0.14em]">
+        <span data-hero-line data-hero-step="line-2" class="block">{second}</span>
+      </span>
+      <span class="block overflow-hidden pb-[0.14em]">
+        <span data-hero-line data-hero-step="line-3" class="text-mustang-soft relative block">
           {accent}
           {/* The accent word is only a step away from bone, so the rule carries the emphasis. */}
           <span
             data-hero-underline
+            data-hero-step="underline"
             class="bg-mustang absolute bottom-[0.1em] left-0 block h-px w-full origin-left"
             aria-hidden="true"></span>
         </span>
       </span>
     </h1>
 
-    <p class="text-body-lg text-mist mt-6 max-w-[42ch]">{t.hero.subline}</p>
+    <p data-hero-fade data-hero-step="subline" class="text-body-lg text-mist mt-6 max-w-[42ch]">
+      {t.hero.subline}
+    </p>
 
-    <div class="mt-10 flex flex-wrap gap-4">
+    <div data-hero-fade data-hero-step="cta" class="mt-10 flex flex-wrap gap-4">
       <Button href="#contact" variant="primary" size="lg">{t.hero.ctaPrimary}</Button>
       <Button href={path('work', lang)} variant="ghost" size="lg">{t.hero.ctaSecondary}</Button>
     </div>
   </div>
 
   <div
+    data-hero-fade
+    data-hero-step="hint"
     class="absolute inset-x-0 bottom-8 z-20 hidden flex-col items-center gap-3 md:flex"
     aria-hidden="true"
   >
@@ -79,3 +89,8 @@ const widths = responsiveWidths(heroImage, [640, 1024, 1536, 2048, 2400]);
     <span data-scroll-rule class="bg-mustang-dim relative block h-10 w-px overflow-hidden"></span>
   </div>
 </section>
+
+<script>
+  import '~/scripts/hero-reveal.ts';
+  import '~/scripts/parallax.ts';
+</script>

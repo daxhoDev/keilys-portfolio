@@ -1,18 +1,31 @@
 ---
 /**
  * The About page, shared by /sobre-mi (Spanish) and /en/about (English).
- * Phase 7 adds the portrait, the secondary image and the closing CTA band.
+ *
+ * Her biography is the longest thing on the site and the most personal. It is set at a
+ * 68ch measure in mist, with the lead at 58ch in bone — the page is meant to be read,
+ * not skimmed, so nothing competes with the text except the two photographs.
  */
+import { Image } from 'astro:assets';
+
 import PageLayout from '~/layouts/PageLayout.astro';
-import type { Lang } from '~/i18n/routes';
-import { useTranslations } from '~/i18n/utils';
-import { SITE, absoluteUrl } from '~/lib/site';
+import type { Lang } from '~/i18n/routes.ts';
+import { path } from '~/i18n/routes.ts';
+import { useTranslations } from '~/i18n/utils.ts';
+import { SITE, absoluteUrl } from '~/lib/site.ts';
+import { responsiveWidths } from '~/lib/images.ts';
+import Reveal from '~/components/motion/Reveal.astro';
+import Button from '~/components/ui/Button.astro';
+import Container from '~/components/ui/Container.astro';
+import Section from '~/components/ui/Section.astro';
+import portrait from '~/assets/portrait.jpg';
+import secondary from '~/assets/about-secondary.jpg';
 
 interface Props {
   lang: Lang;
 }
 
-const { lang } = Astro.props;
+const { lang }: Props = Astro.props;
 const t = useTranslations(lang);
 
 const aboutJsonLd = [
@@ -25,6 +38,13 @@ const aboutJsonLd = [
     mainEntity: { '@id': `${SITE.url}/#person` },
   },
 ];
+
+const portraitWidths = responsiveWidths(portrait, [400, 600, 900, 1200]);
+const secondaryWidths = responsiveWidths(secondary, [700, 1000, 1400, 1800]);
+
+// The biography reads as one piece, so the portrait sits beside its opening rather
+// than interrupting it: first two paragraphs alongside, the rest at full measure.
+const [opening, ...rest] = [t.about.page.body.slice(0, 2), t.about.page.body.slice(2)];
 ---
 
 <PageLayout
@@ -34,14 +54,55 @@ const aboutJsonLd = [
   eyebrow={t.about.eyebrow}
   heading={t.about.page.title}
   lead={t.about.page.lead}
-  container="narrow"
+  container="content"
   jsonLd={aboutJsonLd}
 >
-  <div class="mt-12 space-y-5">
-    {t.about.page.body.map((paragraph) => <p class="text-body measure text-mist">{paragraph}</p>)}
+  <div class="mt-14 grid gap-12 lg:grid-cols-[1fr_0.62fr] lg:gap-16">
+    <div class="flex flex-col gap-5">
+      {
+        opening.map((paragraph, index) => (
+          <Reveal as="p" delay={index * 80} class="text-body measure text-mist">
+            {paragraph}
+          </Reveal>
+        ))
+      }
+    </div>
+
+    <Reveal class="lg:sticky lg:top-28 lg:self-start">
+      <Image
+        src={portrait}
+        alt={t.about.portraitAlt}
+        widths={portraitWidths}
+        sizes="(min-width: 1024px) 38vw, 100vw"
+        loading="eager"
+        class="w-full"
+      />
+    </Reveal>
   </div>
 
-  <section class="mt-16">
+  <div class="mt-12 flex flex-col gap-5">
+    {
+      rest[0].map((paragraph, index) => (
+        <Reveal as="p" delay={Math.min(index, 4) * 80} class="text-body measure text-mist">
+          {paragraph}
+        </Reveal>
+      ))
+    }
+  </div>
+
+  <Reveal as="figure" class="mt-16">
+    <Image
+      src={secondary}
+      alt={t.about.secondaryAlt}
+      widths={secondaryWidths}
+      sizes="(min-width: 1280px) 72rem, 100vw"
+      loading="lazy"
+      class="w-full"
+    />
+    <figcaption class="text-body-sm text-mist mt-3">{t.about.secondaryAlt}</figcaption>
+  </Reveal>
+
+  <Reveal as="section" class="mt-16">
     <h2 class="font-display text-display-sm">{t.about.page.factsHeading}</h2>
     <dl class="mt-6">
       {
@@ -53,5 +114,23 @@ const aboutJsonLd = [
         ))
       }
     </dl>
-  </section>
+  </Reveal>
+
+  {
+    /*
+    Full-bleed, so it goes in the named slot rather than after the layout: anything
+    rendered outside PageLayout lands after </html>, which is invalid and silently
+    still "works" in a browser.
+  */
+  }
+  <Section slot="full" background="coal" spacing="tight" class="mt-20">
+    <Container>
+      <Reveal class="flex flex-col items-center gap-8 text-center">
+        <p class="font-display text-display-md measure-lead text-bone">{t.contact.lead}</p>
+        <Button href={`${path('home', lang)}#contact`} variant="primary" size="lg">
+          {t.hero.ctaPrimary}
+        </Button>
+      </Reveal>
+    </Container>
+  </Section>
 </PageLayout>

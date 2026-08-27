@@ -1,0 +1,20 @@
+---
+/**
+ * Marks an element for parallax.ts. Desktop only, and skipped entirely under reduced
+ * motion — the script decides, not this component.
+ */
+interface Props {
+  factor?: number;
+  as?: string;
+  class?: string;
+}
+
+const { factor = 0.15, class: className }: Props = Astro.props;
+
+// See Reveal.astro: a dynamic tag name needs the cast to accept HTML attributes.
+const Tag = (Astro.props.as ?? 'div') as any;
+---
+
+<Tag data-parallax style={`--parallax-factor:${factor}`} class={className}>
+  <slot />
+</Tag>

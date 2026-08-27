@@ -1,0 +1,35 @@
+---
+/**
+ * Marks an element for the shared IntersectionObserver in reveal.ts. Renders its
+ * children unchanged — the hidden state is CSS, gated on `.js`, so a reveal that never
+ * fires can never hide content.
+ */
+interface Props {
+  delay?: number;
+  distance?: number;
+  as?: string;
+  variant?: 'default' | 'gallery';
+  class?: string;
+}
+
+const { delay = 0, distance = 24, variant = 'default', class: className }: Props = Astro.props;
+
+// A dynamic tag name is typed as a component by the JSX definitions, so arbitrary HTML
+// attributes are rejected. The cast says: this really is an intrinsic element.
+const Tag = (Astro.props.as ?? 'div') as any;
+
+const style = [
+  delay > 0 ? `--reveal-delay:${delay}ms` : null,
+  distance !== 24 ? `--reveal-distance:${distance}px` : null,
+]
+  .filter(Boolean)
+  .join(';');
+---
+
+<Tag
+  data-reveal={variant === 'gallery' ? 'gallery' : ''}
+  style={style || undefined}
+  class={className}
+>
+  <slot />
+</Tag>

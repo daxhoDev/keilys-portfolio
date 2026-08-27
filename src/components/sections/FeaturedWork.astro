@@ -14,6 +14,7 @@ import type { Photo } from '~/lib/photos.ts';
 import { FEATURED_COUNT } from '~/lib/photos.ts';
 import PhotoCard from '~/components/gallery/PhotoCard.astro';
 import Lightbox from '~/components/gallery/Lightbox.astro';
+import Reveal from '~/components/motion/Reveal.astro';
 import Section from '~/components/ui/Section.astro';
 import Container from '~/components/ui/Container.astro';
 import SectionHeading from '~/components/ui/SectionHeading.astro';
@@ -36,7 +37,9 @@ if (photos.length !== FEATURED_COUNT) {
 
 <Section background="ink">
   <Container>
-    <SectionHeading eyebrow={t.work.eyebrow} heading={t.work.heading} lead={t.work.lead} />
+    <Reveal>
+      <SectionHeading eyebrow={t.work.eyebrow} heading={t.work.heading} lead={t.work.lead} />
+    </Reveal>
 
     <ul data-gallery class="mt-12 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
       {
@@ -53,9 +56,9 @@ if (photos.length !== FEATURED_COUNT) {
       }
     </ul>
 
-    <div class="mt-12">
+    <Reveal class="mt-12">
       <Button href={path('work', lang)} variant="primary">{t.work.cta}</Button>
-    </div>
+    </Reveal>
 
     <Lightbox {lang} />
   </Container>

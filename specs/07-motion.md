@@ -13,8 +13,9 @@ nothing loops forever except the two ambient hints below; nothing moves more tha
 | `--ease-in-out-soft` | `cubic-bezier(0.65, 0, 0.35, 1)` | Colour and opacity transitions |
 | `--duration-fast` | `180ms` | Colour, underline, focus |
 | `--duration-base` | `320ms` | Header state, menu, button fills |
-| `--duration-slow` | `600ms` | Image hover scale, section reveal |
-| `--duration-reveal` | `800ms` | Hero headline lines |
+| `--duration-slow` | `600ms` | Image hover scale |
+| `--duration-entrance` | `1000ms` | Section reveal, gallery cascade, hero fades |
+| `--duration-reveal` | `1200ms` | Hero headline lines and the accent underline |
 
 Only `transform` and `opacity` are ever animated. Animating `width`, `height`, `top`, `left`,
 `background-position`, or `filter` is forbidden — they force layout or paint on every frame.
@@ -26,13 +27,13 @@ Fires once, on load, without waiting for the IntersectionObserver.
 | Element | From | To | Duration | Easing | Delay |
 |---|---|---|---|---|---|
 | Hero image | `scale(1.06)`, `opacity 0` | `scale(1)`, `opacity 1` | 1200ms | `--ease-out-expo` | 0 |
-| Headline line 1 | `translateY(100%)` inside an `overflow:hidden` mask | `translateY(0)` | 800ms | `--ease-out-expo` | 200ms |
-| Headline line 2 | same | same | 800ms | same | 290ms |
-| Headline line 3 | same | same | 800ms | same | 380ms |
-| Accent underline | `scaleX(0)`, `transform-origin: left` | `scaleX(1)` | 600ms | `--ease-out-quart` | 520ms |
-| Subline | `translateY(16px)`, `opacity 0` | rest | 700ms | `--ease-out-expo` | 560ms |
-| CTA row | `translateY(16px)`, `opacity 0` | rest | 700ms | `--ease-out-expo` | 660ms |
-| Scroll hint | `opacity 0` | `opacity 1` | 600ms | linear | 1000ms |
+| Headline line 1 | `translateY(100%)` inside an `overflow:hidden` mask | `translateY(0)` | 1200ms | `--ease-out-expo` | 280ms |
+| Headline line 2 | same | same | 1200ms | same | 420ms |
+| Headline line 3 | same | same | 1200ms | same | 560ms |
+| Accent underline | `scaleX(0)`, `transform-origin: left` | `scaleX(1)` | 1200ms | `--ease-out-quart` | 900ms |
+| Subline | `translateY(16px)`, `opacity 0` | rest | 1000ms | `--ease-out-expo` | 980ms |
+| CTA row | `translateY(16px)`, `opacity 0` | rest | 1000ms | `--ease-out-expo` | 1160ms |
+| Scroll hint | `opacity 0` | `opacity 1` | 1000ms | `--ease-out-expo` | 1600ms |
 
 **The accent underline** is the 1px `mustang` rule beneath "fotógrafa." in headline line 3. It draws in
 after that line has landed, and it is the reason the accent word reads as emphasised at all — the word
@@ -71,19 +72,22 @@ Applies to the hero image only.
 
 Every major block on every page — headings, paragraphs, images, the form, the CTA bands.
 
-- `translateY(24px)` + `opacity: 0` → rest. 600ms, `--ease-out-expo`.
-- One shared `IntersectionObserver`: `threshold: 0.15`, `rootMargin: '0px 0px -8% 0px'`. Each element is
+- `translateY(24px)` + `opacity: 0` → rest. **1000ms** (`--duration-entrance`), `--ease-out-expo`.
+- One shared `IntersectionObserver`: `threshold: 0.1`, `rootMargin: '0px 0px -25% 0px'`. Each element is
   unobserved after it fires — reveals happen once, never on scroll-back.
-- Within a section, direct children stagger by **80ms**, capped at 5 steps (`min(index, 4) * 80ms`) so a long
-  list never ends up with a two-second tail.
+- **Why the large bottom inset:** at `-8%` an element fired almost as soon as it appeared, so with a
+  1s entrance the animation was over before it reached reading height — the motion existed and nobody saw
+  it. At `-25%` the element climbs a quarter of the way up the screen first.
+- Within a section, direct children stagger by **120ms**, capped at 5 steps (`min(index, 4) * 120ms`) so a
+  long list never ends up with a long tail.
 - Same FOUC guard as the hero: hidden state gated on `.js` on `<html>`.
 
 ## Gallery entrance
 
-- Items stagger by **60ms** in DOM order, capped at 8 steps.
+- Items stagger by **90ms** in DOM order, capped at 8 steps.
 - Because the gallery uses CSS columns, stagger by DOM order reads as a soft cascade rather than a strict
   left-to-right sweep. This is intentional and looks better than trying to correct for column order.
-- Each item: `translateY(20px) scale(0.98)`, `opacity 0` → rest. 700ms, `--ease-out-expo`.
+- Each item: `translateY(20px) scale(0.98)`, `opacity 0` → rest. **1100ms**, `--ease-out-expo`.
 - Items already in the viewport on load animate immediately; the observer handles the rest.
 - **Never** animate `filter` on photographs.
 

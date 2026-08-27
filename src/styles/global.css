@@ -90,7 +90,9 @@
   --duration-base: 320ms;
   --duration-menu: 280ms;
   --duration-slow: 600ms;
-  --duration-reveal: 800ms;
+  --duration-reveal: 1200ms;
+  /** Entrance motion that is not the hero: sections, the gallery cascade. */
+  --duration-entrance: 1000ms;
 }
 
 /* Layout rhythm. Not Tailwind namespaces, so they are consumed through the
@@ -259,4 +261,90 @@
 
 @utility measure-lead {
   max-inline-size: var(--measure-lead);
+}
+
+/* ---------------------------------------------------------------------------
+   Motion. Only transform and opacity are ever animated — see specs/07-motion.md.
+--------------------------------------------------------------------------- */
+
+/**
+ * The hidden state is gated on .js, set by an inline script in <head>. Without
+ * JavaScript nothing is ever hidden, so a reveal that cannot fire can never take
+ * content with it. This is the FOUC guard, and it is the reason the class exists.
+ */
+.js [data-reveal] {
+  opacity: 0;
+  transform: translateY(var(--reveal-distance, 24px));
+  transition:
+    opacity var(--duration-entrance) var(--ease-out-expo) var(--reveal-delay, 0ms),
+    transform var(--duration-entrance) var(--ease-out-expo) var(--reveal-delay, 0ms);
+}
+
+.js [data-reveal][data-revealed] {
+  opacity: 1;
+  transform: none;
+}
+
+/* The gallery entrance is the same idea with a little scale, per 07-motion.md. */
+.js [data-reveal='gallery'] {
+  transform: translateY(20px) scale(0.98);
+  transition-duration: 1100ms;
+}
+
+.js [data-reveal='gallery'][data-revealed] {
+  transform: none;
+}
+
+/* The hero runs on load rather than on an observer, so it has its own hidden state. */
+.js [data-hero] [data-hero-line] {
+  transform: translateY(100%);
+  transition: transform var(--duration-reveal) var(--ease-out-expo) var(--hero-delay, 0ms);
+}
+
+.js [data-hero] [data-hero-fade] {
+  opacity: 0;
+  transform: translateY(16px);
+  transition:
+    opacity var(--duration-entrance) var(--ease-out-expo) var(--hero-delay, 0ms),
+    transform var(--duration-entrance) var(--ease-out-expo) var(--hero-delay, 0ms);
+}
+
+.js [data-hero] [data-hero-underline] {
+  transform: scaleX(0);
+  transition: transform var(--duration-reveal) var(--ease-out-quart) var(--hero-delay, 0ms);
+}
+
+.js [data-hero][data-hero-ready] [data-hero-line],
+.js [data-hero][data-hero-ready] [data-hero-fade] {
+  opacity: 1;
+  transform: none;
+}
+
+.js [data-hero][data-hero-ready] [data-hero-underline] {
+  transform: scaleX(1);
+}
+
+/**
+ * One authoritative block. EVERY animation in this project is covered here — if a new
+ * one is added and is not disabled by this, that is a bug, not a preference.
+ */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+
+  .js [data-reveal],
+  .js [data-hero] * {
+    opacity: 1 !important;
+    transform: none !important;
+  }
+
+  [data-parallax] {
+    transform: none !important;
+  }
 }
