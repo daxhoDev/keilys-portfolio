@@ -27,7 +27,7 @@ Fires once, on load, without waiting for the IntersectionObserver.
 | Element | From | To | Duration | Easing | Delay |
 |---|---|---|---|---|---|
 | Hero image | `scale(1.06)`, `opacity 0` | `scale(1)`, `opacity 1` | 1200ms | `--ease-out-expo` | 0 |
-| Headline line 1 | `translateY(100%)` inside an `overflow:hidden` mask | `translateY(0)` | 1200ms | `--ease-out-expo` | 280ms |
+| Headline line 1 | `translateY(100%)` + `opacity: 0` inside an `overflow:hidden` mask | rest | 1200ms | `--ease-out-expo` | 280ms |
 | Headline line 2 | same | same | 1200ms | same | 420ms |
 | Headline line 3 | same | same | 1200ms | same | 560ms |
 | Accent underline | `scaleX(0)`, `transform-origin: left` | `scaleX(1)` | 1200ms | `--ease-out-quart` | 900ms |
@@ -39,6 +39,10 @@ Fires once, on load, without waiting for the IntersectionObserver.
 after that line has landed, and it is the reason the accent word reads as emphasised at all — the word
 itself is `mustang-soft`, only a step away from the `bone` around it, so the rule is carrying the emphasis.
 Under reduced motion it is present from the start rather than animated.
+
+**The lines fade as well as travel.** The mask carries vertical padding so Playfair’s italic descenders
+are not clipped at rest, and a line sitting in that padding is visible before its delay elapses — so a
+translate alone let the text peek. Opacity removes it.
 
 **Line masking:** each headline segment is `<span class="block overflow-hidden"><span class="block">…</span></span>`.
 The inner span translates; the outer clips. The `overflow: hidden` must have enough vertical padding

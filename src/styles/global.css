@@ -297,8 +297,17 @@
 
 /* The hero runs on load rather than on an observer, so it has its own hidden state. */
 .js [data-hero] [data-hero-line] {
+  /*
+   * Opacity as well as the translate. The mask carries vertical padding so Playfair's
+   * italic descenders are not clipped at rest, and a line sitting in that padding is
+   * visible before its delay elapses. Fading removes that peek, and it means a line is
+   * never briefly legible in the wrong place.
+   */
+  opacity: 0;
   transform: translateY(100%);
-  transition: transform var(--duration-reveal) var(--ease-out-expo) var(--hero-delay, 0ms);
+  transition:
+    opacity var(--duration-reveal) var(--ease-out-expo) var(--hero-delay, 0ms),
+    transform var(--duration-reveal) var(--ease-out-expo) var(--hero-delay, 0ms);
 }
 
 .js [data-hero] [data-hero-fade] {

@@ -278,3 +278,55 @@ describe('Reveal forwards what it wraps', () => {
     assert.match(source, /\{\.\.\.rest\}/, 'Reveal drops unknown attributes again');
   });
 });
+
+describe('the hero starts invisible, not merely displaced', () => {
+  /**
+   * The headline lines used to translate only. The mask carries vertical padding so
+   * italic descenders are not clipped at rest, which meant a line waiting for its delay
+   * could be seen sitting in that padding — briefly legible in the wrong position.
+   */
+  test('headline lines begin at opacity 0', () => {
+    const sheet = css();
+    const rule = sheet.match(/\.js \[data-hero\] \[data-hero-line\]\{([^}]*)\}/)?.[1];
+    assert.ok(rule, 'no hidden state for the headline lines');
+    assert.match(rule, /opacity:\s*0/, 'the lines are only displaced, so they can peek');
+    assert.match(rule, /transform:\s*translateY\(100%\)/, 'the mask travel is gone');
+  });
+
+  test('opacity is transitioned, not snapped', () => {
+    const sheet = css();
+    const rule = sheet.match(/\.js \[data-hero\] \[data-hero-line\]\{([^}]*)\}/)![1];
+    assert.match(rule, /transition:[^;]*opacity/, 'opacity would jump to 1 instantly');
+  });
+
+  test('every animated hero element is returned to full opacity when ready', () => {
+    const sheet = css();
+    const ready = sheet.match(
+      /\.js \[data-hero\]\[data-hero-ready\] \[data-hero-line\][^{]*\{([^}]*)\}/,
+    )?.[1];
+    assert.ok(ready, 'no ready state');
+    assert.match(ready, /opacity:\s*1/, 'a faded line is never brought back');
+  });
+
+  test('and reduced motion still shows everything immediately', () => {
+    // The reduced-motion block covers [data-hero] *, so the new opacity is included
+    // without a second rule — but only because the selector is a descendant wildcard.
+    const sheet = css();
+    const pattern = /@media\s*\(prefers-reduced-motion:\s*reduce\)\s*\{/g;
+    let covered = false;
+
+    for (const match of sheet.matchAll(pattern)) {
+      let depth = 1;
+      let i = match.index! + match[0].length;
+      while (i < sheet.length && depth > 0) {
+        if (sheet[i] === '{') depth += 1;
+        else if (sheet[i] === '}') depth -= 1;
+        i += 1;
+      }
+      const body = sheet.slice(match.index! + match[0].length, i);
+      if (/\[data-hero\] \*/.test(body) && /opacity:1!important/.test(body)) covered = true;
+    }
+
+    assert.ok(covered, 'the hero is not forced visible under reduced motion');
+  });
+});
