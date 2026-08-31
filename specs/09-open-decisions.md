@@ -177,7 +177,7 @@ here because several of them are visible to visitors.
 
 | # | Question | Decision | Consequence |
 |---|---|---|---|
-| 5.1 | Domain | **None for now** — the site lives at `https://keilymargallery.vercel.app`, matching her work Instagram handle. A custom domain comes much later | `SITE.url` holds the Vercel URL, so canonical, `hreflang`, sitemap and OG URLs are all correct on day one. Moving later is one constant plus 301s |
+| 5.1 | Domain | **None for now** — the site lives at `https://keilymargallery-sage.vercel.app`, matching her work Instagram handle. A custom domain comes much later | `SITE.url` holds the Vercel URL, so canonical, `hreflang`, sitemap and OG URLs are all correct on day one. Moving later is one constant plus 301s |
 | 5.2 | Search indexing | **`noindex` while on `*.vercel.app`** | `SITE.indexable = false` drives `<meta name="robots" content="noindex, nofollow">`, a `Disallow: /` `robots.txt`, and omission of the sitemap. Flipped to `true` with the custom domain, so the vercel.app URL never has to be de-indexed or redirected for SEO |
 | 5.3 | English copy | **We translate; it ships without Keily's review** | English is no longer a launch blocker and no longer waits on her. The biography is translated as real prose, not literally — its register is the thing most at risk, and nobody downstream will catch a mistake, so it gets a second pass before launch |
 | 5.4 | Interface microcopy | **We write it; the developer approves** | The ~40 UI strings (eyebrows, headings, CTAs, form labels, validation, 404, meta) are written in Spanish at production quality and reviewed in the build. They do **not** go back to Keily |

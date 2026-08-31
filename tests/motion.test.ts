@@ -240,9 +240,10 @@ describe('reveal coverage', () => {
     assert.ok((page.match(/data-reveal/g) ?? []).length >= 13);
   });
 
-  test('the contact form and its sidebar are revealed, not just the heading', () => {
+  test('the contact sidebar is revealed, not just the heading', () => {
+    // The form's wrapper went with the form when it was hidden; the sidebar that
+    // replaced it as the contact path must still animate in.
     const page = html('/');
-    assert.match(page, /data-reveal[^>]*data-contact/, 'the form itself never animates');
     assert.match(
       page,
       /<aside[^>]*data-reveal|data-reveal[^>]*<aside/,
@@ -258,7 +259,8 @@ describe('Reveal forwards what it wraps', () => {
    * controller and the gallery's empty state from their markup.
    */
   test('data attributes survive the wrapper', () => {
-    assert.match(html('/'), /data-reveal[^>]*data-contact/, 'data-contact was dropped');
+    // data-contact went with the hidden form; the gallery empty state is the
+    // remaining wrapped element that a script finds by attribute.
     assert.match(
       html('/mi-trabajo'),
       /data-reveal[^>]*data-gallery-empty/,

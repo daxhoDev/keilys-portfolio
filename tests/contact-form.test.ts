@@ -1,8 +1,12 @@
 /**
- * The contact form as emitted, plus the guarantees the stub has to keep.
+ * The contact form is HIDDEN, not removed (specs/09-open-decisions.md §4). It has no
+ * delivery, and a form promising "te responderé lo antes posible" while sending
+ * nothing is worse than no form.
  *
- * Behaviour — when errors appear, focus movement, the submitting state — is in
- * tests/browser/contact.spec.ts. A pass here does not mean the form is usable.
+ * So this file does two jobs: it holds the form to being genuinely absent from the
+ * page, and it keeps the component's contract under test while it is dormant — against
+ * the source rather than the DOM. Otherwise the form rots in the dark and turning it
+ * back on becomes a rewrite.
  */
 import { test, describe, before } from 'node:test';
 import assert from 'node:assert/strict';
@@ -14,12 +18,14 @@ import { es } from '../src/i18n/es.ts';
 import { en } from '../src/i18n/en.ts';
 import { LIMITS, errorAttribute, type ErrorKey } from '../src/lib/validation.ts';
 
-const DIST = join(import.meta.dirname, '..', 'dist');
+const ROOT = join(import.meta.dirname, '..');
+const DIST = join(ROOT, 'dist');
 const html = (route: string) =>
   readFileSync(
     join(DIST, route === '/' ? 'index.html' : `${route.replace(/^\//, '')}/index.html`),
     'utf8',
   );
+const source = (path: string) => readFileSync(join(ROOT, path), 'utf8');
 
 const LANDINGS = [
   { route: '/', dict: es },
@@ -28,226 +34,143 @@ const LANDINGS = [
 
 before(() => assert.ok(existsSync(DIST), 'run `npm run build` first'));
 
-describe('the form is where it should be', () => {
+describe('the form is hidden while it has no backend', () => {
   for (const { route } of LANDINGS) {
-    test(`${route} renders one form with all four fields`, () => {
+    test(`${route} renders no form at all`, () => {
       const page = html(route);
-      assert.equal((page.match(/<form[^>]*data-contact-form/g) ?? []).length, 1);
-      for (const field of ['name', 'email', 'subject', 'message']) {
-        assert.match(page, new RegExp(`data-field="${field}"`), `missing ${field}`);
-      }
+      assert.ok(!/<form/.test(page), 'a form is on the page but cannot deliver anything');
+      assert.ok(!page.includes('data-contact-form'), 'the form markup is still rendered');
     });
   }
 
-  test('it does not appear on pages that do not have it', () => {
-    for (const route of ['/sobre-mi', '/mi-trabajo', '/en/about', '/en/my-work']) {
-      assert.ok(!html(route).includes('data-contact-form'), route);
-    }
+  test('its controller is not shipped either', () => {
+    // Dead weight in the bundle, and it would bind to nothing.
+    assert.ok(!html('/').includes('data-form-submit'), 'the submit button is still emitted');
   });
 
-  test('the controller ships only where the form does', () => {
-    assert.match(html('/'), /contact-form/);
-    assert.ok(!html('/sobre-mi').includes('contact-form'));
-  });
-});
-
-describe('labels and ARIA', () => {
   for (const { route, dict } of LANDINGS) {
-    test(`${route}: every control has a real label bound by for/id`, () => {
+    test(`${route} still offers a way to make contact`, () => {
       const page = html(route);
-      for (const [id, label] of [
-        ['contact-name', dict.contact.form.name.label],
-        ['contact-email', dict.contact.form.email.label],
-        ['contact-subject', dict.contact.form.subject.label],
-        ['contact-message', dict.contact.form.message.label],
-      ]) {
-        assert.match(
-          page,
-          new RegExp(`<label for="${id}"[^>]*>\\s*${label}`),
-          `${id} has no label`,
-        );
-        assert.match(page, new RegExp(`id="${id}"`), `${id} does not exist`);
-      }
-    });
-
-    test(`${route}: no placeholder is doing a label's job`, () => {
-      // Every field has both, and the label is the one that survives autofill.
-      const page = html(route);
-      const placeholders = (page.match(/placeholder="/g) ?? []).length;
-      const labels = (page.match(/<label for="contact-/g) ?? []).length;
-      assert.ok(labels >= placeholders, 'a placeholder exists without its label');
+      assert.ok(page.includes(`mailto:${SITE.email}`), 'no mailto — the section is a dead end');
+      assert.ok(page.includes(dict.contact.socials.instagramGallery), 'no Instagram either');
+      assert.ok(page.includes(dict.contact.lead), 'her invitation to write is gone too');
     });
   }
-
-  test('error slots exist in the DOM from the start, so aria-describedby is never dangling', () => {
-    const page = html('/');
-    for (const field of ['name', 'email', 'subject', 'message']) {
-      assert.match(page, new RegExp(`data-error-for="${field}"[^>]*role="alert"`), field);
-      assert.match(
-        page,
-        new RegExp(`data-error-for="${field}"[^>]*hidden`),
-        `${field} starts visible`,
-      );
-    }
-  });
-
-  test('required fields are marked three ways, not just with an asterisk', () => {
-    const page = html('/');
-    for (const id of ['contact-name', 'contact-email', 'contact-message']) {
-      const tag = page.match(new RegExp(`<(?:input|textarea)[^>]*id="${id}"[^>]*>`))![0];
-      assert.match(tag, /required/, `${id} is not required in HTML`);
-      assert.match(tag, /aria-describedby="[^"]*required/, `${id} has no described requirement`);
-    }
-    assert.match(page, /class="sr-only">\s*obligatorio/, 'no hidden text naming the requirement');
-  });
 });
 
-describe('native constraints survive novalidate', () => {
-  test('the form carries novalidate but the inputs keep real attributes', () => {
-    const page = html('/');
-    assert.match(page, /<form[^>]*novalidate/);
+describe('the form survives intact, ready to be switched on', () => {
+  const files = [
+    'src/components/form/ContactForm.astro',
+    'src/components/form/Field.astro',
+    'src/components/form/FormStatus.astro',
+    'src/scripts/contact-form.ts',
+    'src/lib/contact.ts',
+    'src/lib/validation.ts',
+  ];
 
-    const message = page.match(/<textarea[^>]*id="contact-message"[^>]*>/)![0];
-    assert.match(message, new RegExp(`minlength="${LIMITS.message.min}"`));
-    assert.match(message, new RegExp(`maxlength="${LIMITS.message.max}"`));
-
-    const email = page.match(/<input[^>]*id="contact-email"[^>]*>/)![0];
-    assert.match(email, /type="email"/, 'the mobile keyboard depends on this');
-    assert.match(email, /autocomplete="email"/);
+  test('every part of it is still on disk', () => {
+    for (const file of files) assert.ok(existsSync(join(ROOT, file)), `${file} was deleted`);
   });
-});
 
-describe('honeypot', () => {
-  test('is hidden from people three ways and named innocuously', () => {
-    const page = html('/');
-    const input = page.match(/<input[^>]*name="company"[^>]*>/)![0];
-    assert.match(input, /tabindex="-1"/, 'reachable by keyboard');
-    assert.match(input, /autocomplete="off"/, 'a password manager would fill it');
+  test('it is commented out at one call site, not disabled from within', () => {
+    const section = source('src/components/sections/ContactSection.astro');
+    assert.match(section, /HIDDEN, NOT REMOVED/, 'no explanation of why it is gone');
     assert.match(
-      page,
-      /aria-hidden="true"[^>]*>\s*<label for="contact-company"/,
-      'announced to screen readers',
+      section,
+      /<ContactForm \{lang\} \/>/,
+      'the call site was deleted rather than commented',
+    );
+
+    // The component itself must not have been hollowed out to hide it.
+    const form = source('src/components/form/ContactForm.astro');
+    assert.ok(!/\bhidden\b\s*$/m.test(form.split('\n')[0]), 'the form hides itself');
+  });
+
+  test('the restore instructions name the one thing that actually blocks it', () => {
+    const section = source('src/components/sections/ContactSection.astro');
+    assert.match(section, /submitContact/, 'nothing says what has to be implemented');
+  });
+});
+
+describe('the component contract, checked against its source', () => {
+  const form = source('src/components/form/ContactForm.astro');
+  const field = source('src/components/form/Field.astro');
+  const status = source('src/components/form/FormStatus.astro');
+
+  test('all four fields are still declared', () => {
+    for (const name of ['name', 'email', 'subject', 'message']) {
+      assert.match(form, new RegExp(`name="${name}"`), `${name} is gone`);
+    }
+  });
+
+  test('the honeypot is still hidden three ways and still not required', () => {
+    assert.match(form, /name="company"/);
+    assert.match(form, /tabindex="-1"/);
+    assert.match(form, /autocomplete="off"/);
+    assert.match(form, /aria-hidden="true"/);
+
+    const honeypot = form.match(/<input id="contact-company"[^>]*>/)![0];
+    assert.ok(!/\brequired\b/.test(honeypot), 'a person who finds it could not submit');
+  });
+
+  test('native constraints are still declared alongside novalidate', () => {
+    assert.match(form, /novalidate/);
+    assert.match(form, new RegExp(`minlength=\\{LIMITS.message.min\\}`));
+    assert.match(form, new RegExp(`maxlength=\\{LIMITS.message.max\\}`));
+    assert.equal(LIMITS.message.max, 2000);
+  });
+
+  test('every error message still reaches an attribute the controller reads', () => {
+    // The bug this guards shipped once: the attribute name and the dataset key the
+    // script reads had drifted, so errors rendered as a bare icon.
+    assert.match(field, /errorAttribute/, 'Field no longer derives the attribute name');
+    const controller = source('src/scripts/contact-form.ts');
+    assert.match(controller, /errorDatasetKey/, 'the controller hand-rolls the key again');
+
+    for (const key of ['required', 'tooShort', 'tooLong', 'invalid'] as ErrorKey[]) {
+      assert.match(errorAttribute(key), /^data-error-[a-z-]+$/);
+    }
+  });
+
+  test('the states are still present and still announced', () => {
+    assert.match(status, /data-form-success[\s\S]*role="status"/);
+    assert.match(status, /data-form-error[\s\S]*role="alert"/);
+    assert.match(status, /tabindex="-1"/, 'focus could not be moved to a panel');
+  });
+
+  test('the panels are outside the form element', () => {
+    // They were inside it once, and setState hides the form to show them — so a
+    // successful submit hid its own confirmation.
+    const formTag = form.match(/<form[\s\S]*?<\/form>/)![0];
+    assert.ok(!formTag.includes('<FormStatus'), 'the success panel is inside the form again');
+    assert.match(form, /<FormStatus \{lang\} \/>/, 'the panels are gone entirely');
+  });
+
+  test('fields go readonly, never disabled, while submitting', () => {
+    const controller = source('src/scripts/contact-form.ts');
+    assert.match(controller, /field\.readOnly = busy/);
+    // The submit button is legitimately disabled while busy; the FIELDS must not be,
+    // because a disabled field leaves the accessibility tree and takes the value the
+    // person just typed with it.
+    assert.ok(!/field\.disabled/.test(controller), 'a field is disabled rather than readonly');
+    assert.match(
+      controller,
+      /submitButton\.disabled = busy/,
+      'the button stays clickable while busy',
     );
   });
-
-  test('it is not a required field, or a person who finds it cannot submit', () => {
-    const input = html('/').match(/<input[^>]*name="company"[^>]*>/)![0];
-    assert.ok(!/\brequired\b/.test(input));
-  });
 });
 
-describe('states', () => {
-  test('success, error and summary all exist up front and start hidden', () => {
-    const page = html('/');
-    for (const marker of ['data-form-success', 'data-form-error', 'data-form-summary']) {
-      assert.match(page, new RegExp(`${marker}[^>]*hidden`), `${marker} is missing or visible`);
-    }
+describe('the stub still tells the truth', () => {
+  const contact = source('src/lib/contact.ts');
+
+  test('it is still marked as the one thing standing between this and a real form', () => {
+    assert.match(contact, /TODO\(backend\)/);
   });
 
-  test('the success panel is announced and focusable', () => {
-    const page = html('/');
-    assert.match(page, /data-form-success[^>]*role="status"/);
-    assert.match(page, /data-form-success-heading[^>]*tabindex="-1"/);
-  });
-
-  test('the error panel is an alert and focusable', () => {
-    const page = html('/');
-    assert.match(page, /data-form-error[^>]*role="alert"/);
-    assert.match(page, /data-form-error[^>]*tabindex="-1"/);
-  });
-
-  test('both summary phrasings are rendered, so the controller stays language-free', () => {
-    for (const { route, dict } of LANDINGS) {
-      const page = html(route);
-      assert.ok(page.includes(dict.contact.form.errorSummary(1)), `${route}: no singular form`);
-      assert.ok(page.includes(dict.contact.form.errorSummary(0)), `${route}: no plural template`);
-    }
-  });
-
-  test('the submitting label is localised at render time', () => {
-    for (const { route, dict } of LANDINGS) {
-      assert.match(
-        html(route),
-        new RegExp(`data-submitting-label="${dict.contact.form.submitting}"`),
-      );
-    }
-  });
-});
-
-describe('the form does not pretend to work', () => {
-  const contact = readFileSync(join(import.meta.dirname, '..', 'src/lib/contact.ts'), 'utf8');
-
-  test('the stub is still a stub, and still says so', () => {
-    assert.match(contact, /TODO\(backend\)/, 'the boundary must stay findable');
-    assert.match(contact, /console\.info\('\[contact\] stubbed submission'/);
-  });
-
-  test('bots get success and no log entry', () => {
+  test('bots would still get success and no log entry', () => {
     const botBranch = contact.indexOf('payload.company');
     const logLine = contact.indexOf('console.info');
     assert.ok(botBranch > 0 && botBranch < logLine, 'the honeypot must return before logging');
-  });
-
-  test('the mailto fallback is visible, since it is the only path that works in v1', () => {
-    for (const { route } of LANDINGS) {
-      const page = html(route);
-      assert.ok(page.includes(`mailto:${SITE.email}`), `${route}: no mailto`);
-      assert.match(page, /<noscript>[\s\S]*mailto:/, `${route}: no no-JS fallback`);
-    }
-  });
-});
-
-describe('every error message reaches the DOM', () => {
-  /**
-   * The bug this guards: an error whose <p> unhides with an empty <span>, showing an
-   * alert icon and no words. Nothing in the markup looks wrong, and the field is
-   * correctly marked invalid — it just says nothing.
-   */
-  for (const { route, dict } of LANDINGS) {
-    test(`${route}: every message in the dictionary is rendered as an attribute`, () => {
-      const page = html(route);
-      const form = dict.contact.form;
-
-      const expected: [string, Record<string, string>][] = [
-        ['name', form.name.error],
-        ['email', form.email.error],
-        ['subject', form.subject.error],
-        ['message', form.message.error],
-      ];
-
-      for (const [field, errors] of expected) {
-        const tag = page.match(
-          new RegExp(`<(?:input|textarea)[^>]*data-field="${field}"[^>]*>`),
-        )![0];
-
-        for (const [key, message] of Object.entries(errors)) {
-          const attribute = errorAttribute(key as ErrorKey);
-          assert.match(tag, new RegExp(attribute), `${field}: ${attribute} is missing`);
-          assert.ok(
-            tag.includes(message.replace(/&/g, '&amp;')) || tag.includes(message),
-            `${field}.${key}: the message is not in the attribute`,
-          );
-        }
-      }
-    });
-  }
-
-  test('no attribute uses the squashed spelling that silently resolved to undefined', () => {
-    for (const { route } of LANDINGS) {
-      const page = html(route);
-      assert.ok(!page.includes('data-error-tooshort'), `${route}: squashed tooShort`);
-      assert.ok(!page.includes('data-error-toolong'), `${route}: squashed tooLong`);
-    }
-  });
-
-  test('the error slot has a span for the text, not just an icon', () => {
-    const page = html('/');
-    for (const field of ['name', 'email', 'message']) {
-      const slot = page.match(
-        new RegExp(`<p id="[^"]*" data-error-for="${field}"[\\s\\S]*?</p>`),
-      )![0];
-      assert.match(slot, /<svg/, `${field}: no icon`);
-      assert.match(slot, /data-error-text/, `${field}: nowhere to put the message`);
-    }
   });
 });

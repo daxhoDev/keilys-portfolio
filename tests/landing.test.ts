@@ -163,11 +163,11 @@ describe('contact shell', () => {
     });
   }
 
-  test('the form is present, and the mailto beside it still is too', () => {
-    // The form ships as a stub that delivers nothing, so the address next to it is the
-    // only working contact path. Removing it would make the section a dead end.
+  test('the mailto is the contact path, since the form is hidden', () => {
+    // The form is commented out until it has a backend (09-open-decisions.md §4), so
+    // the address is now the ONLY way to reach her from this page.
     const page = html('/');
-    assert.match(page, /<form[^>]*data-contact-form/, 'no form');
-    assert.ok(page.includes(`mailto:${SITE.email}`), 'the working contact path is gone');
+    assert.ok(!/<form/.test(page), 'a form that cannot deliver is on the page');
+    assert.ok(page.includes(`mailto:${SITE.email}`), 'the section is a dead end');
   });
 });

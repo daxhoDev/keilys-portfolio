@@ -252,7 +252,7 @@ export const SITE = {
   name: 'Keily Mar Couselo',
   wordmark: 'Keily Mar',
   /** Temporary Vercel URL. A custom domain comes much later; this is the only line that changes. */
-  url: 'https://keilymargallery.vercel.app',
+  url: 'https://keilymargallery-sage.vercel.app',
   /** false while on *.vercel.app: noindex + Disallow + no sitemap. See 08-…#indexing-is-off-until-the-custom-domain. */
   indexable: false,
   email: 'kylieemar0500@gmail.com',

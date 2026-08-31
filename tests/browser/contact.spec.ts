@@ -6,11 +6,21 @@
  */
 import { test, expect } from '@playwright/test';
 
+/**
+ * SKIPPED while the contact form is hidden (specs/09-open-decisions.md §4).
+ *
+ * The form is built and its markup contract is still covered by
+ * tests/contact-form.test.ts against the component source. These tests drive the live
+ * form, so they cannot run until it is back on the page — which happens when
+ * submitContact gets a real implementation. Un-skip then; nothing else should need to
+ * change.
+ */
+
 const NAME = '[data-field="name"]';
 const EMAIL = '[data-field="email"]';
 const MESSAGE = '[data-field="message"]';
 
-test.describe('validation timing', () => {
+test.describe.skip('validation timing', () => {
   test('no error while typing a first pass', async ({ page }) => {
     await page.goto('/');
     await page.locator(NAME).fill('K');
@@ -46,7 +56,7 @@ test.describe('validation timing', () => {
   });
 });
 
-test.describe('submit', () => {
+test.describe.skip('submit', () => {
   test('an invalid submit focuses the first invalid field and announces a count', async ({
     page,
   }) => {
@@ -113,7 +123,7 @@ test.describe('submit', () => {
   });
 });
 
-test.describe('honeypot', () => {
+test.describe.skip('honeypot', () => {
   test('a filled honeypot still reports success, and logs nothing', async ({ page }) => {
     const logs: string[] = [];
     page.on('console', (message) => logs.push(message.text()));
@@ -141,7 +151,7 @@ test.describe('honeypot', () => {
   });
 });
 
-test.describe('the character counter', () => {
+test.describe.skip('the character counter', () => {
   test('stays hidden until near the limit', async ({ page }) => {
     await page.goto('/');
     await page.locator(MESSAGE).fill('a'.repeat(100));
@@ -153,7 +163,7 @@ test.describe('the character counter', () => {
   });
 });
 
-test.describe('the message, not just the icon', () => {
+test.describe.skip('the message, not just the icon', () => {
   /**
    * Shipped once: the error paragraph unhid with an empty span, so a "too short" name
    * showed an alert icon and no words. The field was correctly marked invalid, and the

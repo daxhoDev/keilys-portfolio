@@ -32,3 +32,6 @@ playwright-report/
 
 # Keily's original camera exports — ingested into src/assets/, not shipped
 Fotos para portfolio/
+
+# Windows "downloaded from the internet" metadata, created by WSL on copy
+*:Zone.Identifier

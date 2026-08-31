@@ -7,7 +7,7 @@
 import type { Lang } from '~/i18n/routes.ts';
 import { SITE } from '~/lib/site.ts';
 import { useTranslations } from '~/i18n/utils.ts';
-import ContactForm from '~/components/form/ContactForm.astro';
+// import ContactForm from '~/components/form/ContactForm.astro'; // restore with the form
 import Reveal from '~/components/motion/Reveal.astro';
 import Section from '~/components/ui/Section.astro';
 import Container from '~/components/ui/Container.astro';
@@ -34,31 +34,53 @@ const t = useTranslations(lang);
             lead={t.contact.lead}
           />
         </Reveal>
+        {
+          /*
+          HIDDEN, NOT REMOVED — to be switched on with the backend.
+
+          The form is built and tested: validation, states, focus management, honeypot
+          and i18n are all production-ready (specs/05-pages-and-sections.md § Contact
+          form). What it lacks is delivery — submitContact is a documented stub — and a
+          form that says "Te responderé lo antes posible" while sending nothing is
+          worse than no form at all.
+
+          To restore it: uncomment the block below and the import above, then implement
+          submitContact in src/lib/contact.ts. Nothing else needs to change.
+        */
+        }
+        {
+          /*
         <div class="mt-10">
           <ContactForm {lang} />
         </div>
+        */
+        }
       </div>
 
       <Reveal as="aside" delay={120} class="lg:pt-4">
         <h3 class="text-eyebrow text-mustang uppercase">{t.contact.socials.heading}</h3>
         <ul class="mt-4 flex flex-col gap-2">
           {
-            SITE.socials.map((social) => (
-              <li>
-                <a
-                  href={social.href}
-                  class="text-body text-mist hover:text-bone inline-flex min-h-11 items-center gap-3 transition-colors"
-                  {...(social.icon === 'instagram' ? { rel: 'me noopener', target: '_blank' } : {})}
-                >
-                  {social.icon === 'instagram' ? (
-                    <InstagramIcon class="size-5" />
-                  ) : (
-                    <MailIcon class="size-5" />
-                  )}
-                  {t.contact.socials[social.id]}
-                </a>
-              </li>
-            ))
+            SITE.socials
+              .filter((social) => social.icon !== 'mail')
+              .map((social) => (
+                <li>
+                  <a
+                    href={social.href}
+                    class="text-body text-mist hover:text-bone inline-flex min-h-11 items-center gap-3 transition-colors"
+                    {...(social.icon === 'instagram'
+                      ? { rel: 'me noopener', target: '_blank' }
+                      : {})}
+                  >
+                    {social.icon === 'instagram' ? (
+                      <InstagramIcon class="size-5" />
+                    ) : (
+                      <MailIcon class="size-5" />
+                    )}
+                    {t.contact.socials[social.id]}
+                  </a>
+                </li>
+              ))
           }
         </ul>
 

@@ -13,6 +13,47 @@ const open = async (page: import('@playwright/test').Page, index = 0) => {
   await expect(page.locator('[data-lightbox]')).toBeVisible();
 };
 
+/** A touch drag: pointerType "touch", which is the only kind the lightbox acts on. */
+async function drag(
+  page: import('@playwright/test').Page,
+  from: { x: number; y: number },
+  to: { x: number; y: number },
+) {
+  await page.evaluate(
+    async ([start, end]) => {
+      const stage = document.querySelector('[data-lightbox-stage]')!;
+      const base = {
+        pointerId: 1,
+        pointerType: 'touch',
+        isPrimary: true,
+        bubbles: true,
+        cancelable: true,
+      };
+
+      stage.dispatchEvent(
+        new PointerEvent('pointerdown', { ...base, clientX: start.x, clientY: start.y }),
+      );
+
+      const steps = 8;
+      for (let i = 1; i <= steps; i++) {
+        stage.dispatchEvent(
+          new PointerEvent('pointermove', {
+            ...base,
+            clientX: start.x + ((end.x - start.x) * i) / steps,
+            clientY: start.y + ((end.y - start.y) * i) / steps,
+          }),
+        );
+        await new Promise((resolve) => requestAnimationFrame(resolve));
+      }
+
+      stage.dispatchEvent(
+        new PointerEvent('pointerup', { ...base, clientX: end.x, clientY: end.y }),
+      );
+    },
+    [from, to],
+  );
+}
+
 test.describe('opening and closing', () => {
   test('a photograph opens the dialog and moves focus to close', async ({ page }) => {
     await open(page);
@@ -205,8 +246,10 @@ test.describe('bugs that shipped once', () => {
   });
 
   test('a not-yet-loaded photograph shows a spinner, not the previous one', async ({ page }) => {
+    // Modest delay: this intercepts all 27 gallery images as well, and the lightbox's
+    // own request queues behind them.
     await page.route('**/_astro/*.avif', async (route) => {
-      await new Promise((resolve) => setTimeout(resolve, 800));
+      await new Promise((resolve) => setTimeout(resolve, 250));
       await route.continue();
     });
 
@@ -216,10 +259,10 @@ test.describe('bugs that shipped once', () => {
 
     // The old frame must be gone the moment the counter moves.
     await expect(page.locator('[data-lightbox-spinner]')).toBeVisible();
-    await expect(page.locator('[data-lightbox-image]')).not.toHaveAttribute('data-shown', '');
+    await expect(page.locator('[data-lightbox-image]')).not.toHaveAttribute('data-shown');
 
-    await expect(page.locator('[data-lightbox-image]')).toHaveAttribute('data-shown', '', {
-      timeout: 5000,
+    await expect(page.locator('[data-lightbox-image]')).toHaveAttribute('data-shown', {
+      timeout: 15000,
     });
     await expect(page.locator('[data-lightbox-spinner]')).toBeHidden();
   });
@@ -237,8 +280,10 @@ test.describe('bugs that shipped once', () => {
     await bw.click();
 
     await expect(bw).toHaveAttribute('aria-pressed', 'true');
-    expect(await background(bw), 'the pressed chip did not repaint').toBe(activeColour);
-    expect(await background(all), 'the old chip stayed painted').not.toBe(activeColour);
+
+    // Poll: the fill is transitioned, so an immediate read catches it mid-fade.
+    await expect.poll(() => background(bw), { timeout: 3000 }).toBe(activeColour);
+    await expect.poll(() => background(all), { timeout: 3000 }).not.toBe(activeColour);
   });
 });
 
@@ -254,10 +299,7 @@ test.describe('mobile', () => {
     const box = (await stage.boundingBox())!;
     const y = box.y + box.height / 2;
 
-    await page.mouse.move(box.x + box.width * 0.8, y);
-    await page.mouse.down();
-    await page.mouse.move(box.x + box.width * 0.2, y, { steps: 10 });
-    await page.mouse.up();
+    await drag(page, { x: box.x + box.width * 0.8, y }, { x: box.x + box.width * 0.2, y });
 
     await expect(page.locator('[data-lightbox-counter]')).toHaveText('2 de 27');
   });
@@ -270,10 +312,8 @@ test.describe('mobile', () => {
     const box = (await stage.boundingBox())!;
     const y = box.y + box.height / 2;
 
-    await page.mouse.move(box.x + box.width * 0.5, y);
-    await page.mouse.down();
-    await page.mouse.move(box.x + box.width * 0.5 - 20, y, { steps: 5 });
-    await page.mouse.up();
+    // Short: under the threshold, so it must settle back rather than navigate.
+    await drag(page, { x: box.x + box.width * 0.5, y }, { x: box.x + box.width * 0.5 - 20, y });
 
     await expect(page.locator('[data-lightbox-counter]')).toHaveText('1 de 27');
   });
@@ -286,10 +326,7 @@ test.describe('mobile', () => {
     const box = (await stage.boundingBox())!;
     const x = box.x + box.width / 2;
 
-    await page.mouse.move(x, box.y + box.height * 0.3);
-    await page.mouse.down();
-    await page.mouse.move(x, box.y + box.height * 0.8, { steps: 10 });
-    await page.mouse.up();
+    await drag(page, { x, y: box.y + box.height * 0.3 }, { x, y: box.y + box.height * 0.8 });
 
     await expect(page.locator('[data-lightbox]')).toBeHidden();
   });

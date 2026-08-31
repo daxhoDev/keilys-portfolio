@@ -136,7 +136,7 @@ Ours to write ([decision 5.4](./09-open-decisions.md#5--delivery--launch-decisio
 | Instagram (work) | [`@kyliemargallery`](https://instagram.com/kyliemargallery) — listed first |
 | Instagram (personal) | [`@_kyliemar_`](https://instagram.com/_kyliemar_) |
 | Other socials | None |
-| URL | `https://keilymargallery.vercel.app`, `noindex` for now; custom domain much later |
+| URL | `https://keilymargallery-sage.vercel.app`, `noindex` for now; custom domain much later |
 
 **How the name is used.** "Keily Mar Couselo" is long for a header wordmark at 375px, and the hero already
 introduces her as "Keily". So:

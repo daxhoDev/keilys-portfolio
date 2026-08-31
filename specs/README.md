@@ -48,6 +48,6 @@ Her answers, in her own words: **[preguntas-para-keily.md](./preguntas-para-keil
 | Socials | Two Instagram accounts (`@kyliemargallery`, `@_kyliemar_`) + email. Extensible list |
 | Name | **Keily Mar Couselo**; header wordmark "Keily Mar" |
 | Favicon | Black italic "K" on a light ground — inverted from the site, her choice |
-| Hosting | Vercel, static, at `keilymargallery.vercel.app`. `noindex` until a custom domain, which comes much later |
+| Hosting | Vercel, static, at `keilymargallery-sage.vercel.app`. `noindex` until a custom domain, which comes much later |
 | Extra scope | Styled 404 only. She has asked for **services & pricing, a blog, and print sales** in a later phase |
 | Content | Spanish copy delivered; English and interface strings are ours to write. **The 20 photographs are the only outstanding item** |

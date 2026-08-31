@@ -8,6 +8,15 @@ import { defineConfig, devices } from '@playwright/test';
 export default defineConfig({
   testDir: './tests/browser',
   fullyParallel: true,
+
+  /**
+   * Every image on this site is AVIF, and /mi-trabajo carries 27 of them. AVIF decode
+   * is CPU-bound, page.goto waits for load, and load waits for every decode — so the
+   * default 30s is not enough here, and running one worker per core makes the workers
+   * compete for the very CPU the decoding needs.
+   */
+  timeout: 60_000,
+  workers: process.env.CI ? 2 : 4,
   forbidOnly: !!process.env.CI,
   retries: process.env.CI ? 1 : 0,
   reporter: process.env.CI ? 'github' : [['list']],

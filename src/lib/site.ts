@@ -9,7 +9,7 @@ export const SITE = {
   wordmark: 'Keily Mar',
 
   /** Temporary Vercel URL. A custom domain comes much later; this is the only line that changes. */
-  url: 'https://keilymargallery.vercel.app',
+  url: 'https://keilymargallery-sage.vercel.app',
 
   /**
    * false while the site lives on *.vercel.app: noindex on every page, Disallow in

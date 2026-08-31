@@ -75,7 +75,7 @@ Primary conversion action: **submitting the contact form** (or reaching her via 
 ## Constraints
 
 - Frontend only, static output, deployable to Vercel with no serverless functions. The site launches at
-  `keilymargallery.vercel.app` and is `noindex` until a custom domain replaces it.
+  `keilymargallery-sage.vercel.app` and is `noindex` until a custom domain replaces it.
 - The build proceeds against generated placeholders where content is missing, tracked in
   [10-content-checklist.md](./10-content-checklist.md).
 - Every design decision is closed ([09-open-decisions.md](./09-open-decisions.md)). The remaining

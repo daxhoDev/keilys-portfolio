@@ -117,7 +117,7 @@ the visible content is not permitted.
 
 ### Indexing is off until the custom domain
 
-The site launches on `https://keilymargallery.vercel.app`
+The site launches on `https://keilymargallery-sage.vercel.app`
 ([decision 5.2](./09-open-decisions.md#5--delivery--launch-decisions)). Letting that URL into the index only
 to redirect away from it later is avoidable work, so a single constant gates the whole thing:
 

@@ -20,7 +20,8 @@
     "test:browser": "playwright test",
     "check:hero": "node scripts/check-hero-contrast.mjs",
     "favicons": "node scripts/generate-favicons.mjs",
-    "check:budgets": "node scripts/check-budgets.mjs"
+    "check:budgets": "node scripts/check-budgets.mjs",
+    "og": "node scripts/generate-og-image.mjs"
   },
   "dependencies": {
     "@astrojs/sitemap": "^3.7.3",

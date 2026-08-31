@@ -18,7 +18,7 @@ import {
   type PageKey,
 } from '../src/i18n/routes.ts';
 
-const url = (pathname: string) => new URL(pathname, 'https://keilymargallery.vercel.app');
+const url = (pathname: string) => new URL(pathname, 'https://keilymargallery-sage.vercel.app');
 const PAGE_KEYS = Object.keys(ROUTES) as PageKey[];
 
 describe('language defaults', () => {

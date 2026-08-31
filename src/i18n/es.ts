@@ -175,7 +175,7 @@ export const es = {
     },
 
     socials: {
-      heading: 'También me encuentras en',
+      heading: 'Puedes encontrarme en',
       instagramGallery: 'Instagram · Galería',
       instagramPersonal: 'Instagram · Personal',
       email: 'Correo electrónico',

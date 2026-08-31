@@ -88,7 +88,7 @@ Inglés · *Canon PowerShot SX400 IS*. Si algo ha cambiado, dímelo y se cambia 
 
 - **El inglés lo traducimos nosotros.** No tienes que escribir nada en inglés. Eso sí: si quieres echarle un
   ojo al texto largo antes de que salga, dilo y te lo paso — es el más tuyo de todos y estás en tu derecho.
-- **La dirección de la web, de momento, será temporal:** `keilymargallery.vercel.app` (igual que tu cuenta
+- **La dirección de la web, de momento, será temporal:** `keilymargallery-sage.vercel.app` (igual que tu cuenta
   de Instagram de trabajo). Funciona perfectamente y se puede compartir. Cuando quieras un dominio propio
   (`loquesea.com`), se cambia sin rehacer nada. Mientras tanto la web **no aparecerá en Google**, y es a
   propósito: así, cuando llegue el dominio de verdad, no hay dos direcciones tuyas compitiendo entre ellas.

@@ -87,7 +87,7 @@ import tailwindcss from '@tailwindcss/vite';
 import sitemap from '@astrojs/sitemap';
 
 export default defineConfig({
-  site: 'https://keilymargallery.vercel.app',   // temporary; custom domain much later
+  site: 'https://keilymargallery-sage.vercel.app',   // temporary; custom domain much later
   output: 'static',
   trailingSlash: 'never',
   vite: { plugins: [tailwindcss()] },

@@ -106,8 +106,6 @@ const f = t.contact.form;
     >
     </p>
 
-    <FormStatus {lang} />
-
     <div>
       <button
         type="submit"
@@ -125,6 +123,14 @@ const f = t.contact.form;
       </button>
     </div>
   </form>
+
+  {
+    /*
+    Outside the <form> on purpose: the controller hides the form to show the success
+    panel, so a panel nested inside it would be hidden by the same call.
+  */
+  }
+  <FormStatus {lang} />
 
   {
     /*

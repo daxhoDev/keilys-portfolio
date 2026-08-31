@@ -19,7 +19,7 @@ critical path.
 | Facts list values | ✅ Ships as proposed, flagged for her confirmation |
 | Interface microcopy (~40 strings) | ✅ Ours to write, developer approves |
 | English translation | ✅ Ours, ships without her review |
-| URL | ✅ `keilymargallery.vercel.app`, `noindex` until a custom domain |
+| URL | ✅ `keilymargallery-sage.vercel.app`, `noindex` until a custom domain |
 | Contact form delivery | ✅ Stub at launch, email visible beside it |
 | **The photographs** | ✅ **27 delivered** — ingested into `src/assets/photos/` |
 | Tone ×27 + the featured 6 | ✅ Tone from her two folders (17 `bw` / 10 `colour`); featured 6 chosen |
@@ -107,7 +107,7 @@ deliberate second pass in Phase 8 alongside the audit.
 
 ## ✅ Handled: the URL
 
-The site launches at `https://keilymargallery.vercel.app` — the Vercel project name matches her work
+The site launches at `https://keilymargallery-sage.vercel.app` — the Vercel project name matches her work
 Instagram handle. A custom domain comes much later, and replacing it is one constant in `src/lib/site.ts`.
 
 While it is on `*.vercel.app`, `SITE.indexable = false`: `noindex` on every page, `Disallow: /` in

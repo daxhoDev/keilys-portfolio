@@ -9,22 +9,24 @@ test.describe('reveals', () => {
     await page.goto('/sobre-mi');
 
     const target = page.locator('[data-reveal]').last();
-    await expect(target).not.toHaveAttribute('data-revealed', '');
+    await expect(target).not.toHaveAttribute('data-revealed');
 
     await target.scrollIntoViewIfNeeded();
-    await expect(target).toHaveAttribute('data-revealed', '', { timeout: 3000 });
+    await expect(target).toHaveAttribute('data-revealed', { timeout: 3000 });
   });
 
   test('a reveal does not replay when scrolled back to', async ({ page }) => {
     await page.goto('/sobre-mi');
 
     const target = page.locator('[data-reveal]').nth(2);
-    await target.scrollIntoViewIfNeeded();
-    await expect(target).toHaveAttribute('data-revealed', '');
+    // Centre it: the observer ignores the bottom 25% of the viewport on purpose, and
+    // scrollIntoViewIfNeeded stops as soon as the element is technically visible.
+    await target.evaluate((el) => el.scrollIntoView({ block: 'center' }));
+    await expect(target).toHaveAttribute('data-revealed');
 
     await page.evaluate(() => window.scrollTo(0, 0));
-    await target.scrollIntoViewIfNeeded();
-    await expect(target).toHaveAttribute('data-revealed', '');
+    await target.evaluate((el) => el.scrollIntoView({ block: 'center' }));
+    await expect(target).toHaveAttribute('data-revealed');
   });
 
   test('it fires after the element has climbed into view, not as it appears', async ({ page }) => {
@@ -40,7 +42,7 @@ test.describe('reveals', () => {
     }, '[data-reveal]');
 
     await page.waitForTimeout(300);
-    await expect(handle).not.toHaveAttribute('data-revealed', '');
+    await expect(handle).not.toHaveAttribute('data-revealed');
   });
 });
 

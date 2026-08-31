@@ -50,7 +50,7 @@ until launch.
 
 | | |
 |---|---|
-| Vercel Production Branch | `master` — so `keilymargallery.vercel.app` stays empty during the build |
+| Vercel Production Branch | `master` — so `keilymargallery-sage.vercel.app` stays empty during the build |
 | The URL to actually use | the branch alias, `keilymargallery-git-development-<scope>.vercel.app` |
 | At launch ([Phase 10](#phase-10--launch)) | merge `development` → `master`; the production URL fills in |
 
@@ -58,7 +58,7 @@ Every deploy during the build is a preview deploy, and previews are password-pro
 work-in-progress should not be publicly readable.
 
 **Note on metadata in previews:** canonical, `og:url` and `hreflang` are built from `SITE.url`, so on a
-preview they point at `keilymargallery.vercel.app` rather than at the alias being viewed. That is correct —
+preview they point at `keilymargallery-sage.vercel.app` rather than at the alias being viewed. That is correct —
 they must describe the final location — and it is harmless while everything is `noindex`.
 
 **Done when:** a push to `development` produces a green deploy and a reachable preview URL, and a
@@ -73,7 +73,7 @@ build that works locally and not on Vercel — while the surface area is one fil
 
 **0.5 days.** The token layer everything else is expressed in.
 
-- Scaffold Astro 5, `output: 'static'`, `site: 'https://keilymargallery.vercel.app'`.
+- Scaffold Astro 5, `output: 'static'`, `site: 'https://keilymargallery-sage.vercel.app'`.
 - Tailwind v4 via `@tailwindcss/vite`; `src/styles/global.css` with the **full `@theme` token set** from
   [02-design-system.md](./02-design-system.md#globalcss-shape) — the black/mustang palette, type scale,
   easings, durations.
@@ -282,7 +282,7 @@ design. Flag it to her the day the files land, not at launch.
 
 **0.25 days.**
 
-- **Merge `development` → `master`.** This is the moment `keilymargallery.vercel.app` stops being empty;
+- **Merge `development` → `master`.** This is the moment `keilymargallery-sage.vercel.app` stops being empty;
   confirm the production deploy is green before telling anyone.
 - Walk all seven routes on a real phone, in Spanish, on a cold cache.
 - **Tell Keily, in as many words, that the contact form does not send yet** and that her email beside it is
@@ -290,7 +290,7 @@ design. Flag it to her the day the files land, not at launch.
   message.
 - Hand over: how to add a photograph, how to change a string, where the specs live.
 
-**Done when:** the site is live at `keilymargallery.vercel.app`, she has seen it on her own phone, and she
+**Done when:** the site is live at `keilymargallery-sage.vercel.app`, she has seen it on her own phone, and she
 knows what the form does and does not do.
 
 ---

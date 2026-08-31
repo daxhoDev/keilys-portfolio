@@ -171,7 +171,7 @@ export const en: Dictionary = {
     },
 
     socials: {
-      heading: 'Also find me on',
+      heading: 'You can find me on',
       instagramGallery: 'Instagram · Gallery',
       instagramPersonal: 'Instagram · Personal',
       email: 'Email',
