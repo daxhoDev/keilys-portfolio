@@ -109,35 +109,45 @@ Stated plainly, so a green suite is never mistaken for a finished audit:
 
 ## Current status
 
+Everything runs. `npm test` builds, runs the node suites, then the browser suites.
+
 | Suite | Cases | State |
 |---|---|---|
 | `routes.test.ts` | 13 | passing |
-| `dictionary.test.ts` | 22 | passing |
+| `dictionary.test.ts` | 25 | passing |
 | `images.test.ts` | 9 | passing |
+| `validation.test.ts` | 18 | passing |
 | `build-output.test.ts` | 43 | passing |
-| `chrome-markup.test.ts` | 32 | passing |
+| `chrome-markup.test.ts` | 38 | passing |
 | `landing.test.ts` | 27 | passing |
+| `about-page.test.ts` | 13 | passing |
+| `gallery.test.ts` | 36 | passing |
+| `contact-form.test.ts` | 25 | passing |
+| `motion.test.ts` | 30 | passing |
 | `hero-contrast.test.ts` | 5 | passing |
 | `css-utilities.test.ts` | 7 | passing |
-| `gallery.test.ts` | 31 | passing |
-| **Total, non-browser** | **193** | **passing** |
-| `browser/*.spec.ts` | 52 | **cannot run in this environment — see below** |
+| `budgets.test.ts` | 19 | passing |
+| **Total, non-browser** | **308** | **passing** |
+| `browser/*.spec.ts` (desktop + mobile) | **116** | **passing** |
 
-### The browser suite is blocked, and it is an environment problem
-
-Chromium will not launch on this machine: the WSL2 Debian image is missing
-`libglib-2.0.so.0` and the other shared libraries the bundled browser links against.
-Installing them needs root:
+The browser suite was blocked for six phases: Chromium could not launch because this
+WSL2 image was missing `libglib-2.0.so.0` and the other shared libraries it links
+against. Installing them needs root:
 
 ```bash
 sudo npx playwright install-deps chromium
 ```
 
-Until that runs, **52 browser assertions are written but unproven** — the focus traps,
-focus return, `Esc`, arrow navigation, scroll lock, `inert`, the live region, filtered
-lightbox navigation, and axe across all seven routes.
+**That gap had a cost, and it is worth recording.** Five bugs reached a person during
+those phases, and the browser suite already contained a test for each one before it
+shipped:
 
-This is not hypothetical. The navigation bug reported during Phase 3 —
-`transition:persist` freezing `aria-current` and the language switcher — was already
-covered by `chrome.spec.ts`, written before the bug shipped. A person found it instead,
-because that file has never run.
+| Bug | The test that would have caught it |
+|---|---|
+| `transition:persist` froze `aria-current` and the language switcher | `chrome.spec.ts` — "aria-current follows a client-side navigation" |
+| Lightbox close and arrows were inert | `lightbox.spec.ts` — "the close and arrow buttons actually respond" |
+| The active filter chip never repainted | `lightbox.spec.ts` — "the active filter chip repaints when pressed" |
+| "Too short" errors rendered as a bare icon | `contact.spec.ts` — "a too-short name shows readable text" |
+| Reveals stopped after any client-side navigation | `chrome.spec.ts` — "elements still animate in after navigating" |
+
+A suite that cannot run is not a safety net. It is a record of what you meant to check.

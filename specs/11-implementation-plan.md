@@ -28,6 +28,10 @@ runs, not when it renders — see [13-testing.md](./13-testing.md).
 
 **~13.5 days** to a live site with her real photographs in it. **~12.5** of those do not depend on her.
 
+The browser suite runs as of Phase 8: 116 Playwright assertions across desktop and mobile, including axe on
+all seven routes. The Phase 3 criteria that depended on it — focus trap, focus return, `Esc`, scroll lock,
+`inert` — are met and verified, not merely written.
+
 ---
 
 ## Phase 0 · Repo, pipeline & first deploy
