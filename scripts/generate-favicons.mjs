@@ -26,7 +26,7 @@ const FONT = join(
 const INK = '#000000';
 const BONE = '#F2F1EF';
 const SIZE = 512; // the master; everything else is scaled down from it
-const PADDING = 0.17; // share of the canvas left clear on the tightest axis
+const PADDING = 0.24; // share of the canvas left clear — a disc crops the corners of the glyph box
 
 function glyphPath() {
   const font = create(readFileSync(FONT));
@@ -54,7 +54,7 @@ function buildSvg({ d, minX, minY, width, height }) {
   const y = (SIZE + height * scale) / 2 + minY * scale;
 
   return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${SIZE} ${SIZE}" width="${SIZE}" height="${SIZE}">
-  <rect width="${SIZE}" height="${SIZE}" fill="${BONE}"/>
+  <circle cx="${SIZE / 2}" cy="${SIZE / 2}" r="${SIZE / 2}" fill="${BONE}"/>
   <path transform="translate(${x.toFixed(2)} ${y.toFixed(2)}) scale(${scale.toFixed(4)} ${-scale.toFixed(4)})" d="${d}" fill="${INK}"/>
 </svg>
 `;
@@ -65,16 +65,26 @@ const svg = buildSvg(glyphPath());
 await mkdir(join(root, 'public'), { recursive: true });
 await writeFile(join(root, 'public/favicon.svg'), svg, 'utf8');
 
-const raster = Buffer.from(svg);
-for (const [name, size] of [
-  ['favicon-96.png', 96],
-  ['apple-touch-icon.png', 180],
-]) {
-  await sharp(raster, { density: 384 })
-    .resize(size, size)
-    .png({ compressionLevel: 9 })
-    .toFile(join(root, 'public', name));
-  console.log(`  + public/${name}  ${size}×${size}`);
-}
+await sharp(Buffer.from(svg), { density: 384 })
+  .resize(96, 96)
+  .png({ compressionLevel: 9 })
+  .toFile(join(root, 'public/favicon-96.png'));
+console.log('  + public/favicon-96.png  96×96  (round, transparent corners)');
+
+/*
+ * apple-touch-icon stays a full-bleed square. iOS masks it with its own squircle, so a
+ * round icon with transparent corners lands as a circle floating on a black backdrop —
+ * the platform rounds it, and doing it twice looks like a mistake.
+ */
+const squareSvg = svg.replace(
+  /<circle[^>]*\/>/,
+  `<rect width="${SIZE}" height="${SIZE}" fill="${BONE}"/>`,
+);
+
+await sharp(Buffer.from(squareSvg), { density: 384 })
+  .resize(180, 180)
+  .png({ compressionLevel: 9 })
+  .toFile(join(root, 'public/apple-touch-icon.png'));
+console.log('  + public/apple-touch-icon.png  180×180  (square — iOS applies its own mask)');
 
 console.log('  + public/favicon.svg  (glyph baked as a path — no font needed)');

@@ -123,6 +123,10 @@ sticky hover states.
 - The scroll position resets to top on navigation (Astro's default), except for same-page hash links.
 - On navigation, `astro:page-load` re-runs every client script's `init()`; each `init()` first tears down any
   listener it previously registered.
+- **The `.js` gate must be restored on `astro:after-swap`.** ClientRouter replaces `<html>`'s attributes
+  with the incoming document's, dropping the class the hidden state hangs off, and an `is:inline` head script
+  is not re-executed. Without the listener, reveals work on a full load and silently stop after the first
+  in-site navigation while every page still renders. This shipped once.
 - **Reduced motion:** view transitions are disabled entirely — `ClientRouter` still handles routing but the
   animation is suppressed via the reduced-motion block below.
 

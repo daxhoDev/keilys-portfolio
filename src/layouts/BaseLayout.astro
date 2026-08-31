@@ -136,7 +136,15 @@ const person = {
     */
     }
     <script is:inline>
+      // Re-applied after every view transition. ClientRouter replaces <html>'s
+      // attributes with the incoming document's, which drops this class — and an
+      // is:inline head script is not re-executed on swap. Without the listener the
+      // reveal rules stop matching after the first client-side navigation, so every
+      // animation silently stops working while the pages still render correctly.
       document.documentElement.classList.add('js');
+      document.addEventListener('astro:after-swap', () =>
+        document.documentElement.classList.add('js'),
+      );
     </script>
 
     <ClientRouter />

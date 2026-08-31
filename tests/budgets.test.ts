@@ -123,3 +123,81 @@ describe('robots.txt', () => {
     assert.equal(hasSitemap, !disallowed, 'the sitemap disagrees with robots.txt');
   });
 });
+
+describe('the favicon is a disc', () => {
+  test('the SVG ground is a circle, not a rectangle', () => {
+    const svg = readFileSync(join(DIST, 'favicon.svg'), 'utf8');
+    assert.match(svg, /<circle[^>]*fill="#F2F1EF"/, 'the ground is not round');
+    assert.ok(!/<rect/.test(svg), 'a square ground is still being drawn');
+  });
+
+  test('the PNG has transparent corners, so it renders as a disc', async () => {
+    const sharp = (await import('sharp')).default;
+    const size = 96;
+    const { data, info } = await sharp(join(DIST, 'favicon-96.png'))
+      .ensureAlpha()
+      .raw()
+      .toBuffer({ resolveWithObject: true });
+
+    const alpha = (x: number, y: number) => data[(y * size + x) * info.channels + 3];
+
+    for (const [x, y] of [
+      [0, 0],
+      [size - 1, 0],
+      [0, size - 1],
+      [size - 1, size - 1],
+    ]) {
+      assert.equal(alpha(x, y), 0, `corner ${x},${y} is opaque — the icon is still square`);
+    }
+    assert.equal(alpha(size / 2, size / 2), 255, 'the middle of the disc is transparent');
+  });
+
+  test('the apple touch icon stays square, because iOS masks it itself', async () => {
+    const sharp = (await import('sharp')).default;
+    const { data } = await sharp(join(DIST, 'apple-touch-icon.png'))
+      .ensureAlpha()
+      .raw()
+      .toBuffer({ resolveWithObject: true });
+
+    // Rounding it twice leaves a circle floating on a black backdrop on iOS.
+    const corner = data[3];
+    assert.equal(corner, 255, 'the corner is transparent — iOS will show it on black');
+  });
+
+  test('the glyph is optically centred in the disc', async () => {
+    const sharp = (await import('sharp')).default;
+    const size = 256;
+    const { data, info } = await sharp(join(DIST, 'favicon.svg'))
+      .resize(size, size)
+      .ensureAlpha()
+      .raw()
+      .toBuffer({ resolveWithObject: true });
+
+    let minX = size;
+    let maxX = 0;
+    let minY = size;
+    let maxY = 0;
+
+    for (let y = 0; y < size; y++) {
+      for (let x = 0; x < size; x++) {
+        const i = (y * size + x) * info.channels;
+        if (data[i + 3] > 40 && data[i] < 128) {
+          minX = Math.min(minX, x);
+          maxX = Math.max(maxX, x);
+          minY = Math.min(minY, y);
+          maxY = Math.max(maxY, y);
+        }
+      }
+    }
+
+    const centreX = (minX + maxX) / 2;
+    const centreY = (minY + maxY) / 2;
+    assert.ok(Math.abs(centreX - size / 2) <= 3, `glyph centre x is ${centreX}`);
+    assert.ok(Math.abs(centreY - size / 2) <= 3, `glyph centre y is ${centreY}`);
+
+    // A disc crops the corners of the glyph's box, so it needs to sit smaller than in
+    // a square or it collides with the edge.
+    const fill = (maxX - minX) / size;
+    assert.ok(fill > 0.4 && fill < 0.62, `glyph fills ${(fill * 100).toFixed(0)}% of the disc`);
+  });
+});

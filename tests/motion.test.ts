@@ -330,3 +330,42 @@ describe('the hero starts invisible, not merely displaced', () => {
     assert.ok(covered, 'the hero is not forced visible under reduced motion');
   });
 });
+
+describe('reveals survive client-side navigation', () => {
+  /**
+   * The hidden state is gated on `.js`. ClientRouter replaces <html>'s attributes with
+   * the incoming document's on every swap, which drops that class — and an is:inline
+   * head script is not re-executed. The result was that reveals worked on a full page
+   * load and silently stopped after the first in-site navigation, while every page
+   * still rendered correctly.
+   */
+  test('the gate is re-applied after every swap', () => {
+    for (const route of ['/', '/sobre-mi', '/mi-trabajo']) {
+      const page = html(route);
+      assert.match(
+        page,
+        /astro:after-swap[\s\S]{0,120}classList\.add\('js'\)/,
+        `${route}: the js gate is set once and never restored`,
+      );
+    }
+  });
+
+  test('the listener is registered inline, not in a module', () => {
+    // A module script runs after the swap has already painted, so the first frame of
+    // the new page would be unstyled.
+    const page = html('/');
+    const head = page.slice(0, page.indexOf('</head>'));
+    assert.match(head, /astro:after-swap/, 'the restore happens outside the head');
+  });
+
+  test('every script that drives motion re-initialises on page-load', () => {
+    for (const file of ['reveal.ts', 'hero-reveal.ts', 'parallax.ts']) {
+      const source = readFileSync(join(ROOT, 'src/scripts', file), 'utf8');
+      assert.match(
+        source,
+        /astro:page-load/,
+        `${file} never re-runs, so it is dead after a navigation`,
+      );
+    }
+  });
+});

@@ -132,3 +132,31 @@ test.describe('skip link', () => {
     await expect(page).toHaveURL(/#main$/);
   });
 });
+
+test.describe('reveals across navigation', () => {
+  /**
+   * Shipped once: reveals worked on a full load and stopped after the first in-site
+   * navigation, because ClientRouter drops the .js class the hidden state hangs off.
+   */
+  test('the js gate survives a client-side navigation', async ({ page }) => {
+    await page.goto('/');
+    await expect(page.locator('html')).toHaveClass(/\bjs\b/);
+
+    await page.locator('[data-header] a', { hasText: 'Sobre mí' }).click();
+    await expect(page).toHaveURL('/sobre-mi');
+    await expect(page.locator('html')).toHaveClass(/\bjs\b/);
+  });
+
+  test('elements still animate in after navigating', async ({ page }) => {
+    await page.goto('/');
+    await page.locator('[data-header] a', { hasText: 'Sobre mí' }).click();
+    await expect(page).toHaveURL('/sobre-mi');
+
+    // Something below the fold must still be waiting to be revealed.
+    const pending = page.locator('[data-reveal]:not([data-revealed])');
+    await expect(pending.first()).toBeAttached();
+
+    await page.evaluate(() => window.scrollTo(0, document.body.scrollHeight));
+    await expect(page.locator('[data-reveal][data-revealed]').last()).toBeVisible();
+  });
+});
