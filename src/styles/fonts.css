@@ -1,0 +1,50 @@
+/**
+ * Font faces, declared by hand rather than by importing Fontsource's CSS.
+ *
+ * `@fontsource-variable/inter` has no per-subset entry point: importing it ships
+ * Cyrillic, Greek and Vietnamese as well — 320KB of faces against a 120KB budget, for
+ * a site that is only ever Spanish and English.
+ *
+ * Only `latin` is loaded. The spec claimed `latin-ext` was needed for ñ, á, ¿ and ¡;
+ * it is not — those all live in U+0000–00FF, inside `latin`. A character outside that
+ * range falls back to the next font in the stack rather than failing.
+ *
+ * Playfair ships 400 and 500 italic only. 600 was declared and never used, and the
+ * roman faces are never loaded at all: this design uses Playfair exclusively in italic.
+ */
+
+@font-face {
+  font-family: 'Inter Variable';
+  font-style: normal;
+  font-weight: 100 900;
+  font-display: swap;
+  src: url('../../node_modules/@fontsource-variable/inter/files/inter-latin-wght-normal.woff2')
+    format('woff2-variations');
+  unicode-range:
+    U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329,
+    U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+
+@font-face {
+  font-family: 'Playfair Display';
+  font-style: italic;
+  font-weight: 400;
+  font-display: swap;
+  src: url('../../node_modules/@fontsource/playfair-display/files/playfair-display-latin-400-italic.woff2')
+    format('woff2');
+  unicode-range:
+    U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329,
+    U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+
+@font-face {
+  font-family: 'Playfair Display';
+  font-style: italic;
+  font-weight: 500;
+  font-display: swap;
+  src: url('../../node_modules/@fontsource/playfair-display/files/playfair-display-latin-500-italic.woff2')
+    format('woff2');
+  unicode-range:
+    U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329,
+    U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}

@@ -243,6 +243,42 @@
   margin-inline: calc(var(--gutter) * -1);
 }
 
+/**
+ * Text-link underline. A 1px rule at the baseline that draws in from the left and, on
+ * mouse-out, leaves to the RIGHT — the origin flips rather than the animation
+ * rewinding, so the line reads as departing instead of un-drawing.
+ *
+ * Pointer devices only. On touch there is no hover to reveal it, and a sticky hover
+ * state after a tap looks like a stuck selection.
+ */
+@utility link-underline {
+  position: relative;
+
+  &::after {
+    content: '';
+    position: absolute;
+    inset-inline: 0;
+    bottom: -2px;
+    height: 1px;
+    background: var(--color-mustang);
+    transform: scaleX(0);
+    transform-origin: right;
+    transition: transform var(--duration-fast) var(--ease-out-quart);
+  }
+
+  @media (hover: hover) and (pointer: fine) {
+    &:hover::after {
+      transform: scaleX(1);
+      transform-origin: left;
+    }
+  }
+
+  &:focus-visible::after {
+    transform: scaleX(1);
+    transform-origin: left;
+  }
+}
+
 @utility gutter-x {
   padding-inline: var(--gutter);
 }

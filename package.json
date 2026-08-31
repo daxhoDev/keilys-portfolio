@@ -18,7 +18,9 @@
     "test:unit": "node --test tests/routes.test.ts tests/dictionary.test.ts tests/images.test.ts",
     "test:build": "node --test tests/build-output.test.ts",
     "test:browser": "playwright test",
-    "check:hero": "node scripts/check-hero-contrast.mjs"
+    "check:hero": "node scripts/check-hero-contrast.mjs",
+    "favicons": "node scripts/generate-favicons.mjs",
+    "check:budgets": "node scripts/check-budgets.mjs"
   },
   "dependencies": {
     "@astrojs/sitemap": "^3.7.3",
